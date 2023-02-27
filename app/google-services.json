@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "755483759143",
+    "project_id": "mapsgt",
+    "storage_bucket": "mapsgt.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:755483759143:android:56f82353dadc46fb747402",
+        "android_client_info": {
+          "package_name": "com.example.mapsgt"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "755483759143-v5hn3eeil3219vcr264oo8ll7bj8ta14.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mapsgt",
+            "certificate_hash": "5bdf0df4d0c293ab9943f8f735bfdb4761b752af"
+          }
+        },
+        {
+          "client_id": "755483759143-2n1q7u2n8vs1jp54bbktv6mfkdf7g8ot.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACKs8duQMxyfKs2u7XXVY8FgY0COsErMk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "755483759143-2n1q7u2n8vs1jp54bbktv6mfkdf7g8ot.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
