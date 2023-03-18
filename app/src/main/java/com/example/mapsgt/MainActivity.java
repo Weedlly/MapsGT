@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
+import com.example.mapsgt.map.MapsFragment;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -12,7 +14,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         MapsFragment mapsFragment = new MapsFragment();
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container_maps, mapsFragment)
+                .replace(R.id.main_holder_map, mapsFragment)
                 .commit();
     }
 }
