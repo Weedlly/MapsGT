@@ -29,12 +29,13 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/API_KEY" />
+            android:value="AIzaSyACKs8duQMxyfKs2u7XXVY8FgY0COsErMk" />
 
         <activity
-            android:name=".MapsActivity"
+            android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/title_activity_maps">
+            android:label="@string/title_activity_maps"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
