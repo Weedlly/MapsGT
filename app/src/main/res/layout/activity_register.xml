@@ -123,13 +123,11 @@
         android:layout_marginTop="20dp"
         android:text="@string/register" />
 
-    <Button
-        android:id="@+id/btn_login_now"
+    <TextView
+        android:id="@+id/tv_login_now"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:background="@android:color/darker_gray"
-        android:backgroundTint="@android:color/transparent"
         android:text="Already have an account? Login"
         android:textColor="@android:color/black" />
 

@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.mapsgt.MainActivity;
@@ -50,7 +51,7 @@ public class RegisterActivity extends AppCompatActivity {
     private Button btnReg;
     private ProgressBar progressBar;
 
-    private Button btnGoToLogin;
+    private TextView goToLoginTV;
 
     private FirebaseAuth mAuth;
     private MyDatabase myDatabase;
@@ -71,7 +72,7 @@ public class RegisterActivity extends AppCompatActivity {
         genderSpinner = findViewById(R.id.gender_spinner);
         btnReg = findViewById(R.id.btn_register);
         progressBar = findViewById(R.id.progressBar);
-        btnGoToLogin = findViewById(R.id.btn_login_now);
+        goToLoginTV = findViewById(R.id.tv_login_now);
 
         String[] genders = new String[]{UserGenderEnum.MALE.name(), UserGenderEnum.FEMALE.name(), UserGenderEnum.OTHER.name()};
 
@@ -95,7 +96,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        btnGoToLogin.setOnClickListener(new View.OnClickListener() {
+        goToLoginTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), LoginActivity.class);

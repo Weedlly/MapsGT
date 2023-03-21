@@ -25,6 +25,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private TextInputEditText editTextEmail;
     private TextInputEditText editTextPassword;
+    private TextView forgotPassTV;
     private Button btnLogin;
     private ProgressBar progressBar;
 
@@ -50,6 +51,7 @@ public class LoginActivity extends AppCompatActivity {
 
         editTextEmail = findViewById(R.id.edt_email);
         editTextPassword = findViewById(R.id.edt_password);
+        forgotPassTV = findViewById(R.id.tv_forgot_password);
         btnLogin = findViewById(R.id.btn_login);
         progressBar = findViewById(R.id.progressBar);
         registerLabel = findViewById(R.id.txt_register_now);
@@ -60,6 +62,15 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        forgotPassTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), ForgotPasswordActivity.class);
                 startActivity(intent);
                 finish();
             }
