@@ -16,18 +16,12 @@
         android:theme="@style/Theme.MapsGT"
         tools:targetApi="31">
         <activity
-            android:name=".ui.auth.ForgotPasswordActivity"
-            android:exported="false" />
-        <activity
             android:name=".MainActivity"
             android:exported="false"
             android:label="@string/title_activity_maps" />
+
         <activity
-            android:name=".ui.auth.RegisterActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Material3.Light.NoActionBar" />
-        <activity
-            android:name=".ui.auth.LoginActivity"
+            android:name=".ui.auth.AuthActivity"
             android:exported="true"
             android:theme="@style/Theme.Material3.Light.NoActionBar">
             <intent-filter>

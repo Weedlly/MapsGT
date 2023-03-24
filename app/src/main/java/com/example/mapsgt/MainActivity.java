@@ -2,12 +2,10 @@ package com.example.mapsgt;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.mapsgt.ui.auth.AuthActivity;
+
 import android.os.Bundle;
-
-import com.example.mapsgt.ui.auth.LoginActivity;
-
 import android.content.Intent;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -33,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         user = auth.getCurrentUser();
 
         if(user == null) {
-            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+            Intent intent = new Intent(getApplicationContext(), AuthActivity.class);
             startActivity(intent);
             finish();
         } else {
@@ -44,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                Intent intent = new Intent(getApplicationContext(), AuthActivity.class);
                 startActivity(intent);
                 finish();
             }

@@ -1,13 +1,14 @@
 package com.example.mapsgt.ui.auth;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,7 +20,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class ForgotPasswordActivity extends AppCompatActivity {
+public class ForgotPasswordFragment extends Fragment {
 
     private TextView emailEdt;
     private Button resetBtn;
@@ -28,17 +29,23 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
 
     private MyDatabase myDatabase;
+    private AuthActivity mAuthActivity;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_forgot_password);
         mAuth = FirebaseAuth.getInstance();
-        myDatabase = MyDatabase.getInstance(this);
+        myDatabase = MyDatabase.getInstance(getContext());
+        mAuthActivity = (AuthActivity) getActivity();
+    }
 
-        emailEdt = findViewById(R.id.edt_email);
-        resetBtn = findViewById(R.id.btn_reset);
-        loginNowTV = findViewById(R.id.tv_login_now);
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View mView = inflater.inflate(R.layout.fragment_forgot_password, container, false);
+        emailEdt = mView.findViewById(R.id.edt_email);
+        resetBtn = mView.findViewById(R.id.btn_reset);
+        loginNowTV = mView.findViewById(R.id.tv_login_now);
 
         resetBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,25 +57,27 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         loginNowTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivity(intent);
-                finish();
+                mAuthActivity.goToLoginEmail();
             }
         });
+        return mView;
     }
 
     private void handleSendEmail() {
         String emailAddress = emailEdt.getText().toString().trim();
+//        TODO: handle loading
 
         if (TextUtils.isEmpty(emailAddress)) {
-            Toast.makeText(ForgotPasswordActivity.this, "Enter your email", Toast.LENGTH_SHORT).show();
+            emailEdt.setError("Enter your email");
+            emailEdt.requestFocus();
             return;
         }
 
         User user = myDatabase.userDAO().getUserByEmail(emailAddress);
 
-        if(user == null) {
-            Toast.makeText(ForgotPasswordActivity.this, "Email is not exist", Toast.LENGTH_SHORT).show();
+        if (user == null) {
+            emailEdt.setError("Email is not exist");
+            emailEdt.requestFocus();
             return;
         }
 
@@ -77,9 +86,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                            startActivity(intent);
-                            finish();
+                            Toast.makeText(getContext(), "Email sent.", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

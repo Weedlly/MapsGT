@@ -3,13 +3,15 @@ package com.example.mapsgt.ui.auth;
 import static android.content.ContentValues.TAG;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -18,7 +20,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.mapsgt.MainActivity;
 import com.example.mapsgt.R;
 import com.example.mapsgt.data.entities.User;
 import com.example.mapsgt.database.MyDatabase;
@@ -36,7 +37,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterFragment extends Fragment {
 
     private TextInputEditText editFirstName;
     private TextInputEditText editLastName;
@@ -55,28 +56,34 @@ public class RegisterActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private MyDatabase myDatabase;
+    private AuthActivity mAuthActivity;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register);
+        mAuthActivity = (AuthActivity) getActivity();
+        myDatabase = MyDatabase.getInstance(getContext());
+        mAuth = FirebaseAuth.getInstance();
+    }
 
-        myDatabase = MyDatabase.getInstance(this);
-
-        editFirstName = findViewById(R.id.edt_first_name);
-        editLastName = findViewById(R.id.edt_last_name);
-        editTextEmail = findViewById(R.id.edt_email);
-        editPhoneNumber = findViewById(R.id.edt_phone);
-        editDOB = findViewById(R.id.edt_dob);
-        editTextPassword = findViewById(R.id.edt_password);
-        genderSpinner = findViewById(R.id.gender_spinner);
-        btnReg = findViewById(R.id.btn_register);
-        progressBar = findViewById(R.id.progressBar);
-        goToLoginTV = findViewById(R.id.tv_login_now);
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View mView = inflater.inflate(R.layout.fragment_register, container, false);
+        editFirstName = mView.findViewById(R.id.edt_first_name);
+        editLastName = mView.findViewById(R.id.edt_last_name);
+        editTextEmail = mView.findViewById(R.id.edt_email);
+        editPhoneNumber = mView.findViewById(R.id.edt_phone);
+        editDOB = mView.findViewById(R.id.edt_dob);
+        editTextPassword = mView.findViewById(R.id.edt_password);
+        genderSpinner = mView.findViewById(R.id.gender_spinner);
+        btnReg = mView.findViewById(R.id.btn_register);
+        progressBar = mView.findViewById(R.id.progressBar);
+        goToLoginTV = mView.findViewById(R.id.tv_login_now);
 
         String[] genders = new String[]{UserGenderEnum.MALE.name(), UserGenderEnum.FEMALE.name(), UserGenderEnum.OTHER.name()};
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
                 android.R.layout.simple_spinner_item, genders);
 
         genderSpinner.setAdapter(adapter);
@@ -94,14 +101,10 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        mAuth = FirebaseAuth.getInstance();
-
         goToLoginTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivity(intent);
-                finish();
+                mAuthActivity.goToLoginEmail();
             }
         });
 
@@ -120,6 +123,7 @@ public class RegisterActivity extends AppCompatActivity {
                 signUp();
             }
         });
+        return mView;
     }
 
     private void signUp() {
@@ -131,32 +135,41 @@ public class RegisterActivity extends AppCompatActivity {
         String password = editTextPassword.getText().toString().trim();
 
         if (TextUtils.isEmpty(firstName)) {
-            Toast.makeText(RegisterActivity.this, "Enter first name", Toast.LENGTH_SHORT).show();
+            editFirstName.setError("Enter first name");
+            editFirstName.requestFocus();
             return;
         }
 
         if (TextUtils.isEmpty(lastName)) {
-            Toast.makeText(RegisterActivity.this, "Enter last name", Toast.LENGTH_SHORT).show();
+            editLastName.setError("Enter last name");
+            editLastName.requestFocus();
             return;
         }
 
         if (TextUtils.isEmpty(dob)) {
-            Toast.makeText(RegisterActivity.this, "Select date of birth", Toast.LENGTH_SHORT).show();
+            editDOB.setError("Select date of birth");
+            editDOB.requestFocus();
             return;
         }
 
         if (TextUtils.isEmpty(email)) {
-            Toast.makeText(RegisterActivity.this, "Enter email", Toast.LENGTH_SHORT).show();
+            //TODO: check email valid
+            editTextEmail.setError("Enter email");
+            editTextEmail.requestFocus();
             return;
         }
 
         if (TextUtils.isEmpty(phoneNo)) {
-            Toast.makeText(RegisterActivity.this, "Enter phone number", Toast.LENGTH_SHORT).show();
+//            TODO: validate phone is existed
+            editPhoneNumber.setError("Enter phone number");
+            editPhoneNumber.requestFocus();
             return;
         }
 
         if (TextUtils.isEmpty(password)) {
-            Toast.makeText(RegisterActivity.this, "Enter password", Toast.LENGTH_SHORT).show();
+//            TODO: validate the length of password
+            editTextPassword.setError("Enter password");
+            editTextPassword.requestFocus();
             return;
         }
 
@@ -174,14 +187,11 @@ public class RegisterActivity extends AppCompatActivity {
                             User user = new User(authUser.getUid(), authUser.getEmail(), phoneNo, firstName, lastName, convertStringToDate(dob), gender);
                             myDatabase.userDAO().insertUser(user);
 
-                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                            startActivity(intent);
-                            finish();
+                            mAuthActivity.goToMainActivity();
                         } else {
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(RegisterActivity.this, task.getException().getMessage(),
+                            Toast.makeText(getContext(), task.getException().getMessage(),
                                     Toast.LENGTH_SHORT).show();
-
                         }
                     }
                 });
@@ -200,7 +210,7 @@ public class RegisterActivity extends AppCompatActivity {
                 editDOB.setText(date);
             }
         });
-        materialDatePicker.show(getSupportFragmentManager(), "tag");
+        materialDatePicker.show(getActivity().getSupportFragmentManager(), "tag");
     }
 
     private Date convertStringToDate(String dateStr) {
