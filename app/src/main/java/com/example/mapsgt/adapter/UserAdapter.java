@@ -33,16 +33,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public void onBindViewHolder(@NonNull UserViewHolder userViewHolder, int i) {
         User user = mListUser.get(i);
 
-        if(user == null)
+        if (user == null)
             return;
 
-        userViewHolder.tvUsername.setText(user.getUsername());
         userViewHolder.tvFirstName.setText(user.getFirstName());
     }
 
     @Override
     public int getItemCount() {
-        if(mListUser != null) {
+        if (mListUser != null) {
             return mListUser.size();
         }
         return 0;
