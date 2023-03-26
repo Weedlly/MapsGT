@@ -15,8 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_weight="1"
-        tools:src="@drawable/logo_app_name"
-        android:contentDescription="@string/app_name" />
+        android:src="@drawable/logo_app_name" />
 
     <Button
         android:id="@+id/btn_sign_in_google"
