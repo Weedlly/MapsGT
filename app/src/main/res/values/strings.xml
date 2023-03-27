@@ -18,4 +18,18 @@
     <string name="click_to_login">Click to login</string>
     <string name="click_to_register">You don\'t have an account? \n Go to register</string>
     <string name="forgot_password">Forgot password?</string>
+
+    <string name="nav_home">Home</string>
+    <string name="nav_favorite">Favorite</string>
+    <string name="nav_history">History</string>
+    <string name="nav_account">Account</string>
+    <string name="nav_my_profile">My Profile</string>
+    <string name="nav_add_friend">Add Friend</string>
+    <string name="nav_security">Security</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+
+
 </resources>
