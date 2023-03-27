@@ -1,49 +1,50 @@
 package com.example.mapsgt.network.model.location;
 
-import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
-public class Maneuver{
+import java.util.List;
 
-	@SerializedName("instruction")
-	private String instruction;
+public class Maneuver {
 
-	@SerializedName("modifier")
-	private String modifier;
+    @SerializedName("instruction")
+    private String instruction;
 
-	@SerializedName("bearing_after")
-	private int bearingAfter;
+    @SerializedName("modifier")
+    private String modifier;
 
-	@SerializedName("bearing_before")
-	private int bearingBefore;
+    @SerializedName("bearing_after")
+    private int bearingAfter;
 
-	@SerializedName("location")
-	private List<Object> location;
+    @SerializedName("bearing_before")
+    private int bearingBefore;
 
-	@SerializedName("type")
-	private String type;
+    @SerializedName("location")
+    private List<Object> location;
 
-	public String getInstruction(){
-		return instruction;
-	}
+    @SerializedName("type")
+    private String type;
 
-	public String getModifier(){
-		return modifier;
-	}
+    public String getInstruction() {
+        return instruction;
+    }
 
-	public int getBearingAfter(){
-		return bearingAfter;
-	}
+    public String getModifier() {
+        return modifier;
+    }
 
-	public int getBearingBefore(){
-		return bearingBefore;
-	}
+    public int getBearingAfter() {
+        return bearingAfter;
+    }
 
-	public List<Object> getLocation(){
-		return location;
-	}
+    public int getBearingBefore() {
+        return bearingBefore;
+    }
 
-	public String getType(){
-		return type;
-	}
+    public List<Object> getLocation() {
+        return location;
+    }
+
+    public String getType() {
+        return type;
+    }
 }

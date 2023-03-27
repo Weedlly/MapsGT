@@ -1,49 +1,50 @@
 package com.example.mapsgt.network.model.location;
 
-import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
-public class RoutesItem{
+import java.util.List;
 
-	@SerializedName("duration")
-	private Object duration;
+public class RoutesItem {
 
-	@SerializedName("distance")
-	private Object distance;
+    @SerializedName("duration")
+    private Double duration;
 
-	@SerializedName("legs")
-	private List<LegsItem> legs;
+    @SerializedName("distance")
+    private Double distance;
 
-	@SerializedName("weight_name")
-	private String weightName;
+    @SerializedName("legs")
+    private List<LegsItem> legs;
 
-	@SerializedName("weight")
-	private Object weight;
+    @SerializedName("weight_name")
+    private String weightName;
 
-	@SerializedName("geometry")
-	private Geometry geometry;
+    @SerializedName("weight")
+    private Object weight;
 
-	public Object getDuration(){
-		return duration;
-	}
+    @SerializedName("geometry")
+    private Geometry geometry;
 
-	public Object getDistance(){
-		return distance;
-	}
+    public Double getDuration() {
+        return duration;
+    }
 
-	public List<LegsItem> getLegs(){
-		return legs;
-	}
+    public Double getDistance() {
+        return distance;
+    }
 
-	public String getWeightName(){
-		return weightName;
-	}
+    public List<LegsItem> getLegs() {
+        return legs;
+    }
 
-	public Object getWeight(){
-		return weight;
-	}
+    public String getWeightName() {
+        return weightName;
+    }
 
-	public Geometry getGeometry(){
-		return geometry;
-	}
+    public Object getWeight() {
+        return weight;
+    }
+
+    public Geometry getGeometry() {
+        return geometry;
+    }
 }

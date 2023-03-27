@@ -1,7 +1,6 @@
 package com.example.mapsgt.network;
 
 
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -11,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitClient {
 
     private static RetrofitClient instance = null;
-    private Api myApi;
+    private final Api myApi;
 
     private RetrofitClient() {
         Gson gson = new GsonBuilder()

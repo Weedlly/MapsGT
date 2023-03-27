@@ -2,24 +2,24 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="10dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="10dp">
 
     <TextView
         android:id="@+id/tv_username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/app_name"
-        android:textSize="16sp"
-        android:textColor="@android:color/black"/>
+        android:textColor="@android:color/black"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/tv_first_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/app_name"
         android:layout_marginTop="3dp"
-        android:textSize="14sp"
-        android:textColor="@android:color/darker_gray"/>
+        android:text="@string/app_name"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="14sp" />
 
 </LinearLayout>

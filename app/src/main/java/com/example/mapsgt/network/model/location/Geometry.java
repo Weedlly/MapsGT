@@ -1,21 +1,22 @@
 package com.example.mapsgt.network.model.location;
 
-import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
-public class Geometry{
+import java.util.List;
 
-	@SerializedName("coordinates")
-	private List<List<Double>> coordinates;
+public class Geometry {
 
-	@SerializedName("type")
-	private String type;
+    @SerializedName("coordinates")
+    private List<List<Double>> coordinates;
 
-	public List<List<Double>> getCoordinates(){
-		return coordinates;
-	}
+    @SerializedName("type")
+    private String type;
 
-	public String getType(){
-		return type;
-	}
+    public List<List<Double>> getCoordinates() {
+        return coordinates;
+    }
+
+    public String getType() {
+        return type;
+    }
 }

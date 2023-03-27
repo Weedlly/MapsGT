@@ -1,6 +1,6 @@
 package com.example.mapsgt.enumeration;
 
-public enum MovingStyle {
+public enum MovingStyleEnum {
     walking,
     traffic,
     driving,

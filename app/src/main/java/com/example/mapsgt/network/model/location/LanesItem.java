@@ -1,35 +1,36 @@
 package com.example.mapsgt.network.model.location;
 
-import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
-public class LanesItem{
+import java.util.List;
 
-	@SerializedName("valid")
-	private boolean valid;
+public class LanesItem {
 
-	@SerializedName("indications")
-	private List<String> indications;
+    @SerializedName("valid")
+    private boolean valid;
 
-	@SerializedName("valid_indication")
-	private String validIndication;
+    @SerializedName("indications")
+    private List<String> indications;
 
-	@SerializedName("active")
-	private boolean active;
+    @SerializedName("valid_indication")
+    private String validIndication;
 
-	public boolean isValid(){
-		return valid;
-	}
+    @SerializedName("active")
+    private boolean active;
 
-	public List<String> getIndications(){
-		return indications;
-	}
+    public boolean isValid() {
+        return valid;
+    }
 
-	public String getValidIndication(){
-		return validIndication;
-	}
+    public List<String> getIndications() {
+        return indications;
+    }
 
-	public boolean isActive(){
-		return active;
-	}
+    public String getValidIndication() {
+        return validIndication;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
 }

@@ -1,56 +1,57 @@
 package com.example.mapsgt.network.model.location;
 
-import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
-public class LegsItem{
+import java.util.List;
 
-	@SerializedName("duration")
-	private Object duration;
+public class LegsItem {
 
-	@SerializedName("summary")
-	private String summary;
+    @SerializedName("duration")
+    private Object duration;
 
-	@SerializedName("distance")
-	private Object distance;
+    @SerializedName("summary")
+    private String summary;
 
-	@SerializedName("weight")
-	private Object weight;
+    @SerializedName("distance")
+    private Object distance;
 
-	@SerializedName("via_waypoints")
-	private List<Object> viaWaypoints;
+    @SerializedName("weight")
+    private Object weight;
 
-	@SerializedName("steps")
-	private List<StepsItem> steps;
+    @SerializedName("via_waypoints")
+    private List<Object> viaWaypoints;
 
-	@SerializedName("admins")
-	private List<AdminsItem> admins;
+    @SerializedName("steps")
+    private List<StepsItem> steps;
 
-	public Object getDuration(){
-		return duration;
-	}
+    @SerializedName("admins")
+    private List<AdminsItem> admins;
 
-	public String getSummary(){
-		return summary;
-	}
+    public Object getDuration() {
+        return duration;
+    }
 
-	public Object getDistance(){
-		return distance;
-	}
+    public String getSummary() {
+        return summary;
+    }
 
-	public Object getWeight(){
-		return weight;
-	}
+    public Object getDistance() {
+        return distance;
+    }
 
-	public List<Object> getViaWaypoints(){
-		return viaWaypoints;
-	}
+    public Object getWeight() {
+        return weight;
+    }
 
-	public List<StepsItem> getSteps(){
-		return steps;
-	}
+    public List<Object> getViaWaypoints() {
+        return viaWaypoints;
+    }
 
-	public List<AdminsItem> getAdmins(){
-		return admins;
-	}
+    public List<StepsItem> getSteps() {
+        return steps;
+    }
+
+    public List<AdminsItem> getAdmins() {
+        return admins;
+    }
 }

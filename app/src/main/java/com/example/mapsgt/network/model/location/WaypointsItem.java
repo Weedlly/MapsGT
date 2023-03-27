@@ -1,28 +1,29 @@
 package com.example.mapsgt.network.model.location;
 
-import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
-public class WaypointsItem{
+import java.util.List;
 
-	@SerializedName("distance")
-	private Object distance;
+public class WaypointsItem {
 
-	@SerializedName("name")
-	private String name;
+    @SerializedName("distance")
+    private Object distance;
 
-	@SerializedName("location")
-	private List<Object> location;
+    @SerializedName("name")
+    private String name;
 
-	public Object getDistance(){
-		return distance;
-	}
+    @SerializedName("location")
+    private List<Object> location;
 
-	public String getName(){
-		return name;
-	}
+    public Object getDistance() {
+        return distance;
+    }
 
-	public List<Object> getLocation(){
-		return location;
-	}
+    public String getName() {
+        return name;
+    }
+
+    public List<Object> getLocation() {
+        return location;
+    }
 }

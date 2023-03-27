@@ -1,35 +1,36 @@
 package com.example.mapsgt.network.model.location;
 
-import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
-	public class LocationResponse {
+import java.util.List;
 
-	@SerializedName("routes")
-	private List<RoutesItem> routes;
+public class LocationResponse {
 
-	@SerializedName("code")
-	private String code;
+    @SerializedName("routes")
+    private List<RoutesItem> routes;
 
-	@SerializedName("waypoints")
-	private List<WaypointsItem> waypoints;
+    @SerializedName("code")
+    private String code;
 
-	@SerializedName("uuid")
-	private String uuid;
+    @SerializedName("waypoints")
+    private List<WaypointsItem> waypoints;
 
-	public List<RoutesItem> getRoutes(){
-		return routes;
-	}
+    @SerializedName("uuid")
+    private String uuid;
 
-	public String getCode(){
-		return code;
-	}
+    public List<RoutesItem> getRoutes() {
+        return routes;
+    }
 
-	public List<WaypointsItem> getWaypoints(){
-		return waypoints;
-	}
+    public String getCode() {
+        return code;
+    }
 
-	public String getUuid(){
-		return uuid;
-	}
+    public List<WaypointsItem> getWaypoints() {
+        return waypoints;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
 }

@@ -1,91 +1,92 @@
 package com.example.mapsgt.network.model.location;
 
-import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
-public class StepsItem{
+import java.util.List;
 
-	@SerializedName("duration")
-	private Object duration;
+public class StepsItem {
 
-	@SerializedName("mode")
-	private String mode;
+    @SerializedName("duration")
+    private Object duration;
 
-	@SerializedName("distance")
-	private Object distance;
+    @SerializedName("mode")
+    private String mode;
 
-	@SerializedName("name")
-	private String name;
+    @SerializedName("distance")
+    private Object distance;
 
-	@SerializedName("weight")
-	private Object weight;
+    @SerializedName("name")
+    private String name;
 
-	@SerializedName("geometry")
-	private Geometry geometry;
+    @SerializedName("weight")
+    private Object weight;
 
-	@SerializedName("driving_side")
-	private String drivingSide;
+    @SerializedName("geometry")
+    private Geometry geometry;
 
-	@SerializedName("intersections")
-	private List<IntersectionsItem> intersections;
+    @SerializedName("driving_side")
+    private String drivingSide;
 
-	@SerializedName("maneuver")
-	private Maneuver maneuver;
+    @SerializedName("intersections")
+    private List<IntersectionsItem> intersections;
 
-	@SerializedName("exits")
-	private String exits;
+    @SerializedName("maneuver")
+    private Maneuver maneuver;
 
-	@SerializedName("destinations")
-	private String destinations;
+    @SerializedName("exits")
+    private String exits;
 
-	@SerializedName("ref")
-	private String ref;
+    @SerializedName("destinations")
+    private String destinations;
 
-	public Object getDuration(){
-		return duration;
-	}
+    @SerializedName("ref")
+    private String ref;
 
-	public String getMode(){
-		return mode;
-	}
+    public Object getDuration() {
+        return duration;
+    }
 
-	public Object getDistance(){
-		return distance;
-	}
+    public String getMode() {
+        return mode;
+    }
 
-	public String getName(){
-		return name;
-	}
+    public Object getDistance() {
+        return distance;
+    }
 
-	public Object getWeight(){
-		return weight;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public Geometry getGeometry(){
-		return geometry;
-	}
+    public Object getWeight() {
+        return weight;
+    }
 
-	public String getDrivingSide(){
-		return drivingSide;
-	}
+    public Geometry getGeometry() {
+        return geometry;
+    }
 
-	public List<IntersectionsItem> getIntersections(){
-		return intersections;
-	}
+    public String getDrivingSide() {
+        return drivingSide;
+    }
 
-	public Maneuver getManeuver(){
-		return maneuver;
-	}
+    public List<IntersectionsItem> getIntersections() {
+        return intersections;
+    }
 
-	public String getExits(){
-		return exits;
-	}
+    public Maneuver getManeuver() {
+        return maneuver;
+    }
 
-	public String getDestinations(){
-		return destinations;
-	}
+    public String getExits() {
+        return exits;
+    }
 
-	public String getRef(){
-		return ref;
-	}
+    public String getDestinations() {
+        return destinations;
+    }
+
+    public String getRef() {
+        return ref;
+    }
 }

@@ -1,133 +1,134 @@
 package com.example.mapsgt.network.model.location;
 
-import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
-public class IntersectionsItem{
+import java.util.List;
 
-	@SerializedName("entry")
-	private List<Boolean> entry;
+public class IntersectionsItem {
 
-	@SerializedName("bearings")
-	private List<Integer> bearings;
+    @SerializedName("entry")
+    private List<Boolean> entry;
 
-	@SerializedName("is_urban")
-	private boolean isUrban;
+    @SerializedName("bearings")
+    private List<Integer> bearings;
 
-	@SerializedName("admin_index")
-	private int adminIndex;
+    @SerializedName("is_urban")
+    private boolean isUrban;
 
-	@SerializedName("geometry_index")
-	private int geometryIndex;
+    @SerializedName("admin_index")
+    private int adminIndex;
 
-	@SerializedName("location")
-	private List<Object> location;
+    @SerializedName("geometry_index")
+    private int geometryIndex;
 
-	@SerializedName("mapbox_streets_v8")
-	private MapboxStreetsV8 mapboxStreetsV8;
+    @SerializedName("location")
+    private List<Object> location;
 
-	@SerializedName("out")
-	private int out;
+    @SerializedName("mapbox_streets_v8")
+    private MapboxStreetsV8 mapboxStreetsV8;
 
-	@SerializedName("in")
-	private int in;
+    @SerializedName("out")
+    private int out;
 
-	@SerializedName("turn_weight")
-	private int turnWeight;
+    @SerializedName("in")
+    private int in;
 
-	@SerializedName("turn_duration")
-	private Object turnDuration;
+    @SerializedName("turn_weight")
+    private int turnWeight;
 
-	@SerializedName("weight")
-	private Object weight;
+    @SerializedName("turn_duration")
+    private Object turnDuration;
 
-	@SerializedName("duration")
-	private Object duration;
+    @SerializedName("weight")
+    private Object weight;
 
-	@SerializedName("lanes")
-	private List<LanesItem> lanes;
+    @SerializedName("duration")
+    private Object duration;
 
-	@SerializedName("classes")
-	private List<String> classes;
+    @SerializedName("lanes")
+    private List<LanesItem> lanes;
 
-	@SerializedName("toll_collection")
-	private TollCollection tollCollection;
+    @SerializedName("classes")
+    private List<String> classes;
 
-	@SerializedName("traffic_signal")
-	private boolean trafficSignal;
+    @SerializedName("toll_collection")
+    private TollCollection tollCollection;
 
-	@SerializedName("yield_sign")
-	private boolean yieldSign;
+    @SerializedName("traffic_signal")
+    private boolean trafficSignal;
 
-	public List<Boolean> getEntry(){
-		return entry;
-	}
+    @SerializedName("yield_sign")
+    private boolean yieldSign;
 
-	public List<Integer> getBearings(){
-		return bearings;
-	}
+    public List<Boolean> getEntry() {
+        return entry;
+    }
 
-	public boolean isIsUrban(){
-		return isUrban;
-	}
+    public List<Integer> getBearings() {
+        return bearings;
+    }
 
-	public int getAdminIndex(){
-		return adminIndex;
-	}
+    public boolean isIsUrban() {
+        return isUrban;
+    }
 
-	public int getGeometryIndex(){
-		return geometryIndex;
-	}
+    public int getAdminIndex() {
+        return adminIndex;
+    }
 
-	public List<Object> getLocation(){
-		return location;
-	}
+    public int getGeometryIndex() {
+        return geometryIndex;
+    }
 
-	public MapboxStreetsV8 getMapboxStreetsV8(){
-		return mapboxStreetsV8;
-	}
+    public List<Object> getLocation() {
+        return location;
+    }
 
-	public int getOut(){
-		return out;
-	}
+    public MapboxStreetsV8 getMapboxStreetsV8() {
+        return mapboxStreetsV8;
+    }
 
-	public int getIn(){
-		return in;
-	}
+    public int getOut() {
+        return out;
+    }
 
-	public int getTurnWeight(){
-		return turnWeight;
-	}
+    public int getIn() {
+        return in;
+    }
 
-	public Object getTurnDuration(){
-		return turnDuration;
-	}
+    public int getTurnWeight() {
+        return turnWeight;
+    }
 
-	public Object getWeight(){
-		return weight;
-	}
+    public Object getTurnDuration() {
+        return turnDuration;
+    }
 
-	public Object getDuration(){
-		return duration;
-	}
+    public Object getWeight() {
+        return weight;
+    }
 
-	public List<LanesItem> getLanes(){
-		return lanes;
-	}
+    public Object getDuration() {
+        return duration;
+    }
 
-	public List<String> getClasses(){
-		return classes;
-	}
+    public List<LanesItem> getLanes() {
+        return lanes;
+    }
 
-	public TollCollection getTollCollection(){
-		return tollCollection;
-	}
+    public List<String> getClasses() {
+        return classes;
+    }
 
-	public boolean isTrafficSignal(){
-		return trafficSignal;
-	}
+    public TollCollection getTollCollection() {
+        return tollCollection;
+    }
 
-	public boolean isYieldSign(){
-		return yieldSign;
-	}
+    public boolean isTrafficSignal() {
+        return trafficSignal;
+    }
+
+    public boolean isYieldSign() {
+        return yieldSign;
+    }
 }
