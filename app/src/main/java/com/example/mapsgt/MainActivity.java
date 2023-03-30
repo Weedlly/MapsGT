@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -14,17 +15,22 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.mapsgt.fragment.FavoriteFragment;
+import com.example.mapsgt.fragment.HistoryFragment;
 import com.example.mapsgt.ui.auth.AuthActivity;
+import com.example.mapsgt.ui.base.BaseActivity;
 import com.example.mapsgt.ui.map.MapsFragment;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final int FRAGMENT_HOME = 0;
     private static final int FRAGMENT_FAVORITE = 1;
     private static final int FRAGMENT_HISTORY = 2;
+
+    private static final int LOGOUT = 7;
 
     private int mCurrentFragment = FRAGMENT_HOME;
     private DrawerLayout mDrawerLayout;
@@ -42,10 +48,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivity(intent);
             finish();
         }
-        MapsFragment mapsFragment = new MapsFragment();
-        replaceFragment(mapsFragment);
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        //ImageButton btn_navigation = findViewById(R.id.btn_navigation);
+        Toolbar toolbar = findViewById(R.id.top_app_bar);
         setSupportActionBar(toolbar);
 
         mDrawerLayout = findViewById(R.id.drawer_layout);
@@ -57,7 +61,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        replaceFragment(new MapsFragment());
+        MapsFragment mapsFragment = new MapsFragment();
+        replaceFragment(getLayoutResource(),mapsFragment);
         navigationView.getMenu().findItem(R.id.nav_home).setChecked(true);
     }
 
@@ -66,18 +71,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
         if (id == R.id.nav_home){
             if (mCurrentFragment != FRAGMENT_HOME){
-                replaceFragment(new MapsFragment());
+                MapsFragment mapsFragment = new MapsFragment();
+                replaceFragment(getLayoutResource(),mapsFragment);
                 mCurrentFragment = FRAGMENT_HOME;
             }
         } else if (id == R.id.nav_favorite){
             if (mCurrentFragment != FRAGMENT_FAVORITE){
-                replaceFragment(new MapsFragment());
+                FavoriteFragment favoriteFragment = new FavoriteFragment();
+                replaceFragment(getLayoutResource(), favoriteFragment);
                 mCurrentFragment = FRAGMENT_FAVORITE;
             }
         } else if (id == R.id.nav_history){
             if (mCurrentFragment != FRAGMENT_HISTORY){
-                replaceFragment(new MapsFragment());
+                HistoryFragment historyFragment = new HistoryFragment();
+                replaceFragment(getLayoutResource(), historyFragment);
                 mCurrentFragment = FRAGMENT_HISTORY;
+            }
+        } else if (id == R.id.nav_logout){
+            if (mCurrentFragment != LOGOUT){
+                auth.signOut();
+                startActivity(AuthActivity.class);
+                finish();
             }
         }
         mDrawerLayout.closeDrawer(GravityCompat.START);
@@ -92,13 +106,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             super.onBackPressed();
         }
     }
-
-    private void replaceFragment(Fragment fragment){
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.main_holder_map, fragment);
-        transaction.commit();
-    }
-
-    public void gotoNavigation(View view) {
+    @Override
+    public int getLayoutResource() {
+        return R.id.main_holder;
     }
 }
