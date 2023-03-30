@@ -3,6 +3,7 @@ package com.example.mapsgt;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -96,5 +97,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.main_holder_map, fragment);
         transaction.commit();
+    }
+
+    public void gotoNavigation(View view) {
     }
 }
