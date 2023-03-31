@@ -23,12 +23,23 @@
         android:layout_centerInParent="true"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:textAlignment="center"
         android:background="@drawable/background_icon"
+        android:textAlignment="center"
         app:closeIcon="@drawable/ic_close"
         app:iconifiedByDefault="true"
         app:queryBackground="@null"
         app:queryHint="Tìm kiếm địa điểm"
         app:searchIcon="@drawable/ic_search"
         app:submitBackground="@null" />
+
+    <ImageButton
+        android:id="@+id/my_location_button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="108dp"
+        android:background="@drawable/background_icon"
+        android:src="@drawable/ic_my_location" />
 </RelativeLayout>
