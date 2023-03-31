@@ -1,4 +1,4 @@
-package com.example.mapsgt.fragment;
+package com.example.mapsgt.ui.navigation;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,10 +11,10 @@ import androidx.fragment.app.Fragment;
 
 import com.example.mapsgt.R;
 
-public class HistoryFragment extends Fragment {
+public class FavoriteFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_history, container, false);
+        return inflater.inflate(R.layout.fragment_favorite, container, false);
     }
 }

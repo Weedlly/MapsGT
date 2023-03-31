@@ -1,25 +1,19 @@
 package com.example.mapsgt;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
-import com.example.mapsgt.fragment.FavoriteFragment;
-import com.example.mapsgt.fragment.HistoryFragment;
+import com.example.mapsgt.ui.navigation.FavoriteFragment;
+import com.example.mapsgt.ui.navigation.HistoryFragment;
+import com.example.mapsgt.ui.navigation.HomeFragment;
 import com.example.mapsgt.ui.auth.AuthActivity;
 import com.example.mapsgt.ui.base.BaseActivity;
-import com.example.mapsgt.ui.map.MapsFragment;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -38,16 +32,20 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private FirebaseUser user;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        user = auth.getCurrentUser();
+        if(user == null) {
+            startActivity(AuthActivity.class);
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         auth = FirebaseAuth.getInstance();
-        user = auth.getCurrentUser();
-        if(user == null) {
-            Intent intent = new Intent(getApplicationContext(), AuthActivity.class);
-            startActivity(intent);
-            finish();
-        }
+
         //ImageButton btn_navigation = findViewById(R.id.btn_navigation);
         Toolbar toolbar = findViewById(R.id.top_app_bar);
         setSupportActionBar(toolbar);
@@ -61,8 +59,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         NavigationView navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        MapsFragment mapsFragment = new MapsFragment();
-        replaceFragment(getLayoutResource(),mapsFragment);
+        HomeFragment homeFragment = new HomeFragment();
+        replaceFragment(getLayoutResource(),homeFragment);
         navigationView.getMenu().findItem(R.id.nav_home).setChecked(true);
     }
 
@@ -71,8 +69,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         int id = item.getItemId();
         if (id == R.id.nav_home){
             if (mCurrentFragment != FRAGMENT_HOME){
-                MapsFragment mapsFragment = new MapsFragment();
-                replaceFragment(getLayoutResource(),mapsFragment);
+                HomeFragment homeFragment = new HomeFragment();
+                replaceFragment(getLayoutResource(),homeFragment);
                 mCurrentFragment = FRAGMENT_HOME;
             }
         } else if (id == R.id.nav_favorite){
