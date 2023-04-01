@@ -11,8 +11,7 @@
     <FrameLayout
         android:id="@+id/map_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-    </FrameLayout>
+        android:layout_height="match_parent" />
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/sv_position"
@@ -41,5 +40,18 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="108dp"
         android:background="@drawable/background_icon"
-        android:src="@drawable/ic_my_location" />
+        android:src="@drawable/ic_my_location"
+        android:contentDescription="@string/search_position" />
+
+    <ImageButton
+        android:id="@+id/btn_chat"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_above="@id/my_location_button"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/background_icon"
+        android:src="@drawable/ic_chat"
+        android:contentDescription="@string/chat"/>
 </RelativeLayout>
