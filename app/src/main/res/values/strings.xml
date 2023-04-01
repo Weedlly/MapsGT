@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">MapsGT</string>
     <string name="title_activity_maps">MapsActivity</string>
-    <string name="API_KEY">AIzaSyCo3yxkR1zXKi4nFel0ukpVJOiKHFx7UFw</string>
+    <string name="API_KEY">AIzaSyACKs8duQMxyfKs2u7XXVY8FgY0COsErMk</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
@@ -18,6 +18,4 @@
     <string name="click_to_login">Click to login</string>
     <string name="click_to_register">You don\'t have an account? \n Go to register</string>
     <string name="forgot_password">Forgot password?</string>
-    <string name="search_hint" />
-    <string name="action_search">Search friends</string>
 </resources>
