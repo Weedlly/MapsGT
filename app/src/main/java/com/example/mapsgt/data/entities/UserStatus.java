@@ -3,23 +3,26 @@ package com.example.mapsgt.data.entities;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import com.example.mapsgt.enumeration.UserStatusEnum;
 
 import java.util.Date;
 
-@Entity(tableName = "user_status", foreignKeys = {
-        @ForeignKey(entity = User.class,
-                parentColumns = "user_id",
-                childColumns = "user_id")
-})
+@Entity(tableName = "user_status",
+        foreignKeys = {
+                @ForeignKey(entity = User.class,
+                        parentColumns = "user_id",
+                        childColumns = "user_id")},
+        indices = {@Index(value = "user_id")}
+)
 public class UserStatus {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "user_status_id")
     private int id;
     @ColumnInfo(name = "user_id")
-    private int userId;
+    private String userId;
     @ColumnInfo(name = "status_content")
     private String statusContent;
     @ColumnInfo(name = "status_type")
@@ -29,7 +32,7 @@ public class UserStatus {
     @ColumnInfo(name = "created_at")
     private Date createdAt;
 
-    public UserStatus(int userId, String statusContent, UserStatusEnum statusType, int pin, Date timeout, Date createdAt) {
+    public UserStatus(String userId, String statusContent, UserStatusEnum statusType, int pin, Date timeout, Date createdAt) {
         this.userId = userId;
         this.statusContent = statusContent;
         this.statusType = statusType;
@@ -46,11 +49,11 @@ public class UserStatus {
         this.id = id;
     }
 
-    public int getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

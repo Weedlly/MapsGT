@@ -12,7 +12,7 @@ public class Post {
     @ColumnInfo(name = "post_id")
     private int id;
     @ColumnInfo(name = "user_creator_id")
-    private int userCreatorId;
+    private String userCreatorId;
     @ColumnInfo(name = "location_id")
     private int locationId;
     private String caption;
@@ -20,7 +20,7 @@ public class Post {
     @ColumnInfo(name = "created_at")
     private Date createdAt;
 
-    public Post(int userCreatorId, int locationId, String caption, String image, Date createdAt) {
+    public Post(String userCreatorId, int locationId, String caption, String image, Date createdAt) {
         this.userCreatorId = userCreatorId;
         this.locationId = locationId;
         this.caption = caption;
@@ -36,11 +36,11 @@ public class Post {
         this.id = id;
     }
 
-    public int getUserCreatorId() {
+    public String getUserCreatorId() {
         return userCreatorId;
     }
 
-    public void setUserCreatorId(int userCreatorId) {
+    public void setUserCreatorId(String userCreatorId) {
         this.userCreatorId = userCreatorId;
     }
 

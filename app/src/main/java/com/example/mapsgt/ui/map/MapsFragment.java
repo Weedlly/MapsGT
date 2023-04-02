@@ -1,4 +1,4 @@
-package com.example.mapsgt.map;
+package com.example.mapsgt.ui.map;
 
 import android.Manifest;
 import android.content.Context;

@@ -1,41 +1,70 @@
 {
   "project_info": {
-    "project_number": "755483759143",
-    "project_id": "mapsgt",
-    "storage_bucket": "mapsgt.appspot.com"
+    "project_number": "135615372754",
+    "project_id": "mapsgt-6ea1e",
+    "storage_bucket": "mapsgt-6ea1e.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:755483759143:android:56f82353dadc46fb747402",
+        "mobilesdk_app_id": "1:135615372754:android:b948f28c74571c66933c0b",
         "android_client_info": {
           "package_name": "com.example.mapsgt"
         }
       },
       "oauth_client": [
         {
-          "client_id": "755483759143-v5hn3eeil3219vcr264oo8ll7bj8ta14.apps.googleusercontent.com",
+          "client_id": "135615372754-p9lnjqmk9ei9bpuq5aung6agho3bfrvl.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.mapsgt",
-            "certificate_hash": "5bdf0df4d0c293ab9943f8f735bfdb4761b752af"
+            "certificate_hash": "a00689e7b77f74609bfe8326407b8559d279bf49"
           }
         },
         {
-          "client_id": "755483759143-2n1q7u2n8vs1jp54bbktv6mfkdf7g8ot.apps.googleusercontent.com",
+          "client_id": "135615372754-k95fmaklrmur4023gtd6hn79e2cleeib.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyACKs8duQMxyfKs2u7XXVY8FgY0COsErMk"
+          "current_key": "AIzaSyCgpqpZwPQ0nHj43sIPpLlDizdtK7RJmPQ"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "755483759143-2n1q7u2n8vs1jp54bbktv6mfkdf7g8ot.apps.googleusercontent.com",
+              "client_id": "135615372754-k95fmaklrmur4023gtd6hn79e2cleeib.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:135615372754:android:a48c131d18d02c78933c0b",
+        "android_client_info": {
+          "package_name": "com.mapsgt"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "135615372754-k95fmaklrmur4023gtd6hn79e2cleeib.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgpqpZwPQ0nHj43sIPpLlDizdtK7RJmPQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "135615372754-k95fmaklrmur4023gtd6hn79e2cleeib.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

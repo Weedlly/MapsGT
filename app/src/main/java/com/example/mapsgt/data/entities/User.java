@@ -3,6 +3,7 @@ package com.example.mapsgt.data.entities;
 import android.text.TextUtils;
 import android.util.Patterns;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Index;
@@ -12,16 +13,14 @@ import com.example.mapsgt.enumeration.UserGenderEnum;
 
 import java.util.Date;
 
-@Entity(tableName = "user", indices = {@Index(value = {"email", "username"},
-        unique = true)})
+@Entity(tableName = "user", indices = {@Index(value = {"email", "phone"}, unique = true)})
 public class User {
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
+    @NonNull
     @ColumnInfo(name = "user_id")
-    private int id;
-    private String username;
+    private String id;
     private String email;
     private String phone;
-    private String password;
     @ColumnInfo(name = "first_name")
     private String firstName;
     @ColumnInfo(name = "last_name")
@@ -34,23 +33,21 @@ public class User {
     @ColumnInfo(name = "last_known_location_id")
     private int lastKnownLocationId;
 
-    public User(String username, String email, String phone, String password, String firstName, String lastName, Date dateOfBirth, String profilePicture, UserGenderEnum gender) {
-        this.username = username;
+    public User(String id, String email, String phone, String firstName, String lastName, Date dateOfBirth, UserGenderEnum gender) {
+        this.id = id;
         this.email = email;
         this.phone = phone;
-        this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
-        this.profilePicture = profilePicture;
         this.gender = gender;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -60,14 +57,6 @@ public class User {
 
     public int getLastKnownLocationId() {
         return lastKnownLocationId;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getEmail() {
@@ -84,14 +73,6 @@ public class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getFirstName() {
@@ -142,10 +123,8 @@ public class User {
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
-                ", password='" + password + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", dateOfBirth=" + dateOfBirth +

@@ -3,26 +3,29 @@ package com.example.mapsgt.data.entities;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import java.util.Date;
 
-@Entity(tableName = "message", foreignKeys = {
-        @ForeignKey(entity = User.class,
-                parentColumns = "user_id",
-                childColumns = "sender_id"),
-        @ForeignKey(entity = User.class,
-                parentColumns = "user_id",
-                childColumns = "receiver_id"),
-})
+@Entity(tableName = "message",
+        foreignKeys = {
+                @ForeignKey(entity = User.class,
+                        parentColumns = "user_id",
+                        childColumns = "sender_id"),
+                @ForeignKey(entity = User.class,
+                        parentColumns = "user_id",
+                        childColumns = "receiver_id")},
+        indices = {@Index(value = {"sender_id", "receiver_id"})}
+)
 public class Message {
     @ColumnInfo(name = "message_id")
     @PrimaryKey(autoGenerate = true)
     private int id;
     @ColumnInfo(name = "sender_id")
-    private int senderId;
+    private String senderId;
     @ColumnInfo(name = "receiver_id")
-    private int receiverId;
+    private String receiverId;
     @ColumnInfo(name = "message_content")
     private String messageContent;
     @ColumnInfo(name = "date_sent")
@@ -30,7 +33,7 @@ public class Message {
     @ColumnInfo(name = "is_read")
     private boolean isRead;
 
-    public Message(int senderId, int receiverId, String messageContent, Date dateSent, boolean isRead) {
+    public Message(String senderId, String receiverId, String messageContent, Date dateSent, boolean isRead) {
         this.senderId = senderId;
         this.receiverId = receiverId;
         this.messageContent = messageContent;
@@ -46,19 +49,19 @@ public class Message {
         this.id = id;
     }
 
-    public int getSenderId() {
+    public String getSenderId() {
         return senderId;
     }
 
-    public void setSenderId(int senderId) {
+    public void setSenderId(String senderId) {
         this.senderId = senderId;
     }
 
-    public int getReceiverId() {
+    public String getReceiverId() {
         return receiverId;
     }
 
-    public void setReceiverId(int receiverId) {
+    public void setReceiverId(String receiverId) {
         this.receiverId = receiverId;
     }
 
