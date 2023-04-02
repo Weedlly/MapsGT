@@ -1,8 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/map"
     android:name="com.google.android.gms.maps.SupportMapFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ui.map.MapsFragment" />
+    android:layout_marginTop="50dp"
+    map:cameraTilt="30"
+    map:mapId="@string/map_id"
+    map:uiRotateGestures="true"
+    map:uiZoomControls="true"
+    tools:context=".map.MapsFragment"
+    tools:ignore="FragmentTagUsage">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="50dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/editText"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:hint="Search Location"
+                android:inputType="textPersonName" />
+
+            <Button
+                android:id="@+id/search_bt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:onClick="searchLocation"
+                android:text="Search" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/bottom_panel"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/cardview_light_background">
+
+
+            <TextView
+                android:id="@+id/duration_tv"
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_height="0dp"
+                android:text="Duration :"
+                android:textSize="20sp"
+                />
+            <TextView
+                android:id="@+id/distance_tv"
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_height="0dp"
+                android:text="Distance :"
+                android:textSize="20sp"
+                />
+
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</fragment>
