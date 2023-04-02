@@ -64,43 +64,43 @@ public class FindFriends extends AppCompatActivity {
     private List<User> getListUsers() {
         List<User> list = new ArrayList<>();
         list.add(new User("1", "testing01@gmail.com", "012345678", "Duy01", "Alann", null, null));
-        list.add(new User("2", "testing02@gmail.com", "012845678", "Duy02", "Alann", null, null));
-        list.add(new User("3", "testing03@gmail.com", "012345678", "Duy03", "Alann", null, null));
-        list.add(new User("4", "testing04@gmail.com", "012965678", "Duy04", "Alann", null, null));
-        list.add(new User("5", "testing05@gmail.com", "012345678", "Duy05", "Alann", null, null));
-        list.add(new User("6", "testing06@gmail.com", "013745678", "Duy06", "Alann", null, null));
-        list.add(new User("7", "testing07@gmail.com", "012355578", "Duy07", "Alann", null, null));
-        list.add(new User("8", "testing08@gmail.com", "012349998", "Duy08", "Alann", null, null));
-        list.add(new User("9", "testing08@gmail.com", "012341018", "Duy09", "Alann", null, null));
+        list.add(new User("2", "testing02@gmail.com", "012845678", "B02", "Run", null, null));
+        list.add(new User("3", "testing03@gmail.com", "012345678", "C03", "Fire", null, null));
+        list.add(new User("4", "testing04@gmail.com", "012965678", "D04", "Brown", null, null));
+        list.add(new User("5", "testing05@gmail.com", "012345678", "E05", "Billy", null, null));
+        list.add(new User("6", "testing06@gmail.com", "013745678", "F06", "Fear", null, null));
+        list.add(new User("7", "testing07@gmail.com", "012355578", "G07", "Google", null, null));
+        list.add(new User("8", "testing08@gmail.com", "012349998", "H08", "Day", null, null));
+        list.add(new User("9", "testing08@gmail.com", "012341018", "L09", "Simon", null, null));
 
         return list;
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-
-        searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setMaxWidth(Integer.MAX_VALUE);
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                searchFriendAdapter.getFilter().filter(query);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                searchFriendAdapter.getFilter().filter(newText);
-                return false;
-            }
-        });
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.main_menu, menu);
+//
+//        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//
+//        searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+//        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+//        searchView.setMaxWidth(Integer.MAX_VALUE);
+//
+//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                searchFriendAdapter.getFilter().filter(query);
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//                searchFriendAdapter.getFilter().filter(newText);
+//                return false;
+//            }
+//        });
+//        return true;
+//    }
 
     @Override
     public void onBackPressed() {

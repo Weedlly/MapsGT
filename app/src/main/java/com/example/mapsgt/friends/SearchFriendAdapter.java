@@ -31,7 +31,7 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
     @NonNull
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_user, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_friends, parent, false);
 
         return new UserViewHolder(view);
     }
@@ -44,8 +44,9 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
         }
 
         //holder.imgUser.setImageResource(user.getProfilePicture()); ((TODO: add picture image))
-        holder.tvName.setText(user.getLastName());
-        holder.tvFirstname.setText(user.getFirstName());
+        String nickname = user.getFirstName() + " " + user.getLastName();
+        holder.tvName.setText(nickname);
+        holder.tvPhoneNumber.setText(user.getPhone());
     }
 
     @Override
@@ -61,13 +62,14 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
 
         private CircleImageView imgUser;
         private TextView tvName;
-        private TextView tvFirstname;
+        private TextView tvPhoneNumber;
 
         public UserViewHolder(@NonNull View itemView){
             super(itemView);
-            imgUser = itemView.findViewById(R.id.img_user);
+            //imgUser = itemView.findViewById(R.id.img_user);
+
             tvName = itemView.findViewById(R.id.tv_username);
-            tvFirstname = itemView.findViewById(R.id.tv_first_name);
+            tvPhoneNumber = itemView.findViewById(R.id.tv_phone);
         }
     }
 
@@ -82,7 +84,10 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
                 } else {
                     List<User> list = new ArrayList<>();
                     for (User user : mListUsersOld) {
-                        if (user.getFirstName().toLowerCase().contains(strSearch.toLowerCase())) {
+                        if (user.getFirstName().toLowerCase().contains(strSearch.toLowerCase()) || user.getLastName().toLowerCase().contains(strSearch.toLowerCase())) {
+                            list.add(user);
+                        }
+                        else if (user.getPhone().contains(strSearch)){
                             list.add(user);
                         }
                     }
