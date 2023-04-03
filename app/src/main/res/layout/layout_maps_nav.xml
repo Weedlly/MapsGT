@@ -2,29 +2,45 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="180dp"
-    android:background="@color/purple_500"
+    android:orientation="horizontal"
+    android:padding="10dp"
     android:gravity="bottom"
-    android:orientation="vertical"
-    android:padding="20dp">
+    android:background="@color/colorPrimary">
 
     <ImageView
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:src="@mipmap/ic_launcher" />
+        android:src="@mipmap/ic_launcher"
+        android:contentDescription="@string/action_sign_in" />
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="154dp"
         android:layout_height="wrap_content"
-        android:text="MapsGT"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:gravity="top"
+        android:orientation="vertical"
+        android:padding="10dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="MapsGT@gmail.com"
-        android:textColor="@color/white"
-        android:textSize="14sp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MapsGT"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="+84 903302271"
+            android:textColor="@color/colorTextBehind"
+            android:textSize="14sp" />
+
+
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="29dp"
+        android:layout_height="77dp"
+        android:src="@drawable/ic_edit_24" />
 </LinearLayout>

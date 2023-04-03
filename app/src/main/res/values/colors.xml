@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#F4F4F2</color>
-    <color name="colorAccent">#495464</color>
-    <color name="colorSecondary">#BBBFCA</color>
+    <color name="colorPrimary">#CCCCCC</color>
+    <color name="colorSecondary">#6A6A6A</color>
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="colorOnBackground">#000000</color>
+    <color name="colorError">#B00020</color>
+    <color name="colorTextBehind">#666666</color>
 
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>

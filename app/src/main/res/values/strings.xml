@@ -1,18 +1,8 @@
 <resources>
     <string name="app_name">MapsGT</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="API_KEY">AIzaSyACKs8duQMxyfKs2u7XXVY8FgY0COsErMk</string>
     <string name="map_id">5618cd7b01db1e2e</string>
-
-    <string name="nav_home">Home</string>
-    <string name="nav_favorite">Favorite</string>
-    <string name="nav_history">History</string>
-    <string name="nav_account">Account</string>
-    <string name="nav_my_profile">My Profile</string>
-    <string name="nav_add_friend">Add Friend</string>
-    <string name="nav_security">Security</string>
-
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="title_activity_login">LoginActivity</string>
     <string name="prompt_email">Email</string>
@@ -30,4 +20,19 @@
     <string name="click_to_login">Click to login</string>
     <string name="click_to_register">You don\'t have an account? \n Go to register</string>
     <string name="forgot_password">Forgot password?</string>
+
+    <string name="nav_home">Home</string>
+    <string name="nav_favorite">Favorite</string>
+    <string name="nav_history">History</string>
+    <string name="nav_account">Account</string>
+    <string name="nav_my_profile">My Profile</string>
+    <string name="nav_add_friend">Add Friend</string>
+    <string name="nav_security">Security</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_log_out">Log out</string>
+    <string name="search_position">Nhập địa điểm muốn đến</string>
+    <string name="chat">chat</string>
+
 </resources>
