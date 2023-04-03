@@ -16,18 +16,19 @@ import com.example.mapsgt.ui.map.MapsFragment;
 
 public class HomeFragment extends Fragment {
     private Toolbar toolbar;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        toolbar =  requireActivity().findViewById(R.id.top_app_bar);
+        toolbar = requireActivity().findViewById(R.id.top_app_bar);
 
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         SearchView searchView = view.findViewById(R.id.sv_position);
-        //searchView.setVisibility(View.GONE);
         searchView.setOnSearchClickListener(v -> toolbar.setVisibility(View.GONE));
         searchView.setOnCloseListener(() -> {
             toolbar.setVisibility(View.VISIBLE);
