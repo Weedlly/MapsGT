@@ -35,7 +35,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     protected void onStart() {
         super.onStart();
         user = auth.getCurrentUser();
-        if(user == null) {
+        if (user == null) {
             startActivity(AuthActivity.class);
         }
     }
@@ -46,7 +46,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         setContentView(R.layout.activity_main);
         auth = FirebaseAuth.getInstance();
 
-        //ImageButton btn_navigation = findViewById(R.id.btn_navigation);
         Toolbar toolbar = findViewById(R.id.top_app_bar);
         setSupportActionBar(toolbar);
 
@@ -60,33 +59,33 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         navigationView.setNavigationItemSelectedListener(this);
 
         HomeFragment homeFragment = new HomeFragment();
-        replaceFragment(getLayoutResource(),homeFragment);
+        replaceFragment(getLayoutResource(), homeFragment);
         navigationView.getMenu().findItem(R.id.nav_home).setChecked(true);
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.nav_home){
-            if (mCurrentFragment != FRAGMENT_HOME){
+        if (id == R.id.nav_home) {
+            if (mCurrentFragment != FRAGMENT_HOME) {
                 HomeFragment homeFragment = new HomeFragment();
-                replaceFragment(getLayoutResource(),homeFragment);
+                replaceFragment(getLayoutResource(), homeFragment);
                 mCurrentFragment = FRAGMENT_HOME;
             }
-        } else if (id == R.id.nav_favorite){
-            if (mCurrentFragment != FRAGMENT_FAVORITE){
+        } else if (id == R.id.nav_favorite) {
+            if (mCurrentFragment != FRAGMENT_FAVORITE) {
                 FavoriteFragment favoriteFragment = new FavoriteFragment();
                 replaceFragment(getLayoutResource(), favoriteFragment);
                 mCurrentFragment = FRAGMENT_FAVORITE;
             }
-        } else if (id == R.id.nav_history){
-            if (mCurrentFragment != FRAGMENT_HISTORY){
+        } else if (id == R.id.nav_history) {
+            if (mCurrentFragment != FRAGMENT_HISTORY) {
                 HistoryFragment historyFragment = new HistoryFragment();
                 replaceFragment(getLayoutResource(), historyFragment);
                 mCurrentFragment = FRAGMENT_HISTORY;
             }
-        } else if (id == R.id.nav_logout){
-            if (mCurrentFragment != LOGOUT){
+        } else if (id == R.id.nav_logout) {
+            if (mCurrentFragment != LOGOUT) {
                 auth.signOut();
                 startActivity(AuthActivity.class);
                 finish();
@@ -98,12 +97,13 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     @Override
     public void onBackPressed() {
-        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)){
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
     }
+
     @Override
     public int getLayoutResource() {
         return R.id.main_holder;
