@@ -334,15 +334,24 @@ public class MapsFragment extends Fragment implements
         mValueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // todo: show list of friend location on map
-                UserLocationDto location = snapshot.child("locations").child("users").child("xczs09n7kJg9HfLvQeKRySS2N0z1").getValue(UserLocationDto.class);
+                // todo: replace friend list on database
+                List<String> friendIdList = new ArrayList<>();
+                friendIdList.add("xczs09n7kJg9HfLvQeKRySS2N0z1");
+                List<UserLocationDto> friendLocations = new ArrayList<>();
+
+                friendIdList.forEach((friendId) -> {
+                    UserLocationDto userLocationDto = snapshot.child("locations").child("users").child(friendId).getValue(UserLocationDto.class);
+                    friendLocations.add(userLocationDto);
+                });
 
                 // update UI
                 mGoogleMap.clear();
                 renderMarkerOnMap(mGPSLocation);
-                if (location != null && location.getIsSharing()) {
-                    renderMarkerOnMap(new LatLng(location.getLatitude(), location.getLongitude()));
-                }
+                friendLocations.stream().forEach((userLocationDto -> {
+                    if (userLocationDto != null && userLocationDto.getIsSharing()) {
+                        renderMarkerOnMap(new LatLng(userLocationDto.getLatitude(), userLocationDto.getLongitude()));
+                    }
+                }));
             }
 
             @Override
