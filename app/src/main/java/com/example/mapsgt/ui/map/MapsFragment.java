@@ -337,7 +337,9 @@ public class MapsFragment extends Fragment implements
                     location.setLatitude(mGPSLocation.latitude);
                     location.setLongitude(mGPSLocation.longitude);
                 }
-                Log.d("Location", String.valueOf(location.getLatitude()) + " " + String.valueOf(location.getLongitude()));
+                mGoogleMap.clear();
+                renderMarkerOnMap(new LatLng(location.getLatitude(), location.getLongitude()));
+                renderMarkerOnMap(mGPSLocation);
             }
 
             @Override
@@ -347,6 +349,17 @@ public class MapsFragment extends Fragment implements
             }
         };
         mDatabase.addValueEventListener(mValueEventListener);
+    }
+
+    private void renderMarkerOnMap(LatLng latLng) {
+        MarkerOptions options = new MarkerOptions();
+        options.position(latLng);
+        options.icon(
+                bitmapFromVector(this.getContext(), R.drawable.imagesuser)
+        );
+
+        // Add new marker to the Google Map Android API V2
+        mGoogleMap.addMarker(options.title("Wendy"));
     }
 
     private void startSharingService() {
