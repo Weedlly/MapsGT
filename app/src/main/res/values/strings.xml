@@ -34,5 +34,6 @@
     <string name="nav_log_out">Log out</string>
     <string name="search_position">Nhập địa điểm muốn đến</string>
     <string name="chat">chat</string>
+    <string name="tracking_enabled_notif">Tracking is currently enabled.</string>
 
 </resources>

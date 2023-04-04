@@ -71,6 +71,13 @@
                 android:text="Distance :"
                 android:textSize="20sp" />
 
+            <Switch
+                android:id="@+id/sw_sharing"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="16dp"
+                android:layout_weight="1"
+                android:text="Share location" />
 
         </LinearLayout>
 
