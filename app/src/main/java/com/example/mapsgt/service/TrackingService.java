@@ -85,6 +85,7 @@ public class TrackingService extends Service {
                 UserLocationDto userLocationDto = new UserLocationDto();
                 userLocationDto.setLongitude(location.getLongitude());
                 userLocationDto.setLatitude(location.getLatitude());
+                userLocationDto.setIsSharing(true);
 
                 //Save the location data to the database
                 ref.child("locations").child("users").child(user.getUid()).setValue(userLocationDto);

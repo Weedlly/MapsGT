@@ -3,6 +3,7 @@ package com.example.mapsgt.data.dto;
 public class UserLocationDto {
     private Double latitude;
     private Double longitude;
+    private Boolean isSharing;
 
     public UserLocationDto() {
     }
@@ -21,5 +22,13 @@ public class UserLocationDto {
 
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
+    }
+
+    public Boolean getIsSharing() {
+        return isSharing;
+    }
+
+    public void setIsSharing(Boolean isSharing) {
+        this.isSharing = isSharing;
     }
 }

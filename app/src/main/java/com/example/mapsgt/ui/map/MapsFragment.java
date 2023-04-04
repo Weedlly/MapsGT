@@ -47,6 +47,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -77,6 +79,7 @@ public class MapsFragment extends Fragment implements
     private DatabaseReference mDatabase;
 
     ValueEventListener mValueEventListener;
+    private FirebaseUser user;
 
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
         @Override
@@ -122,6 +125,7 @@ public class MapsFragment extends Fragment implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        user = FirebaseAuth.getInstance().getCurrentUser();
 
         showFriendLocation();
 
@@ -144,7 +148,7 @@ public class MapsFragment extends Fragment implements
         sw_sharing.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(sw_sharing.isChecked()) {
+                if (sw_sharing.isChecked()) {
                     startSharingService();
                 } else {
                     stopTrackerService();
@@ -332,14 +336,13 @@ public class MapsFragment extends Fragment implements
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 // todo: show list of friend location on map
                 UserLocationDto location = snapshot.child("locations").child("users").child("xczs09n7kJg9HfLvQeKRySS2N0z1").getValue(UserLocationDto.class);
-                if(location == null) {
-                    location = new UserLocationDto();
-                    location.setLatitude(mGPSLocation.latitude);
-                    location.setLongitude(mGPSLocation.longitude);
-                }
+
+                // update UI
                 mGoogleMap.clear();
-                renderMarkerOnMap(new LatLng(location.getLatitude(), location.getLongitude()));
                 renderMarkerOnMap(mGPSLocation);
+                if (location != null && location.getIsSharing()) {
+                    renderMarkerOnMap(new LatLng(location.getLatitude(), location.getLongitude()));
+                }
             }
 
             @Override
@@ -448,6 +451,9 @@ public class MapsFragment extends Fragment implements
     private void stopTrackerService() {
         Intent intent = new Intent(getContext(), TrackingService.class);
         getContext().stopService(intent);
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+        ref.child("locations").child("users").child(user.getUid()).child("isSharing").setValue(false);
     }
 }
 
