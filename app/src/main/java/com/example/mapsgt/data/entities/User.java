@@ -33,6 +33,10 @@ public class User {
     @ColumnInfo(name = "last_known_location_id")
     private int lastKnownLocationId;
 
+    public User() { //Todo
+        // Required public no-argument constructor
+    }
+
     public User(String id, String email, String phone, String firstName, String lastName, Date dateOfBirth, UserGenderEnum gender) {
         this.id = id;
         this.email = email;

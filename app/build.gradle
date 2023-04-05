@@ -67,5 +67,28 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10.1'
 
     implementation 'de.hdodenhof:circleimageview:3.1.0'
-    implementation "androidx.recyclerview:recyclerview:1.1.0"
+    
+
+    implementation 'com.google.firebase:firebase-analytics:17.2.0'
+
+
+    implementation 'com.squareup.picasso:picasso:2.5.2'
+
+
+    implementation 'com.google.firebase:firebase-storage: 17.0.0'
+    //implementation 'com.firebaseui:firebase-ui-database:2.1.1'
+
+
+//    implementation 'com.google.firebase:firebase-auth:19.2.0'
+//    implementation 'com.google.firebase:firebase-crash:9.4.0'
+//    implementation 'com.firebase:firebase-client-android:2.3.1'
+//    implementation 'com.google.firebase:firebase-messaging:20.1.0'
+//    implementation 'com.firebaseui:firebase-ui-storage:6.2.0'
+    implementation 'com.firebaseui:firebase-ui-database:8.0.0'
+
+    implementation 'com.google.firebase:firebase-database:20.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+
+
+
 }

@@ -18,12 +18,19 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapter.UserViewHolder> implements Filterable {
+public class FriendsRecyclerAdapter extends RecyclerView.Adapter<FriendsRecyclerAdapter.UserViewHolder> implements Filterable {
 
-    private List<User> mListUser;
-    private List<User> mListUsersOld;
+    private ArrayList<User> mListUser;
+    private ArrayList<User> mListUsersOld;
 
-    public SearchFriendAdapter(List<User> mListUser){
+    private ArrayList<User> mListFriend = new ArrayList<>();
+    private OnFriendsDetailListener mOnFriendsDetailClick;
+    public FriendsRecyclerAdapter(ArrayList<User> users, OnFriendsDetailListener mOnFriendsDetailClick) {
+        this.mListFriend = users;
+        this.mOnFriendsDetailClick = mOnFriendsDetailClick;
+    }
+
+    public FriendsRecyclerAdapter(ArrayList<User> mListUser){
         this.mListUser = mListUser;
         this.mListUsersOld = mListUser;
     }
@@ -33,12 +40,12 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_friends, parent, false);
 
-        return new UserViewHolder(view);
+        return new UserViewHolder(view, mOnFriendsDetailClick);
     }
 
     @Override
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
-        User user = mListUser.get(position);
+        User user = mListFriend.get(position);
         if (user == null) {
             return;
         }
@@ -47,30 +54,39 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
         String nickname = user.getFirstName() + " " + user.getLastName();
         holder.tvName.setText(nickname);
         holder.tvPhoneNumber.setText(user.getPhone());
+
     }
 
     @Override
     public int getItemCount() {
-        if (mListUser != null) {
-            return mListUser.size();
+        if (mListFriend != null) {
+            return mListFriend.size();
         }
         return 0;
     }
 
 
-    public class UserViewHolder extends RecyclerView.ViewHolder{
+    public class UserViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         private CircleImageView imgUser;
         private TextView tvName;
         private TextView tvPhoneNumber;
 
-        public UserViewHolder(@NonNull View itemView){
+        OnFriendsDetailListener onFriendsDetailListener;
+
+        public UserViewHolder(@NonNull View itemView, OnFriendsDetailListener onFriendsDetailListener){
             super(itemView);
             //imgUser = itemView.findViewById(R.id.img_user);
 
             tvName = itemView.findViewById(R.id.tv_username);
             tvPhoneNumber = itemView.findViewById(R.id.tv_phone);
+            this.onFriendsDetailListener = onFriendsDetailListener;
+
+            itemView.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View view) { onFriendsDetailListener.OnFriendsDetailClick(getAdapterPosition()); }
     }
 
     @Override
@@ -80,10 +96,10 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
             protected FilterResults performFiltering(CharSequence constrain) {
                 String strSearch = constrain.toString();
                 if (strSearch.isEmpty()) {
-                    mListUser = mListUsersOld;
+                    mListUser = mListFriend;
                 } else {
-                    List<User> list = new ArrayList<>();
-                    for (User user : mListUsersOld) {
+                    ArrayList<User> list = new ArrayList<>();
+                    for (User user : mListFriend) {
                         if (user.getFirstName().toLowerCase().contains(strSearch.toLowerCase()) || user.getLastName().toLowerCase().contains(strSearch.toLowerCase())) {
                             list.add(user);
                         }
@@ -102,9 +118,13 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
 
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults results) {
-                mListUser = (List<User>) results.values;
+                mListUser = (ArrayList<User>) results.values;
                 notifyDataSetChanged();
             }
         };
+    }
+
+    public interface OnFriendsDetailListener{
+        void OnFriendsDetailClick(int position);
     }
 }
