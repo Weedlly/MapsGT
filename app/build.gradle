@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.mapsgt"
-        minSdk 28
+        minSdk 29
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -76,19 +76,17 @@ dependencies {
 
 
     implementation 'com.google.firebase:firebase-storage: 17.0.0'
-    //implementation 'com.firebaseui:firebase-ui-database:2.1.1'
-
-
-//    implementation 'com.google.firebase:firebase-auth:19.2.0'
-//    implementation 'com.google.firebase:firebase-crash:9.4.0'
-//    implementation 'com.firebase:firebase-client-android:2.3.1'
-//    implementation 'com.google.firebase:firebase-messaging:20.1.0'
-//    implementation 'com.firebaseui:firebase-ui-storage:6.2.0'
     implementation 'com.firebaseui:firebase-ui-database:8.0.0'
 
     implementation 'com.google.firebase:firebase-database:20.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
 
 
+    // Call APi  convert json to object
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.google.code.gson:gson:2.10.1'
 
+    // Continuous update location
+    implementation 'io.nlopez.smartlocation:library:3.3.3'
 }
