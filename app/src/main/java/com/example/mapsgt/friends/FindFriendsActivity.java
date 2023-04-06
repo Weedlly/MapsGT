@@ -50,29 +50,12 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendsRec
         setContentView(R.layout.activity_find_friends);
 
         //mListFriends = getListUsers();
-       // UpDataToFirebase();
+       //UpDataToFirebase();
 
 
        initRecyclerView();
 
-        searchView = findViewById(R.id.search_view);
-        searchView.clearFocus();
 
-
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                Log.d(TAG, "1");
-                mListFriendRecyclerAdapter.getFilter().filter(query);
-                return false;
-            }
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                mListFriendRecyclerAdapter.getFilter().filter(newText);
-                return false;
-            }
-        });
     }
 
     private ArrayList<User> getListUsers() {
@@ -117,7 +100,7 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendsRec
                 {
                     User user = dataSnapshot.getValue(User.class);
                     mListFriends.add(user);
-                    Log.d(TAG, mListFriends.toString());
+                    //Log.d(TAG, mListFriends.toString());
 
                     mListFriendRecyclerAdapter = new FriendsRecyclerAdapter( mListFriends, FindFriendsActivity.this);
                     mRecyclerView.setAdapter(mListFriendRecyclerAdapter);
@@ -132,11 +115,29 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendsRec
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         mRecyclerView.addItemDecoration(itemDecoration);
 
+        searchView = findViewById(R.id.search_view);
+        searchView.clearFocus();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Log.d(TAG, "Debug Search View ");
+                mListFriendRecyclerAdapter.getFilter().filter(query);
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                Log.d(TAG, "Debug Search View 2");
+                mListFriendRecyclerAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+
     }
 
     @Override
     public void OnFriendsDetailClick(int position) {
-        Log.d(TAG, "onFriendDetailClick: clicker." + position);
+       // Log.d(TAG, "onFriendDetailClick: clicker." + position);
 
         visit_user_id = Integer.toString(position);
         Intent intent = new Intent(this, PersonProfileActivity.class);
@@ -148,7 +149,7 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendsRec
     {
         HashMap<String, Object> hashMap = new HashMap<>();
         for (int i = 0; i < getListUsers().size(); i++) {
-            hashMap.put("User_" + String.valueOf(i), getListUsers().get(i));
+            hashMap.put( getListUsers().get(i).getId(), getListUsers().get(i));
         }
 
         allUserDatabaseRef.child("User").setValue(hashMap);

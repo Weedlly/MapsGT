@@ -103,7 +103,7 @@ public class FriendsRecyclerAdapter extends RecyclerView.Adapter<FriendsRecycler
                         if (user.getFirstName().toLowerCase().contains(strSearch.toLowerCase()) || user.getLastName().toLowerCase().contains(strSearch.toLowerCase())) {
                             list.add(user);
                         }
-                        else if (user.getPhone().contains(strSearch)){
+                        if (user.getPhone().contains(strSearch)){
                             list.add(user);
                         }
                     }
