@@ -2,9 +2,14 @@ package com.example.mapsgt.friends;
 
 import static android.content.ContentValues.TAG;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +22,8 @@ import com.example.mapsgt.R;
 import com.example.mapsgt.data.entities.User;
 
 import com.example.mapsgt.enumeration.UserGenderEnum;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,12 +34,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class FindFriendsActivity extends AppCompatActivity implements FriendsRecyclerAdapter.OnFriendsDetailListener{
     private RecyclerView mRecyclerView;
 
     public static ArrayList<User> mListFriends = new ArrayList<>();
 
     private FriendsRecyclerAdapter mListFriendRecyclerAdapter;
+    //private personAdapter mListPersonAdapter;
 
     private SearchView searchView;
 
@@ -104,7 +114,11 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendsRec
 
                     mListFriendRecyclerAdapter = new FriendsRecyclerAdapter( mListFriends, FindFriendsActivity.this);
                     mRecyclerView.setAdapter(mListFriendRecyclerAdapter);
+
                 }
+
+                RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(FindFriendsActivity.this, DividerItemDecoration.VERTICAL);
+                mRecyclerView.addItemDecoration(itemDecoration);
             }
 
             @Override
@@ -112,26 +126,97 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendsRec
 
             }
         });
-        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
-        mRecyclerView.addItemDecoration(itemDecoration);
 
+        // ((TODO Search FriendList on Firebase))
         searchView = findViewById(R.id.search_view);
         searchView.clearFocus();
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Log.d(TAG, "Debug Search View ");
-                mListFriendRecyclerAdapter.getFilter().filter(query);
+
+                SearchData(query);
+
+
                 return false;
             }
             @Override
             public boolean onQueryTextChange(String newText) {
-                Log.d(TAG, "Debug Search View 2");
+                //Log.d(TAG, "Debug Search View 2");
                 mListFriendRecyclerAdapter.getFilter().filter(newText);
+
                 return false;
             }
         });
+    }
+
+    private void SearchData(String query) { // ((TODO Search FriendList on Firebase))
+        Toast.makeText(this, "Searching...", Toast.LENGTH_LONG).show();
+        Log.d(TAG, "Debug Search View " + query);
+        //mListFriendRecyclerAdapter.getFilter().filter(query);
+        FirebaseRecyclerOptions<User> options =
+                new FirebaseRecyclerOptions.Builder<User>()
+                        .setQuery(FirebaseDatabase.getInstance().getReference()
+                                .child("User").orderByChild("firstName").startAt(query).endAt(query + "\ufbff"), User.class)
+                        .build() ;
+
+        Log.d(TAG, "Search: " + options.toString());
+        FirebaseRecyclerAdapter<User, FindFriendsViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<User, FindFriendsViewHolder> (options)
+        {
+            @Override
+            protected void onBindViewHolder(@NonNull FindFriendsViewHolder holder, @SuppressLint("RecyclerView") final int position, @NonNull User model) {
+                model = mListFriends.get(position);
+                Log.d(TAG, "Model: " + model.toString());
+                holder.setFullName(model.getFirstName() + model.getLastName());
+                holder.setPhoneNumber(model.getPhone());
+
+                holder.mView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        visit_user_id = getRef(position + 1).getKey() ;
+                        Log.d(TAG, "position: " + visit_user_id);
+                                //Integer.toString(position);
+                        Intent intent = new Intent(FindFriendsActivity.this, PersonProfileActivity.class);
+                        intent.putExtra("visit_user_id", visit_user_id);
+                        startActivity(intent);
+                    }
+                });
+            }
+
+            @NonNull
+            @Override
+            public FindFriendsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                return null;
+            }
+        };
+
+        Log.d(TAG, "FB adapter: " + firebaseRecyclerAdapter );
+        mRecyclerView.setAdapter(firebaseRecyclerAdapter);
+        //mListPersonAdapter = new personAdapter(options , this);
+        //mRecyclerView.setAdapter(mListPersonAdapter);
+    }
+
+    private static class FindFriendsViewHolder extends RecyclerView.ViewHolder
+    {
+        View mView;
+        public FindFriendsViewHolder(View itemView)
+        {
+            super(itemView);
+
+            mView = itemView;
+        }
+        public void setFullName(String fullName)
+        {
+            TextView myName = (TextView) mView.findViewById(R.id.tv_username);
+            myName.setText(fullName);
+        }
+
+        public void setPhoneNumber(String phongNumber)
+        {
+            TextView myPhoneNum = (TextView) mView.findViewById(R.id.tv_phone);
+            myPhoneNum.setText(phongNumber);
+        }
 
     }
 
@@ -139,7 +224,7 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendsRec
     public void OnFriendsDetailClick(int position) {
        // Log.d(TAG, "onFriendDetailClick: clicker." + position);
 
-        visit_user_id = Integer.toString(position);
+        visit_user_id = Integer.toString(position + 1);
         Intent intent = new Intent(this, PersonProfileActivity.class);
         intent.putExtra("visit_user_id", visit_user_id);
         startActivity(intent);
