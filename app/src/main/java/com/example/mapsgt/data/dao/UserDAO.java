@@ -14,10 +14,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+
 public class UserDAO extends RealtimeDatabase<User> {
     private final MutableLiveData<ArrayList<User>> usersLiveData = new MutableLiveData<>();
     public UserDAO(DatabaseReference databaseReference) {
-        super(databaseReference.child("users"));
+        super(databaseReference);
         ValueEventListener valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
