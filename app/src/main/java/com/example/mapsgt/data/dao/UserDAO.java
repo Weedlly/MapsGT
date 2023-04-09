@@ -1,42 +1,75 @@
 package com.example.mapsgt.data.dao;
 
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.Query;
-import androidx.room.Transaction;
-import androidx.room.Update;
+import android.util.Log;
 
-import com.example.mapsgt.data.entities.Friendship;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+
 import com.example.mapsgt.data.entities.User;
+import com.example.mapsgt.database.RealtimeDatabase;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
-import java.util.List;
+import java.util.ArrayList;
+public class UserDAO extends RealtimeDatabase<User> {
+    private final MutableLiveData<ArrayList<User>> usersLiveData = new MutableLiveData<>();
+    public UserDAO(DatabaseReference databaseReference) {
+        super(databaseReference.child("users"));
+        ValueEventListener valueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                ArrayList<User> userList = new ArrayList<>();
+                for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                    User user = userSnapshot.getValue(User.class);
+                    userList.add(user);
+                }
+                usersLiveData.setValue(userList);
+            }
 
-@Dao
-public interface UserDAO {
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("UserDao", "Error reading users from database", error.toException());
+            }
+        };
+        getDatabaseReference().addValueEventListener(valueEventListener);
+    }
+    @Override
+    public void insert(User user) {
+        getDatabaseReference().child(user.getId()).setValue(user);
+    }
 
-    @Insert
-    void insertUser(User user);
+    @Override
+    public void update(User user) {
+        getDatabaseReference().child(user.getId()).setValue(user);
+    }
 
-    @Insert
-    void insertFriendship(Friendship friendship);
+    @Override
+    public void delete(User user) {
+        getDatabaseReference().child(user.getId()).removeValue();
+    }
 
-    @Query("SELECT * FROM user WHERE user_id = :userId")
-    User getUserById(String userId);
+    @Override
+    public void deleteAll() {
+        getDatabaseReference().removeValue();
+    }
 
-    @Query("SELECT * FROM user WHERE email = :email")
-    User getUserByEmail(String email);
+    @Override
+    public LiveData<ArrayList<User>> getAll() {
+        return usersLiveData;
+    }
 
-    @Query("SELECT * FROM user")
-    List<User> getUserList();
-
-    @Transaction
-    @Query("SELECT * FROM user WHERE user_id IN (SELECT friend_id FROM friendship WHERE user_id = :userId AND status = 'ACCEPTED')")
-    List<User> getFriendsForUser(int userId);
-
-    @Update
-    void updateUser(User user);
-
-    @Delete
-    void deleteUser(User user);
+    public User getUserByEmail(String emailAddress) {
+        if (usersLiveData.getValue() == null) {
+            return null;
+        }
+        for (User user : usersLiveData.getValue()) {
+            if (user.getEmail().equals(emailAddress)) {
+                return user;
+            }
+        }
+        return null;
+    }
 }

@@ -3,34 +3,19 @@ package com.example.mapsgt.data.entities;
 import android.text.TextUtils;
 import android.util.Patterns;
 
-import androidx.annotation.NonNull;
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.Index;
-import androidx.room.PrimaryKey;
-
 import com.example.mapsgt.enumeration.UserGenderEnum;
 
 import java.util.Date;
 
-@Entity(tableName = "user", indices = {@Index(value = {"email", "phone"}, unique = true)})
 public class User {
-    @PrimaryKey
-    @NonNull
-    @ColumnInfo(name = "user_id")
     private String id;
     private String email;
     private String phone;
-    @ColumnInfo(name = "first_name")
     private String firstName;
-    @ColumnInfo(name = "last_name")
     private String lastName;
-    @ColumnInfo(name = "date_of_birth")
     private Date dateOfBirth;
-    @ColumnInfo(name = "profile_picture")
     private String profilePicture;
     private UserGenderEnum gender;
-    @ColumnInfo(name = "last_known_location_id")
     private int lastKnownLocationId;
 
     public User() { //Todo

@@ -1,4 +1,4 @@
-package com.example.mapsgt.friends;
+package com.example.mapsgt.adapter;
 
 import static android.content.ContentValues.TAG;
 
@@ -17,37 +17,36 @@ import com.example.mapsgt.R;
 import com.example.mapsgt.data.entities.User;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class FriendsRecyclerAdapter extends RecyclerView.Adapter<FriendsRecyclerAdapter.UserViewHolder> implements Filterable {
+public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendViewHolder> implements Filterable {
 
     private ArrayList<User> mListUser;
     private ArrayList<User> mListUsersOld;
 
     private ArrayList<User> mListFriend = new ArrayList<>();
     private OnFriendsDetailListener mOnFriendsDetailClick;
-    public FriendsRecyclerAdapter(ArrayList<User> users, OnFriendsDetailListener mOnFriendsDetailClick) {
+    public FriendAdapter(ArrayList<User> users, OnFriendsDetailListener mOnFriendsDetailClick) {
         this.mListFriend = users;
         this.mOnFriendsDetailClick = mOnFriendsDetailClick;
     }
 
-    public FriendsRecyclerAdapter(ArrayList<User> mListUser){
+    public FriendAdapter(ArrayList<User> mListUser){
         this.mListUser = mListUser;
         this.mListUsersOld = mListUser;
     }
 
     @NonNull
     @Override
-    public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public FriendViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_friends, parent, false);
 
-        return new UserViewHolder(view, mOnFriendsDetailClick);
+        return new FriendViewHolder(view, mOnFriendsDetailClick);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull FriendViewHolder holder, int position) {
         User user = mListFriend.get(position);
         if (user == null) {
             return;
@@ -69,7 +68,7 @@ public class FriendsRecyclerAdapter extends RecyclerView.Adapter<FriendsRecycler
     }
 
 
-    public class UserViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public static class FriendViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         private CircleImageView imgUser;
         private TextView tvName;
@@ -77,7 +76,7 @@ public class FriendsRecyclerAdapter extends RecyclerView.Adapter<FriendsRecycler
 
         OnFriendsDetailListener onFriendsDetailListener;
 
-        public UserViewHolder(@NonNull View itemView, OnFriendsDetailListener onFriendsDetailListener){
+        public FriendViewHolder(@NonNull View itemView, OnFriendsDetailListener onFriendsDetailListener){
             super(itemView);
             //imgUser = itemView.findViewById(R.id.img_user);
 

@@ -17,30 +17,6 @@
         android:theme="@style/Theme.MapsGT"
         tools:targetApi="31">
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-
-            android:resource="@xml/searchable"
-            android:value="AIzaSyCo3yxkR1zXKi4nFel0ukpVJOiKHFx7UFw" />
-
-        <activity
-            android:name=".friends.PersonProfileActivity"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
-            android:exported="false"
-            android:label="@string/title_activity_maps" />
-        <activity
-            android:name=".friends.FindFriendsActivity"
-            android:exported="true"
-            android:theme="@style/Theme.Material3.Light.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
         <!--
              TODO: Before you run your application, you need a Google Maps API key.
 
@@ -52,8 +28,33 @@
              project's local.properties file (e.g. MAPS_API_KEY=Aiza...), and replace the
              "YOUR_API_KEY" string in this file with "${MAPS_API_KEY}".
         -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCo3yxkR1zXKi4nFel0ukpVJOiKHFx7UFw" />
+        <activity
+            android:name=".friends.PersonProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".friends.FindFriendsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.auth.AuthActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/title_activity_maps"
+            android:theme="@style/Theme.Material3.Light.NoActionBar" />
+        <activity
+            android:name=".ui.add_friend.AddFriendActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Material3.Light.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-        
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

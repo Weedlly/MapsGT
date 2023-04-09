@@ -2,10 +2,6 @@ package com.example.mapsgt.ui.auth;
 
 import static android.content.ContentValues.TAG;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -19,6 +15,10 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.example.mapsgt.R;
 import com.example.mapsgt.data.entities.User;
@@ -185,7 +185,7 @@ public class RegisterFragment extends Fragment {
                             FirebaseUser authUser = mAuth.getCurrentUser();
 
                             User user = new User(authUser.getUid(), authUser.getEmail(), phoneNo, firstName, lastName, convertStringToDate(dob), gender);
-                            myDatabase.userDAO().insertUser(user);
+                            myDatabase.userDAO().insert(user);
 
                             mAuthActivity.goToMainActivity();
                         } else {

@@ -2,14 +2,9 @@ package com.example.mapsgt.friends;
 
 import static android.content.ContentValues.TAG;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,11 +14,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mapsgt.R;
+import com.example.mapsgt.adapter.FriendAdapter;
 import com.example.mapsgt.data.entities.User;
 
 import com.example.mapsgt.enumeration.UserGenderEnum;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -33,16 +27,13 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-import de.hdodenhof.circleimageview.CircleImageView;
-
-public class FindFriendsActivity extends AppCompatActivity implements FriendsRecyclerAdapter.OnFriendsDetailListener{
+public class FindFriendsActivity extends AppCompatActivity implements FriendAdapter.OnFriendsDetailListener{
     private RecyclerView mRecyclerView;
 
     public static ArrayList<User> mListFriends = new ArrayList<>();
 
-    private FriendsRecyclerAdapter mListFriendRecyclerAdapter;
+    private FriendAdapter mListFriendRecyclerAdapter;
     //private personAdapter mListPersonAdapter;
 
     private SearchView searchView;
@@ -112,7 +103,7 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendsRec
                     mListFriends.add(user);
                     //Log.d(TAG, mListFriends.toString());
 
-                    mListFriendRecyclerAdapter = new FriendsRecyclerAdapter( mListFriends, FindFriendsActivity.this);
+                    mListFriendRecyclerAdapter = new FriendAdapter( mListFriends, FindFriendsActivity.this);
                     mRecyclerView.setAdapter(mListFriendRecyclerAdapter);
                     SearchData();
                 }
@@ -164,7 +155,7 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendsRec
                             //Log.d(TAG, mListFriends.toString());
                             Log.d(TAG, "List friend search: " + mListFriends.toString());
 
-                            mListFriendRecyclerAdapter = new FriendsRecyclerAdapter( mListFriends, FindFriendsActivity.this);
+                            mListFriendRecyclerAdapter = new FriendAdapter( mListFriends, FindFriendsActivity.this);
                             mRecyclerView.setAdapter(mListFriendRecyclerAdapter);
 
                         }
