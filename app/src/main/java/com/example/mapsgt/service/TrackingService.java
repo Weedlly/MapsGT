@@ -17,7 +17,6 @@ import androidx.core.content.ContextCompat;
 
 import com.example.mapsgt.MainActivity;
 import com.example.mapsgt.R;
-import com.example.mapsgt.data.dto.UserLocationDto;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -82,13 +81,11 @@ public class TrackingService extends Service {
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
             Location location = locationResult.getLastLocation();
             if (location != null) {
-                UserLocationDto userLocationDto = new UserLocationDto();
-                userLocationDto.setLongitude(location.getLongitude());
-                userLocationDto.setLatitude(location.getLatitude());
-                userLocationDto.setIsSharing(true);
 
                 //Save the location data to the database
-                ref.child("locations").child("users").child(user.getUid()).setValue(userLocationDto);
+                ref.child("users").child(user.getUid()).child("isSharing").setValue(true);
+                ref.child("users").child(user.getUid()).child("latitude").setValue(location.getLatitude());
+                ref.child("users").child(user.getUid()).child("longitude").setValue(location.getLongitude());
             }
         }
     };

@@ -6,7 +6,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
@@ -31,9 +36,13 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.mapsgt.R;
-import com.example.mapsgt.data.dto.UserLocationDto;
+import com.example.mapsgt.data.entities.User;
 import com.example.mapsgt.enumeration.MovingStyleEnum;
+import com.example.mapsgt.network.FirebaseApiClient;
 import com.example.mapsgt.network.RetrofitClient;
 import com.example.mapsgt.network.model.location.LocationResponse;
 import com.example.mapsgt.network.model.location.RoutesItem;
@@ -48,7 +57,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -68,24 +76,23 @@ public class MapsFragment extends Fragment implements
 
     private static final String TAG = "LocationFragment";
     private static final int ACCESS_FINE_LOCATION_CODE = 100;
-    private static final int PERMISSIONS_REQUEST = 100;
     final RoutesItem[] routesItem = {new RoutesItem()};
     private Switch sw_sharing;
     private final ArrayList<LatLng> markerPoints = new ArrayList<LatLng>();
-    protected LocationManager mLocationManager;
-    protected LatLng mGPSLocation;
-    protected GoogleMap mGoogleMap;
-    protected Button mSearchButton;
+    private LocationManager mLocationManager;
+    private LatLng mGPSLocation;
+    private GoogleMap mGoogleMap;
+    private Button mSearchButton;
     private DatabaseReference mDatabase;
-
-    ValueEventListener mValueEventListener;
-    private FirebaseUser user;
+    private ValueEventListener mValueEventListener;
+    private User currentUser;
 
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
         @Override
         public void onMapReady(GoogleMap googleMap) {
             mGoogleMap = googleMap;
 
+            // check permission
             if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 return;
             }
@@ -109,6 +116,8 @@ public class MapsFragment extends Fragment implements
                     addDestinationPoint(latLng);
                 }
             });
+
+            // update current location
             if (mGPSLocation != null) {
                 handleMyLocation(mGPSLocation);
             }
@@ -125,9 +134,7 @@ public class MapsFragment extends Fragment implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        user = FirebaseAuth.getInstance().getCurrentUser();
-
-        showFriendLocation();
+        getUserInfo();
 
         //Check whether GPS tracking is enabled
         mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -149,7 +156,7 @@ public class MapsFragment extends Fragment implements
             @Override
             public void onClick(View view) {
                 if (sw_sharing.isChecked()) {
-                    startSharingService();
+                    startTrackerService();
                 } else {
                     stopTrackerService();
                 }
@@ -162,6 +169,7 @@ public class MapsFragment extends Fragment implements
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
 
@@ -174,6 +182,11 @@ public class MapsFragment extends Fragment implements
         Location locationGPS = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if (locationGPS != null)
             mGPSLocation = new LatLng(locationGPS.getLatitude(), locationGPS.getLongitude());
+
+        if(currentUser != null && currentUser.isSharing()) {
+            startTrackerService();
+            showFriendLocation();
+        }
     }
 
     @Override
@@ -250,7 +263,6 @@ public class MapsFragment extends Fragment implements
                 LocationResponse locationResponses = response.body();
                 routesItem[0] = locationResponses.getRoutes().get(0);
                 drawDirectionLine(origin, dest);
-
             }
 
             @Override
@@ -295,13 +307,7 @@ public class MapsFragment extends Fragment implements
 
         // Todo: replace this when using real data to get user avatar, name, status
 
-        options.position(latLng);
-        options.icon(
-                bitmapFromVector(this.getContext(), R.drawable.imagesuser)
-        );
-
-        // Add new marker to the Google Map Android API V2
-        mGoogleMap.addMarker(options.title("Wendy"));
+        renderMarkerOnMap(latLng, "https://raw.githubusercontent.com/gotitinc/aha-assets/master/uifaces/m-20.jpg");
     }
 
     public Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
@@ -337,19 +343,21 @@ public class MapsFragment extends Fragment implements
                 // todo: replace friend list on database
                 List<String> friendIdList = new ArrayList<>();
                 friendIdList.add("xczs09n7kJg9HfLvQeKRySS2N0z1");
-                List<UserLocationDto> friendLocations = new ArrayList<>();
+                List<User> friendLocations = new ArrayList<>();
 
                 friendIdList.forEach((friendId) -> {
-                    UserLocationDto userLocationDto = snapshot.child("locations").child("users").child(friendId).getValue(UserLocationDto.class);
+                    User userLocationDto = snapshot.child("users").child(friendId).getValue(User.class);
                     friendLocations.add(userLocationDto);
                 });
 
                 // update UI
                 mGoogleMap.clear();
-                renderMarkerOnMap(mGPSLocation);
-                friendLocations.stream().forEach((userLocationDto -> {
-                    if (userLocationDto != null && userLocationDto.getIsSharing()) {
-                        renderMarkerOnMap(new LatLng(userLocationDto.getLatitude(), userLocationDto.getLongitude()));
+                if(mGPSLocation != null) {
+                    renderMarkerOnMap(mGPSLocation, "https://raw.githubusercontent.com/gotitinc/aha-assets/master/uifaces/m-10.jpg");
+                }
+                friendLocations.stream().forEach((friend -> {
+                    if (friend != null && friend.isSharing()) {
+                        renderMarkerOnMap(new LatLng(friend.getLatitude(), friend.getLongitude()), "https://raw.githubusercontent.com/gotitinc/aha-assets/master/uifaces/f-10.jpg");
                     }
                 }));
             }
@@ -363,30 +371,60 @@ public class MapsFragment extends Fragment implements
         mDatabase.addValueEventListener(mValueEventListener);
     }
 
-    private void renderMarkerOnMap(LatLng latLng) {
-        MarkerOptions options = new MarkerOptions();
-        options.position(latLng);
-        options.icon(
-                bitmapFromVector(this.getContext(), R.drawable.imagesuser)
-        );
+    private void renderMarkerOnMap(LatLng latLng, String imgUrl) {
+        if (isAdded()) {
+            Glide.with(this)
+                    .asBitmap()
+                    .load(imgUrl)
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                            Bitmap circularBitmap = getCircularBitmap(resource);
+                            BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(circularBitmap);
 
-        // Add new marker to the Google Map Android API V2
-        mGoogleMap.addMarker(options.title("Wendy"));
+                            MarkerOptions markerOptions = new MarkerOptions()
+                                    .position(latLng)
+                                    .title("Marker Title")
+                                    .snippet("Marker Snippet")
+                                    .icon(bitmapDescriptor);
+
+                            mGoogleMap.addMarker(markerOptions);
+                        }
+                    });
+        }
     }
 
-    private void startSharingService() {
-        //Check whether this app has access to the location permission
-        int permission = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION);
+    private Bitmap getCircularBitmap(Bitmap bitmap) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        int radius = Math.min(width, height) / 2;
 
-        //If the location permission has been granted, then start the TrackerService
-        if (permission == PackageManager.PERMISSION_GRANTED) {
-            startTrackerService();
-        } else {
-            //If the app doesn’t currently have access to the user’s location, then request access
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST);
-        }
+        Bitmap output = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+        Paint paint = new Paint();
+        Rect rect = new Rect(0, 0, width, height);
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+
+        // Set border color and width
+        int borderColor = Color.GRAY;
+        int borderWidth = 5;
+
+        // Draw the circle
+        paint.setStyle(Paint.Style.FILL);
+        canvas.drawCircle(width / 2f, height / 2f, radius, paint);
+
+        // Draw the border
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(borderWidth);
+        paint.setColor(borderColor);
+        canvas.drawCircle(width / 2f, height / 2f, radius - borderWidth / 2f, paint);
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+
+        return output;
     }
 
     private void requestLocationUpdatesListener() {
@@ -416,10 +454,10 @@ public class MapsFragment extends Fragment implements
         Log.i(TAG, "Provider " + provider + " is disabled");
     }
 
-    public void checkPermission(String permission, int requestCode) {
+    private void checkPermission(String permission, int requestCode) {
         // Checking if permission is not granted
-        if (ContextCompat.checkSelfPermission(this.getContext(), permission) == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(this.getActivity(), new String[]{permission}, requestCode);
+        if (ContextCompat.checkSelfPermission(getContext(), permission) == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{permission}, requestCode);
             Toast.makeText(this.getContext(), "Permission not granted", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this.getContext(), "Permission already granted", Toast.LENGTH_SHORT).show();
@@ -452,7 +490,7 @@ public class MapsFragment extends Fragment implements
         getContext().startService(intent);
 
         //Notify the user that tracking has been enabled
-        Toast.makeText(getContext(), "GPS tracking enabled", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Start sharing", Toast.LENGTH_SHORT).show();
 
         // Todo: Schedule a task to stop the service after 15 minutes
     }
@@ -462,7 +500,31 @@ public class MapsFragment extends Fragment implements
         getContext().stopService(intent);
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-        ref.child("locations").child("users").child(user.getUid()).child("isSharing").setValue(false);
+        ref.child("users").child(currentUser.getId()).child("isSharing").setValue(false);
+        Toast.makeText(getContext(), "Stop sharing", Toast.LENGTH_SHORT).show();
+    }
+
+    private void getUserInfo() {
+        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        Call<User> call = FirebaseApiClient.getFirebaseApi().getUserById(currentUserId);
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful()) {
+                    currentUser = response.body();
+                    // Process the user data here
+                    sw_sharing.setChecked(currentUser.isSharing());
+                } else {
+                    // Handle error here
+                    Log.e("CurrentUser", "error");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                Log.e("CurrentUser", "error");
+            }
+        });
     }
 }
 

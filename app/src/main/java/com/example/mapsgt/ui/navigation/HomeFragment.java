@@ -21,7 +21,6 @@ public class HomeFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         toolbar = requireActivity().findViewById(R.id.top_app_bar);
-
     }
 
     @Nullable

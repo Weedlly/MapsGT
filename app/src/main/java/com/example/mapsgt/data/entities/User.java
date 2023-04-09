@@ -3,37 +3,24 @@ package com.example.mapsgt.data.entities;
 import android.text.TextUtils;
 import android.util.Patterns;
 
-import androidx.annotation.NonNull;
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.Index;
-import androidx.room.PrimaryKey;
-
 import com.example.mapsgt.enumeration.UserGenderEnum;
 
 import java.util.Date;
 
-@Entity(tableName = "user", indices = {@Index(value = {"email", "phone"}, unique = true)})
 public class User {
-    @PrimaryKey
-    @NonNull
-    @ColumnInfo(name = "user_id")
     private String id;
     private String email;
     private String phone;
-    @ColumnInfo(name = "first_name")
     private String firstName;
-    @ColumnInfo(name = "last_name")
     private String lastName;
-    @ColumnInfo(name = "date_of_birth")
     private Date dateOfBirth;
-    @ColumnInfo(name = "profile_picture")
     private String profilePicture;
     private UserGenderEnum gender;
-    @ColumnInfo(name = "last_known_location_id")
-    private int lastKnownLocationId;
+    private double latitude;
+    private double longitude;
+    private boolean isSharing;
 
-    public User(String id, String email, String phone, String firstName, String lastName, Date dateOfBirth, UserGenderEnum gender) {
+    public User(String id, String email, String phone, String firstName, String lastName, Date dateOfBirth, UserGenderEnum gender, double latitude, double longitude, boolean isSharing) {
         this.id = id;
         this.email = email;
         this.phone = phone;
@@ -41,6 +28,10 @@ public class User {
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
         this.gender = gender;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.isSharing = isSharing;
+        this.profilePicture = "https://raw.githubusercontent.com/gotitinc/aha-assets/master/uifaces/m-10.jpg";
     }
 
     public String getId() {
@@ -49,14 +40,6 @@ public class User {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public void setLastKnownLocationId(int lastKnownLocationId) {
-        this.lastKnownLocationId = lastKnownLocationId;
-    }
-
-    public int getLastKnownLocationId() {
-        return lastKnownLocationId;
     }
 
     public String getEmail() {
@@ -119,18 +102,27 @@ public class User {
         return !TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", email='" + email + '\'' +
-                ", phone='" + phone + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", dateOfBirth=" + dateOfBirth +
-                ", profilePicture='" + profilePicture + '\'' +
-                ", gender=" + gender +
-                ", lastKnownLocationId=" + lastKnownLocationId +
-                '}';
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public boolean isSharing() {
+        return isSharing;
+    }
+
+    public void setSharing(boolean sharing) {
+        isSharing = sharing;
     }
 }

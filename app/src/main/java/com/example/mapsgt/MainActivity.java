@@ -9,9 +9,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.example.mapsgt.ui.map.MapsFragment;
 import com.example.mapsgt.ui.navigation.FavoriteFragment;
 import com.example.mapsgt.ui.navigation.HistoryFragment;
-import com.example.mapsgt.ui.navigation.HomeFragment;
 import com.example.mapsgt.ui.auth.AuthActivity;
 import com.example.mapsgt.ui.base.BaseActivity;
 import com.google.android.material.navigation.NavigationView;
@@ -58,8 +58,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         NavigationView navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        HomeFragment homeFragment = new HomeFragment();
-        replaceFragment(getLayoutResource(), homeFragment);
+        replaceFragment(getLayoutResource(), new MapsFragment());
+
         navigationView.getMenu().findItem(R.id.nav_home).setChecked(true);
     }
 
@@ -68,20 +68,17 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         int id = item.getItemId();
         if (id == R.id.nav_home) {
             if (mCurrentFragment != FRAGMENT_HOME) {
-                HomeFragment homeFragment = new HomeFragment();
-                replaceFragment(getLayoutResource(), homeFragment);
+                replaceFragment(getLayoutResource(), new MapsFragment());
                 mCurrentFragment = FRAGMENT_HOME;
             }
         } else if (id == R.id.nav_favorite) {
             if (mCurrentFragment != FRAGMENT_FAVORITE) {
-                FavoriteFragment favoriteFragment = new FavoriteFragment();
-                replaceFragment(getLayoutResource(), favoriteFragment);
+                replaceFragment(getLayoutResource(), new FavoriteFragment());
                 mCurrentFragment = FRAGMENT_FAVORITE;
             }
         } else if (id == R.id.nav_history) {
             if (mCurrentFragment != FRAGMENT_HISTORY) {
-                HistoryFragment historyFragment = new HistoryFragment();
-                replaceFragment(getLayoutResource(), historyFragment);
+                replaceFragment(getLayoutResource(), new HistoryFragment());
                 mCurrentFragment = FRAGMENT_HISTORY;
             }
         } else if (id == R.id.nav_logout) {

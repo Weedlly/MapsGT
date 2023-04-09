@@ -16,11 +16,11 @@ public class MapsGTApplication extends Application {
     }
 
     private void createChanelNotification() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Channel Service Example", NotificationManager.IMPORTANCE_DEFAULT);
 
             NotificationManager manager = getSystemService(NotificationManager.class);
-            if(manager != null) {
+            if (manager != null) {
                 manager.createNotificationChannel(channel);
             }
         }
