@@ -73,7 +73,6 @@ import retrofit2.Response;
 
 public class MapsFragment extends Fragment implements
         LocationListener {
-
     private static final String TAG = "LocationFragment";
     private static final int ACCESS_FINE_LOCATION_CODE = 100;
     final RoutesItem[] routesItem = {new RoutesItem()};
@@ -86,6 +85,7 @@ public class MapsFragment extends Fragment implements
     private DatabaseReference mDatabase;
     private ValueEventListener mValueEventListener;
     private User currentUser;
+    List<User> friendLocations = new ArrayList<>();
 
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
         @Override
@@ -157,6 +157,7 @@ public class MapsFragment extends Fragment implements
             public void onClick(View view) {
                 if (sw_sharing.isChecked()) {
                     startTrackerService();
+                    showFriendLocation();
                 } else {
                     stopTrackerService();
                 }
@@ -183,7 +184,7 @@ public class MapsFragment extends Fragment implements
         if (locationGPS != null)
             mGPSLocation = new LatLng(locationGPS.getLatitude(), locationGPS.getLongitude());
 
-        if(currentUser != null && currentUser.isSharing()) {
+        if (currentUser != null && currentUser.getIsSharing()) {
             startTrackerService();
             showFriendLocation();
         }
@@ -301,13 +302,11 @@ public class MapsFragment extends Fragment implements
 
     private void handleMyLocation(LatLng latLng) {
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f));
-        MarkerOptions options = new MarkerOptions();
         clearMarkers();
         markerPoints.add(latLng);
 
         // Todo: replace this when using real data to get user avatar, name, status
-
-        renderMarkerOnMap(latLng, "https://raw.githubusercontent.com/gotitinc/aha-assets/master/uifaces/m-20.jpg");
+        renderMarker(latLng, currentUser.getProfilePicture());
     }
 
     public Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
@@ -342,24 +341,17 @@ public class MapsFragment extends Fragment implements
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 // todo: replace friend list on database
                 List<String> friendIdList = new ArrayList<>();
-                friendIdList.add("xczs09n7kJg9HfLvQeKRySS2N0z1");
-                List<User> friendLocations = new ArrayList<>();
+                friendIdList.add("aUGYHuCMN9SE61lS4Q9KeK4DgB62");
+                friendLocations.clear();
 
                 friendIdList.forEach((friendId) -> {
-                    User userLocationDto = snapshot.child("users").child(friendId).getValue(User.class);
-                    friendLocations.add(userLocationDto);
+                    User friend = snapshot.child("users").child(friendId).getValue(User.class);
+                    friendLocations.add(friend);
+                    Log.e("friend", friend.getFirstName());
                 });
 
                 // update UI
-                mGoogleMap.clear();
-                if(mGPSLocation != null) {
-                    renderMarkerOnMap(mGPSLocation, "https://raw.githubusercontent.com/gotitinc/aha-assets/master/uifaces/m-10.jpg");
-                }
-                friendLocations.stream().forEach((friend -> {
-                    if (friend != null && friend.isSharing()) {
-                        renderMarkerOnMap(new LatLng(friend.getLatitude(), friend.getLongitude()), "https://raw.githubusercontent.com/gotitinc/aha-assets/master/uifaces/f-10.jpg");
-                    }
-                }));
+                renderAllMarker();
             }
 
             @Override
@@ -371,7 +363,28 @@ public class MapsFragment extends Fragment implements
         mDatabase.addValueEventListener(mValueEventListener);
     }
 
-    private void renderMarkerOnMap(LatLng latLng, String imgUrl) {
+    private void renderAllMarker() {
+        // clear marker
+        mGoogleMap.clear();
+
+        // user location
+        renderMarker(mGPSLocation, currentUser.getProfilePicture());
+
+        // friend location
+        Log.e("render friend marker", "before render");
+        if (currentUser.getIsSharing()) {
+            if (!friendLocations.isEmpty())
+                Log.e("render friend marker", String.valueOf(friendLocations.get(0).getIsSharing()));
+            friendLocations.stream().forEach((friend -> {
+                if (friend != null && friend.getIsSharing()) {
+                    Log.e("render friend marker", "render");
+                    renderMarker(new LatLng(friend.getLatitude(), friend.getLongitude()), friend.getProfilePicture());
+                }
+            }));
+        }
+    }
+
+    private void renderMarker(LatLng latLng, String imgUrl) {
         if (isAdded()) {
             Glide.with(this)
                     .asBitmap()
@@ -432,11 +445,16 @@ public class MapsFragment extends Fragment implements
             return;
         }
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        Log.e("requestLocationUpdatesListener", "change");
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        mGPSLocation = new LatLng(location.getLatitude(), location.getLongitude());
+        if (location.getLongitude() != mGPSLocation.longitude || location.getLatitude() != mGPSLocation.latitude) {
+            Log.e("onLocationChanged", "change");
+            mGPSLocation = new LatLng(location.getLatitude(), location.getLongitude());
+            renderAllMarker();
+        }
     }
 
     @Override
@@ -513,7 +531,7 @@ public class MapsFragment extends Fragment implements
                 if (response.isSuccessful()) {
                     currentUser = response.body();
                     // Process the user data here
-                    sw_sharing.setChecked(currentUser.isSharing());
+                    sw_sharing.setChecked(currentUser.getIsSharing());
                 } else {
                     // Handle error here
                     Log.e("CurrentUser", "error");

@@ -5,22 +5,23 @@ import android.util.Patterns;
 
 import com.example.mapsgt.enumeration.UserGenderEnum;
 
-import java.util.Date;
-
 public class User {
     private String id;
     private String email;
     private String phone;
     private String firstName;
     private String lastName;
-    private Date dateOfBirth;
+    private String dateOfBirth;
     private String profilePicture;
     private UserGenderEnum gender;
     private double latitude;
     private double longitude;
     private boolean isSharing;
 
-    public User(String id, String email, String phone, String firstName, String lastName, Date dateOfBirth, UserGenderEnum gender, double latitude, double longitude, boolean isSharing) {
+    public User() {
+    }
+
+    public User(String id, String email, String phone, String firstName, String lastName, String dateOfBirth, UserGenderEnum gender, double latitude, double longitude, boolean isSharing) {
         this.id = id;
         this.email = email;
         this.phone = phone;
@@ -74,11 +75,11 @@ public class User {
         this.lastName = lastName;
     }
 
-    public Date getDateOfBirth() {
+    public String getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(String dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
@@ -118,11 +119,11 @@ public class User {
         this.longitude = longitude;
     }
 
-    public boolean isSharing() {
+    public boolean getIsSharing() {
         return isSharing;
     }
 
-    public void setSharing(boolean sharing) {
-        isSharing = sharing;
+    public void setIsSharing(boolean isSharing) {
+        this.isSharing = isSharing;
     }
 }
