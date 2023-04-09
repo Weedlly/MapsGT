@@ -22,8 +22,8 @@ import android.widget.Toast;
 
 import com.example.mapsgt.R;
 import com.example.mapsgt.data.entities.User;
-import com.example.mapsgt.database.MyDatabase;
 import com.example.mapsgt.enumeration.UserGenderEnum;
+import com.example.mapsgt.network.FirebaseApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.datepicker.MaterialDatePicker;
@@ -36,6 +36,10 @@ import com.google.firebase.auth.FirebaseUser;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class RegisterFragment extends Fragment {
 
@@ -55,14 +59,12 @@ public class RegisterFragment extends Fragment {
     private TextView goToLoginTV;
 
     private FirebaseAuth mAuth;
-    private MyDatabase myDatabase;
     private AuthActivity mAuthActivity;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAuthActivity = (AuthActivity) getActivity();
-        myDatabase = MyDatabase.getInstance(getContext());
         mAuth = FirebaseAuth.getInstance();
     }
 
@@ -184,10 +186,10 @@ public class RegisterFragment extends Fragment {
                         if (task.isSuccessful()) {
                             FirebaseUser authUser = mAuth.getCurrentUser();
 
-                            User user = new User(authUser.getUid(), authUser.getEmail(), phoneNo, firstName, lastName, convertStringToDate(dob), gender);
-                            myDatabase.userDAO().insertUser(user);
-
-                            mAuthActivity.goToMainActivity();
+                            if (authUser != null) {
+                                User user = new User(authUser.getUid(), authUser.getEmail(), phoneNo, firstName, lastName, dob, gender, -1, -1, false);
+                                createUserOnFirebase(user);
+                            }
                         } else {
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
                             Toast.makeText(getContext(), task.getException().getMessage(),
@@ -195,6 +197,28 @@ public class RegisterFragment extends Fragment {
                         }
                     }
                 });
+    }
+
+    private void createUserOnFirebase(User user) {
+        Call<User> call = FirebaseApiClient.getFirebaseApi().createUser(user.getId(), user);
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful()) {
+                    User createdUser = response.body();
+                    // Process the created user data here
+                    Log.e("User", createdUser.toString());
+                    mAuthActivity.goToMainActivity();
+                } else {
+                    // Handle error here
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                // Handle error here
+            }
+        });
     }
 
     private void handleSelectDate() {

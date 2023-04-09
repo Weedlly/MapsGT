@@ -6,8 +6,10 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
+        android:name=".MapsGTApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -30,14 +32,15 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCo3yxkR1zXKi4nFel0ukpVJOiKHFx7UFw"/>
+            android:value="AIzaSyCo3yxkR1zXKi4nFel0ukpVJOiKHFx7UFw" />
+
+        <service android:name=".service.TrackingService" />
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/title_activity_maps"
-            android:theme="@style/Theme.Material3.Light.NoActionBar">
-        </activity>
+            android:theme="@style/Theme.Material3.Light.NoActionBar"></activity>
         <activity
             android:name=".ui.auth.AuthActivity"
             android:exported="true"
