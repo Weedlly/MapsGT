@@ -1,15 +1,7 @@
 package com.example.mapsgt.data.entities;
 
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
-
-@Entity(tableName = "location")
 public class Location {
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "location_id")
     private int id;
-    @ColumnInfo(name = "location_name")
     private String locationName;
     private double latitude;
     private double longitude;

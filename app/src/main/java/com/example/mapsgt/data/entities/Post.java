@@ -1,23 +1,13 @@
 package com.example.mapsgt.data.entities;
 
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
-
 import java.util.Date;
 
-@Entity(tableName = "post")
 public class Post {
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "post_id")
     private int id;
-    @ColumnInfo(name = "user_creator_id")
     private String userCreatorId;
-    @ColumnInfo(name = "location_id")
     private int locationId;
     private String caption;
     private String image;
-    @ColumnInfo(name = "created_at")
     private Date createdAt;
 
     public Post(String userCreatorId, int locationId, String caption, String image, Date createdAt) {

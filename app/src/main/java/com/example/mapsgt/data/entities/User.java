@@ -16,13 +16,11 @@ public class User {
     private Date dateOfBirth;
     private String profilePicture;
     private UserGenderEnum gender;
-    private int lastKnownLocationId;
+    private double latitude;
+    private double longitude;
+    private boolean isSharing;
 
-    public User() { //Todo
-        // Required public no-argument constructor
-    }
-
-    public User(String id, String email, String phone, String firstName, String lastName, Date dateOfBirth, UserGenderEnum gender) {
+    public User(String id, String email, String phone, String firstName, String lastName, Date dateOfBirth, UserGenderEnum gender, double latitude, double longitude, boolean isSharing) {
         this.id = id;
         this.email = email;
         this.phone = phone;
@@ -30,6 +28,10 @@ public class User {
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
         this.gender = gender;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.isSharing = isSharing;
+        this.profilePicture = "https://raw.githubusercontent.com/gotitinc/aha-assets/master/uifaces/m-10.jpg";
     }
 
     public String getId() {
@@ -38,14 +40,6 @@ public class User {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public void setLastKnownLocationId(int lastKnownLocationId) {
-        this.lastKnownLocationId = lastKnownLocationId;
-    }
-
-    public int getLastKnownLocationId() {
-        return lastKnownLocationId;
     }
 
     public String getEmail() {
@@ -108,18 +102,27 @@ public class User {
         return !TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", email='" + email + '\'' +
-                ", phone='" + phone + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", dateOfBirth=" + dateOfBirth +
-                ", profilePicture='" + profilePicture + '\'' +
-                ", gender=" + gender +
-                ", lastKnownLocationId=" + lastKnownLocationId +
-                '}';
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public boolean isSharing() {
+        return isSharing;
+    }
+
+    public void setSharing(boolean sharing) {
+        isSharing = sharing;
     }
 }

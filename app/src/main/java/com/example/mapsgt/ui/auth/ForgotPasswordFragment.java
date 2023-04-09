@@ -14,8 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.mapsgt.R;
-import com.example.mapsgt.data.entities.User;
-import com.example.mapsgt.database.MyDatabase;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,17 +23,13 @@ public class ForgotPasswordFragment extends Fragment {
     private TextView emailEdt;
     private Button resetBtn;
     private TextView loginNowTV;
-
     private FirebaseAuth mAuth;
-
-    private MyDatabase myDatabase;
     private AuthActivity mAuthActivity;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
-        myDatabase = MyDatabase.getInstance(getContext());
         mAuthActivity = (AuthActivity) getActivity();
     }
 
@@ -73,13 +67,7 @@ public class ForgotPasswordFragment extends Fragment {
             return;
         }
 
-        User user = myDatabase.userDAO().getUserByEmail(emailAddress);
-
-        if (user == null) {
-            emailEdt.setError("Email is not exist");
-            emailEdt.requestFocus();
-            return;
-        }
+        // todo: check email is not exist
 
         mAuth.sendPasswordResetEmail(emailAddress)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {

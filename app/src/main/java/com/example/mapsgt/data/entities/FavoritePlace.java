@@ -1,35 +1,13 @@
 package com.example.mapsgt.data.entities;
 
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.ForeignKey;
-import androidx.room.Index;
-import androidx.room.PrimaryKey;
-
 import java.util.Date;
 
-@Entity(tableName = "favorite_place",
-        foreignKeys = {
-                @ForeignKey(entity = User.class,
-                        parentColumns = "user_id",
-                        childColumns = "user_id"),
-                @ForeignKey(entity = Location.class,
-                        parentColumns = "location_id",
-                        childColumns = "location_id")},
-        indices = {@Index(value = {"user_id", "location_id"})}
-)
 public class FavoritePlace {
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "favorite_place_id")
     private int id;
-    @ColumnInfo(name = "user_id")
     private String userId;
-    @ColumnInfo(name = "place_name")
     private String placeName;
     private String description;
-    @ColumnInfo(name = "location_id")
     private int locationId;
-    @ColumnInfo(name = "created_at")
     private Date createdAt;
 
     public FavoritePlace(String userId, String placeName, String description, int locationId, Date createdAt) {
