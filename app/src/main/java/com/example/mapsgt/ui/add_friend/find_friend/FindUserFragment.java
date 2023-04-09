@@ -12,24 +12,29 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mapsgt.R;
 import com.example.mapsgt.adapter.FriendAdapter;
+import com.example.mapsgt.data.entities.User;
 import com.example.mapsgt.friends.PersonProfileActivity;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link FindFriendFragment#newInstance} factory method to
+ * Use the {@link FindUserFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FindFriendFragment extends Fragment implements FriendAdapter.OnFriendsDetailListener {
+public class FindUserFragment extends Fragment implements FriendAdapter.OnFriendsDetailListener {
     private static final String ARG_PARAM = "query";
     public static String visit_user_id;
     private String mQuery;
     private RecyclerView rvUsers;
-    public FindFriendFragment() {
+    private FindUserViewModel mViewModel;
+    private ArrayList<User> users_list = new ArrayList<>();
+    public FindUserFragment() {
         // Required empty public constructor
     }
 
-    public static FindFriendFragment newInstance(String query) {
-        FindFriendFragment fragment = new FindFriendFragment();
+    public static FindUserFragment newInstance(String query) {
+        FindUserFragment fragment = new FindUserFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM, query);
         fragment.setArguments(args);
@@ -47,9 +52,20 @@ public class FindFriendFragment extends Fragment implements FriendAdapter.OnFrie
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_find_friend, container, false);
-        rvUsers = view.findViewById(R.id.rcv_find_friend);
+        View view = inflater.inflate(R.layout.fragment_find_user, container, false);
+        rvUsers = view.findViewById(R.id.rcv_find_user);
         rvUsers.setLayoutManager(new LinearLayoutManager(getContext()));
+        //TODO: Find user by query
+        mViewModel = new FindUserViewModel();
+        users_list = mViewModel.findFriend(mQuery);
+        if (users_list == null) {
+            users_list = new ArrayList<>();
+        } else {
+            users_list = mViewModel.findFriend(mQuery);
+            FriendAdapter friendAdapter = new FriendAdapter(users_list, this);
+            rvUsers.setAdapter(friendAdapter);
+            friendAdapter.notifyDataSetChanged();
+        }
         // Inflate the layout for this fragment
         return view;
     }
@@ -57,8 +73,6 @@ public class FindFriendFragment extends Fragment implements FriendAdapter.OnFrie
     @Override
     public void OnFriendsDetailClick(int position) {
         visit_user_id = Integer.toString(position + 1);
-        Intent intent = new Intent(getContext(), PersonProfileActivity.class);
-        intent.putExtra("visit_user_id", visit_user_id);
-        startActivity(intent);
+        startActivity(new Intent(getContext(), PersonProfileActivity.class));
     }
 }

@@ -28,10 +28,13 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     private ArrayList<User> mListFriend = new ArrayList<>();
     private OnFriendsDetailListener mOnFriendsDetailClick;
     public FriendAdapter(ArrayList<User> users, OnFriendsDetailListener mOnFriendsDetailClick) {
-        this.mListFriend = users;
+        setmListFriend(users);
         this.mOnFriendsDetailClick = mOnFriendsDetailClick;
     }
-
+    public void setmListFriend(ArrayList<User> mListFriend) {
+        this.mListFriend = mListFriend;
+        notifyDataSetChanged();
+    }
     public FriendAdapter(ArrayList<User> mListUser){
         this.mListUser = mListUser;
         this.mListUsersOld = mListUser;
