@@ -77,4 +77,7 @@ public class UserStatus {
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
+
+    public static class Feedback {
+    }
 }

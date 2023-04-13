@@ -1,6 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:hint="Name"
+        android:textSize="20dp"
+        android:textColor="@android:color/black"
+        android:id="@+id/fb_name"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="This name be null"
+        android:layout_below="@+id/fb_name"
+        android:textSize="18dp"
+        android:textColor="@color/colorError"
+        android:id="@+id/bug_name"/>
+
+
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:hint="Message"
+        android:layout_below="@+id/bug_name"
+        android:textSize="20dp"
+        android:textColor="@android:color/black"
+        android:id="@+id/fb_content"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="This message be null"
+        android:layout_below="@+id/fb_content"
+        android:textSize="18dp"
+        android:textColor="@color/colorError"
+        android:id="@+id/bug_content"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sent Feedback"
+        android:layout_centerInParent="true"
+        android:id="@+id/btn_send_fb"
+        android:textSize="20dp"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="View Send Detail"
+        android:layout_centerInParent="true"
+        android:id="@+id/btn_view_send_detail"
+        android:layout_below="@+id/btn_send_fb"
+        android:enabled="false"
+        android:textSize="20dp"/>
+
+
+
+
+</RelativeLayout>
