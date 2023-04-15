@@ -80,10 +80,9 @@ public class TrackingService extends Service {
             //Get a reference to the database, so your app can perform read and write operations
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
             Location location = locationResult.getLastLocation();
-            if (location != null) {
 
+            if (location != null) {
                 //Save the location data to the database
-                ref.child("users").child(user.getUid()).child("isSharing").setValue(true);
                 ref.child("users").child(user.getUid()).child("latitude").setValue(location.getLatitude());
                 ref.child("users").child(user.getUid()).child("longitude").setValue(location.getLongitude());
             }

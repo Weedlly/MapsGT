@@ -160,6 +160,7 @@ public class MapsFragment extends Fragment implements
                     showFriendLocation();
                 } else {
                     stopTrackerService();
+                    renderAllMarker();
                 }
             }
         });
@@ -339,19 +340,22 @@ public class MapsFragment extends Fragment implements
         mValueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // todo: replace friend list on database
-                List<String> friendIdList = new ArrayList<>();
-                friendIdList.add("aUGYHuCMN9SE61lS4Q9KeK4DgB62");
-                friendLocations.clear();
+                Boolean isTracking = snapshot.child("users").child(currentUser.getId()).getValue(User.class).getIsSharing();
 
-                friendIdList.forEach((friendId) -> {
-                    User friend = snapshot.child("users").child(friendId).getValue(User.class);
-                    friendLocations.add(friend);
-                    Log.e("friend", friend.getFirstName());
-                });
+                if(isTracking) {
+                    // todo: replace friend list on database
+                    List<String> friendIdList = new ArrayList<>();
+                    friendIdList.add("aUGYHuCMN9SE61lS4Q9KeK4DgB62");
+                    friendLocations.clear();
 
-                // update UI
-                renderAllMarker();
+                    friendIdList.forEach((friendId) -> {
+                        User friend = snapshot.child("users").child(friendId).getValue(User.class);
+                        friendLocations.add(friend);
+                    });
+
+                    // update UI
+                    renderAllMarker();
+                }
             }
 
             @Override
@@ -371,13 +375,9 @@ public class MapsFragment extends Fragment implements
         renderMarker(mGPSLocation, currentUser.getProfilePicture());
 
         // friend location
-        Log.e("render friend marker", "before render");
         if (currentUser.getIsSharing()) {
-            if (!friendLocations.isEmpty())
-                Log.e("render friend marker", String.valueOf(friendLocations.get(0).getIsSharing()));
             friendLocations.stream().forEach((friend -> {
                 if (friend != null && friend.getIsSharing()) {
-                    Log.e("render friend marker", "render");
                     renderMarker(new LatLng(friend.getLatitude(), friend.getLongitude()), friend.getProfilePicture());
                 }
             }));
@@ -508,6 +508,8 @@ public class MapsFragment extends Fragment implements
         getContext().startService(intent);
 
         //Notify the user that tracking has been enabled
+        currentUser.setIsSharing(true);
+        mDatabase.child("users").child(currentUser.getId()).child("isSharing").setValue(true);
         Toast.makeText(getContext(), "Start sharing", Toast.LENGTH_SHORT).show();
 
         // Todo: Schedule a task to stop the service after 15 minutes
@@ -517,8 +519,12 @@ public class MapsFragment extends Fragment implements
         Intent intent = new Intent(getContext(), TrackingService.class);
         getContext().stopService(intent);
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-        ref.child("users").child(currentUser.getId()).child("isSharing").setValue(false);
+        if(mValueEventListener != null) {
+            mDatabase.removeEventListener(mValueEventListener);
+        }
+
+        currentUser.setIsSharing(false);
+        mDatabase.child("users").child(currentUser.getId()).child("isSharing").setValue(false);
         Toast.makeText(getContext(), "Stop sharing", Toast.LENGTH_SHORT).show();
     }
 
