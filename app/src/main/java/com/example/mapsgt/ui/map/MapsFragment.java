@@ -451,7 +451,6 @@ public class MapsFragment extends Fragment implements
     @Override
     public void onLocationChanged(Location location) {
         if (location.getLongitude() != mGPSLocation.longitude || location.getLatitude() != mGPSLocation.latitude) {
-            Log.e("onLocationChanged", "change");
             mGPSLocation = new LatLng(location.getLatitude(), location.getLongitude());
             renderAllMarker();
         }
