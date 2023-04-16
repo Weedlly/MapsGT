@@ -10,6 +10,7 @@ import com.example.mapsgt.R;
 import com.example.mapsgt.adapter.FriendAdapter;
 import com.example.mapsgt.data.dao.UserDAO;
 import com.example.mapsgt.data.entities.User;
+import com.example.mapsgt.enumeration.UserGenderEnum;
 import com.example.mapsgt.ui.add_friend.find_friend.FindUserFragment;
 import com.example.mapsgt.ui.base.BaseActivity;
 import com.google.firebase.database.FirebaseDatabase;
@@ -21,6 +22,10 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
     private RecyclerView rvListSuggestUsers;
     public static String visit_user_id;
     private final UserDAO userDAO = new UserDAO(FirebaseDatabase.getInstance().getReference("users"));
+    private ArrayList<User> suggest_list = new ArrayList<>();
+    private ArrayList<User> filtered_list = new ArrayList<>();
+    private User currentUser;
+
     // Initialize fields
     private void InitializeFields() {
         svUserSearch = findViewById(R.id.sv_user_search);
@@ -33,33 +38,78 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
         setContentView(R.layout.activity_add_friend);
 
         InitializeFields();
+        FriendAdapter suggestFriendAdapter = new FriendAdapter(filtered_list, AddFriendActivity.this);
+        rvListSuggestUsers.setAdapter(suggestFriendAdapter);
+
         // Search user
         svUserSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                replaceFragment(getLayoutResource(), FindUserFragment.newInstance(query));
+            public boolean onQueryTextSubmit(String newText) {
+                replaceFragment(getLayoutResource(), FindUserFragment.newInstance(newText));
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                return false;
+                filtered_list.clear();
+                if (newText.isEmpty()) {
+                    filtered_list.addAll(suggest_list);
+                } else {
+                    for (User user : suggest_list) {
+                        if (user.getLastName().toLowerCase().contains(newText.toLowerCase())) {
+                            filtered_list.add(user);
+                        }
+                        if (user.getFirstName().toLowerCase().contains(newText.toLowerCase())) {
+                            filtered_list.add(user);
+                        }
+                    }
+                }
+                suggestFriendAdapter.notifyDataSetChanged();
+                return true;
             }
         });
-        // Suggest user
         rvListSuggestUsers.setLayoutManager(new LinearLayoutManager(this));
-        ArrayList<User> users_list = new ArrayList<>();
-        userDAO.getAll().observe(this, users -> {
-            users_list.clear();
-            users_list.addAll(users);
-            FriendAdapter suggestFriendAdapter = new FriendAdapter(users_list, AddFriendActivity.this);
-            rvListSuggestUsers.setAdapter(suggestFriendAdapter);
+
+        // TODO: get current user
+        userDAO.getSuggestedUsers(10.838665, 106.6652783).observe(this, users -> {
+            suggest_list.clear();
+            filtered_list.clear();
+            suggest_list.addAll(users);
+            filtered_list.addAll(users);
+            suggestFriendAdapter.notifyDataSetChanged();
         });
     }
+
+    //    latitude:10.838665
+//    longitude:106.6652783
+    public void insertUserIn10km() {
+        for (int i = 0; i < 2; i++) {
+            String id = "user" + i;
+            String email = "user" + i + "@example.com";
+            String phone = "098765432" + i;
+            String firstName = "User " + i;
+            String lastName = "Last Name";
+            String dateOfBirth = "Jan 1, 1990 12:00:00 AM";
+            UserGenderEnum gender = UserGenderEnum.MALE;
+            double latitude = 10.838665 + (Math.random() * 0.1 - 0.05);
+            double longitude = 106.6652783 + (Math.random() * 0.1 - 0.05);
+            boolean isSharing = Math.random() < 0.5;
+
+            // Create the user object
+            User user = new User(id, email, phone, firstName, lastName, dateOfBirth, gender, latitude, longitude, isSharing);
+
+            userDAO.insert(user);
+
+            // Set the location of the user in GeoFire
+            userDAO.setLocation(id, latitude, longitude);
+        }
+    }
+
     @Override
     public int getLayoutResource() {
         return R.id.main_holder_friend;
     }
+
     @Override
     public void OnFriendsDetailClick(int position) {
         visit_user_id = Integer.toString(position + 1);

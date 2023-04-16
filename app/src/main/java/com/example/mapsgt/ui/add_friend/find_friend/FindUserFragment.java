@@ -55,17 +55,23 @@ public class FindUserFragment extends Fragment implements FriendAdapter.OnFriend
         View view = inflater.inflate(R.layout.fragment_find_user, container, false);
         rvUsers = view.findViewById(R.id.rcv_find_user);
         rvUsers.setLayoutManager(new LinearLayoutManager(getContext()));
-        //TODO: Find user by query
         mViewModel = new FindUserViewModel();
-        users_list = mViewModel.findFriend(mQuery);
-        if (users_list == null) {
-            users_list = new ArrayList<>();
-        } else {
-            users_list = mViewModel.findFriend(mQuery);
+
+        mViewModel.findFriendByEmail(mQuery).observe(getViewLifecycleOwner(), users -> {
+            users_list.clear();
+            users_list.add(users);
             FriendAdapter friendAdapter = new FriendAdapter(users_list, this);
             rvUsers.setAdapter(friendAdapter);
-            friendAdapter.notifyDataSetChanged();
-        }
+            //friendAdapter.notifyDataSetChanged();
+        });
+
+        mViewModel.findFriendByPhone(mQuery).observe(getViewLifecycleOwner(), users -> {
+            users_list.clear();
+            users_list.add(users);
+            FriendAdapter friendAdapter = new FriendAdapter(users_list, this);
+            rvUsers.setAdapter(friendAdapter);
+            //friendAdapter.notifyDataSetChanged();
+        });
         // Inflate the layout for this fragment
         return view;
     }

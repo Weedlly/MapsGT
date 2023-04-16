@@ -19,24 +19,24 @@
         app:searchIcon="@drawable/ic_search" >
     </androidx.appcompat.widget.SearchView>
 
+    <FrameLayout
+        android:id="@+id/main_holder_friend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+    </FrameLayout>
+
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Gợi ý bạn bè" />
 
-    <FrameLayout
-        android:id="@+id/main_holder_friend"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcv_list_users"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rcv_list_users"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/background_icon_gray" />
-    </FrameLayout>
-
+        android:layout_height="wrap_content"
+        android:background="@drawable/background_icon_gray" />
 </LinearLayout>
 
 

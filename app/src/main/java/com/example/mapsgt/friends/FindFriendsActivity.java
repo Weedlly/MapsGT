@@ -16,8 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mapsgt.R;
 import com.example.mapsgt.adapter.FriendAdapter;
 import com.example.mapsgt.data.entities.User;
-
-import com.example.mapsgt.enumeration.UserGenderEnum;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,7 +24,6 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class FindFriendsActivity extends AppCompatActivity implements FriendAdapter.OnFriendsDetailListener{
     private RecyclerView mRecyclerView;
@@ -59,22 +56,6 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
 
 
     }
-
-    private ArrayList<User> getListUsers() {
-        ArrayList<User> list_friend = new ArrayList<>();
-        list_friend.add(new User("1", "testing01@gmail.com", "012345678", "Duy01", "Alann", null, UserGenderEnum.MALE));
-        list_friend.add(new User("2", "testing02@gmail.com", "012845678", "B02", "Run", null, UserGenderEnum.MALE));
-        list_friend.add(new User("3", "testing03@gmail.com", "012345678", "C03", "Fire", null, UserGenderEnum.FEMALE));
-        list_friend.add(new User("4", "testing04@gmail.com", "012965678", "D04", "Brown", null, UserGenderEnum.FEMALE));
-        list_friend.add(new User("5", "testing05@gmail.com", "012345678", "E05", "Billy", null, UserGenderEnum.OTHER));
-        list_friend.add(new User("6", "testing06@gmail.com", "013745678", "F06", "Fear", null, UserGenderEnum.MALE));
-        list_friend.add(new User("7", "testing07@gmail.com", "012355578", "G07", "Google", null, UserGenderEnum.MALE));
-        list_friend.add(new User("8", "testing08@gmail.com", "012349998", "H08", "Day", null, UserGenderEnum.FEMALE));
-        list_friend.add(new User("9", "testing08@gmail.com", "012341018", "L09", "Simon", null, UserGenderEnum.OTHER));
-
-        return list_friend;
-    }
-
 
     @Override
     public void onBackPressed() {
@@ -184,15 +165,5 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
         Intent intent = new Intent(this, PersonProfileActivity.class);
         intent.putExtra("visit_user_id", visit_user_id);
         startActivity(intent);
-    }
-
-    private void UpDataToFirebase()
-    {
-        HashMap<String, Object> hashMap = new HashMap<>();
-        for (int i = 0; i < getListUsers().size(); i++) {
-            hashMap.put( getListUsers().get(i).getId(), getListUsers().get(i));
-        }
-
-        allUserDatabaseRef.child("User").setValue(hashMap);
     }
 }
