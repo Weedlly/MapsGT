@@ -7,12 +7,10 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -54,6 +52,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -77,8 +76,12 @@ public class MapsFragment extends Fragment implements
     private static final String TAG = "LocationFragment";
     private static final int ACCESS_FINE_LOCATION_CODE = 100;
     final RoutesItem[] routesItem = {new RoutesItem()};
+    private String mapMode = "SHOW";
     private Switch sw_sharing;
-    private final ArrayList<LatLng> markerPoints = new ArrayList<LatLng>();
+    private TextView tv_distance;
+    private TextView tv_duration;
+    private Button btn_start_moving;
+    private Button btn_stop_moving;
     private LocationManager mLocationManager;
     private GoogleMap mGoogleMap;
     private Button mSearchButton;
@@ -87,6 +90,7 @@ public class MapsFragment extends Fragment implements
     private UserLocation currentUser;
     List<String> friendIdList = new ArrayList<>();
     List<UserLocation> friendLocations = new ArrayList<>();
+    private LatLng destination;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -107,18 +111,36 @@ public class MapsFragment extends Fragment implements
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
 
+        tv_distance = view.findViewById(R.id.tv_distance);
+        tv_duration = view.findViewById(R.id.tv_duration);
         sw_sharing = view.findViewById(R.id.sw_sharing);
+        btn_start_moving = view.findViewById(R.id.btn_start_moving);
+        btn_stop_moving = view.findViewById(R.id.btn_stop_moving);
 
-        sw_sharing.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (sw_sharing.isChecked()) {
-                    startTrackerService();
-                    showFriendLocation();
-                } else {
-                    stopTrackerService();
-                    renderAllMarker();
-                }
+        btn_start_moving.setOnClickListener(view1 -> {
+            mapMode = "MOVING";
+            btn_start_moving.setVisibility(View.GONE);
+            btn_stop_moving.setVisibility(View.VISIBLE);
+            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), 25f));
+        });
+
+        btn_stop_moving.setOnClickListener(view13 -> {
+            mapMode = "SHOW";
+            btn_stop_moving.setVisibility(View.GONE);
+            btn_start_moving.setVisibility(View.GONE);
+            moveToMyLocation();
+            renderAllMarker();
+            tv_duration.setVisibility(View.GONE);
+            tv_distance.setVisibility(View.GONE);
+        });
+
+        sw_sharing.setOnClickListener(view12 -> {
+            if (sw_sharing.isChecked()) {
+                startTrackerService();
+                showFriendLocation();
+            } else {
+                stopTrackerService();
+                renderAllMarker();
             }
         });
 
@@ -133,7 +155,6 @@ public class MapsFragment extends Fragment implements
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
 
         mapFragment.getMapAsync(this);
-
 
         checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, ACCESS_FINE_LOCATION_CODE);
     }
@@ -152,41 +173,21 @@ public class MapsFragment extends Fragment implements
     }
 
     private void addDestinationPoint(LatLng latLng) {
-        if (markerPoints.size() > 1) {
-            clearMarkers();
-            renderAllMarker();
-        }
-        // Adding new item to the ArrayList
-        markerPoints.add(latLng);
+        destination = latLng;
 
         // Creating MarkerOptions
-        MarkerOptions options = new MarkerOptions();
+        MarkerOptions options = new MarkerOptions()
+                .position(latLng)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
 
-        // Setting the position of the marker
-        options.position(latLng);
-
-        if (markerPoints.size() == 1) {
-            options.icon(
-                    BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)
-            );
-        } else if (markerPoints.size() == 2) {
-            options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-        }
-
-        // Add new marker to the Google Map Android API V2
+        renderAllMarker();
         mGoogleMap.addMarker(options);
-
-        // Checks, whether start and end locations are captured
-        if (markerPoints.size() >= 2) {
-            LatLng origin = markerPoints.get(0);
-            LatLng dest = markerPoints.get(1);
-
-            getDirection(origin, dest);
-        }
+        getDirection(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), latLng);
     }
 
     private void drawDirectionLine(LatLng origin, LatLng dest) {
-        List<List<Double>> coordinates = routesItem[0].getGeometry().getCoordinates();
+        RoutesItem route = routesItem[0];
+        List<List<Double>> coordinates = route.getGeometry().getCoordinates();
         LatLng nextStep = origin;
         PolylineOptions polylineOptions = new PolylineOptions();
         for (List<Double> step : coordinates) {
@@ -195,10 +196,13 @@ public class MapsFragment extends Fragment implements
             nextStep = lng;
         }
         polylineOptions.add(nextStep, dest);
-        TextView duration = getView().findViewById(R.id.duration_tv);
-        TextView distance = getView().findViewById(R.id.distance_tv);
-        duration.setText("Duration: " + routesItem[0].getDuration() + " p");
-        distance.setText("Distance: " + routesItem[0].getDistance() + " m");
+        tv_duration.setVisibility(View.VISIBLE);
+        tv_duration.setText("Thời gian: " + formatDuration(route.getDuration()));
+        tv_distance.setVisibility(View.VISIBLE);
+        tv_distance.setText("Khoảng cách: " + formatDistance(route.getDistance()));
+        if (mapMode.equals("SHOW")) {
+            btn_start_moving.setVisibility(View.VISIBLE);
+        }
         mGoogleMap.addPolyline(polylineOptions);
     }
 
@@ -245,45 +249,11 @@ public class MapsFragment extends Fragment implements
         }
     }
 
-    private void clearMarkers() {
-        markerPoints.clear();
-        mGoogleMap.clear();
-    }
-
-    private void handleMyLocation() {
+    private void moveToMyLocation() {
         LatLng latLng = new LatLng(currentUser.getLatitude(), currentUser.getLongitude());
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f));
-        clearMarkers();
-        markerPoints.add(latLng);
 
-        // Todo: replace this when using real data to get user avatar, name, status
         renderUserMarker(currentUser);
-    }
-
-    public Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-        Matrix matrix = new Matrix();
-        matrix.postScale(scaleWidth, scaleHeight);
-        Bitmap resizedBitmap = Bitmap.createBitmap(
-                bm, 0, 0, width, height, matrix, false);
-        bm.recycle();
-        return resizedBitmap;
-    }
-
-    private BitmapDescriptor bitmapFromVector(Context context, int vectorResId) {
-
-        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
-
-        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        bitmap = getResizedBitmap(bitmap, 200, 200);
-        Canvas canvas = new Canvas(bitmap);
-        vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        vectorDrawable.draw(canvas);
-
-        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
     private void showFriendLocation() {
@@ -334,6 +304,12 @@ public class MapsFragment extends Fragment implements
 
         // user location
         renderUserMarker(currentUser);
+
+        if (mapMode.equals("MOVING")) {
+            LatLng latLng = new LatLng(currentUser.getLatitude(), currentUser.getLongitude());
+            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 25f));
+            getDirection(latLng, destination);
+        }
 
         // friend location
         if (currentUser.isSharing()) {
@@ -463,7 +439,7 @@ public class MapsFragment extends Fragment implements
                     currentUser = new UserLocation(response);
                     getBitmapDescriptorImg(response.getProfilePicture(), (BitmapDescriptor bitmapDescriptor) -> {
                         currentUser.setProfileImg(bitmapDescriptor);
-                        handleMyLocation();
+                        moveToMyLocation();
                     });
                 }
             }
@@ -544,7 +520,7 @@ public class MapsFragment extends Fragment implements
                 new GoogleMap.OnMyLocationButtonClickListener() {
                     @Override
                     public boolean onMyLocationButtonClick() {
-                        handleMyLocation();
+                        moveToMyLocation();
                         return true;
                     }
                 }
@@ -553,7 +529,9 @@ public class MapsFragment extends Fragment implements
         mGoogleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                addDestinationPoint(latLng);
+                if (mapMode.equals("SHOW")) {
+                    addDestinationPoint(latLng);
+                }
             }
         });
 
@@ -571,6 +549,51 @@ public class MapsFragment extends Fragment implements
             currentUser.setLatitude(locationGPS.getLatitude());
             currentUser.setLongitude(locationGPS.getLongitude());
         }
+
+        mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                if (marker.getPosition().latitude != currentUser.getLatitude() || marker.getPosition().longitude != currentUser.getLongitude()) {
+                    marker.showInfoWindow();
+                    destination = marker.getPosition();
+                    renderAllMarker();
+                    getDirection(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), marker.getPosition());
+                }
+
+                return true;
+            }
+        });
+    }
+
+    private String formatDistance(double distanceInMeters) {
+        if (distanceInMeters < 1000) {
+            // Round the distance to the nearest 10 meters.
+            int roundedDistance = (int) Math.round(distanceInMeters / 10.0) * 10;
+            return roundedDistance + " m";
+        } else if (distanceInMeters < 10000) {
+            // Round the distance to one decimal place.
+            double roundedDistance = Math.round(distanceInMeters / 100.0) / 10.0;
+            return roundedDistance + " km";
+        } else {
+            // Round the distance to the nearest kilometer.
+            int roundedDistance = (int) Math.round(distanceInMeters / 1000.0);
+            return roundedDistance + " km";
+        }
+    }
+
+    private String formatDuration(double seconds) {
+        int hours = (int) (seconds / 3600);
+        int minutes = (int) ((seconds % 3600) / 60);
+
+        String timeString;
+
+        if (hours > 0) {
+            timeString = String.format("%d giờ %02d phút", hours, minutes);
+        } else {
+            timeString = String.format("%d phút", minutes);
+        }
+
+        return timeString;
     }
 }
 
