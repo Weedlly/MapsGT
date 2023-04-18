@@ -75,7 +75,6 @@ public class MapsFragment extends Fragment implements
     private static final String TAG = "LocationFragment";
     private static final int ACCESS_FINE_LOCATION_CODE = 100;
     final RoutesItem[] routesItem = {new RoutesItem()};
-    private String mapMode = "SHOW";
     private Switch sw_sharing;
     private TextView tv_distance;
     private TextView tv_duration;
@@ -87,15 +86,14 @@ public class MapsFragment extends Fragment implements
     private DatabaseReference mDatabase;
     private ValueEventListener mValueEventListener;
     private UserLocation currentUser;
-    List<String> friendIdList = new ArrayList<>();
-    List<UserLocation> friendLocations = new ArrayList<>();
-    private LatLng destination;
-    private String goingFriendId;
-    private boolean isGoingToFriend;
+    private List<String> friendIdList = new ArrayList<>();
+    private List<UserLocation> friendLocations = new ArrayList<>();
+    private MapManagement mapManagement;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mapManagement = new MapManagement();
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
         //Check whether GPS tracking is enabled
@@ -119,15 +117,15 @@ public class MapsFragment extends Fragment implements
         btn_stop_moving = view.findViewById(R.id.btn_stop_moving);
 
         btn_start_moving.setOnClickListener(view1 -> {
-            mapMode = "MOVING";
+            mapManagement.setMapMode(MapMode.MOVING);
             btn_start_moving.setVisibility(View.GONE);
             btn_stop_moving.setVisibility(View.VISIBLE);
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), 25f));
         });
 
         btn_stop_moving.setOnClickListener(view13 -> {
-            mapMode = "SHOW";
-            destination = null;
+            mapManagement.setMapMode(MapMode.SHOW);
+            mapManagement.setDestination(null);
             btn_stop_moving.setVisibility(View.GONE);
             btn_start_moving.setVisibility(View.GONE);
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), 15f));
@@ -141,7 +139,7 @@ public class MapsFragment extends Fragment implements
                 startTrackerService();
                 showFriendLocation();
             } else {
-                goingFriendId = null;
+                mapManagement.setGoingFriendId(null);
                 stopTrackerService();
                 renderAllMarker();
             }
@@ -176,7 +174,7 @@ public class MapsFragment extends Fragment implements
     }
 
     private void addDestinationPoint(LatLng latLng) {
-        destination = latLng;
+        mapManagement.setDestination(latLng);
 
         // Creating MarkerOptions
         MarkerOptions options = new MarkerOptions()
@@ -203,7 +201,7 @@ public class MapsFragment extends Fragment implements
         tv_distance.setVisibility(View.VISIBLE);
         tv_duration.setText("Thời gian: " + formatDuration(route.getDuration()));
         tv_distance.setText("Khoảng cách: " + formatDistance(route.getDistance()));
-        if (mapMode.equals("SHOW")) {
+        if (mapManagement.getMapMode().equals(MapMode.SHOW)) {
             btn_start_moving.setVisibility(View.VISIBLE);
         }
         mGoogleMap.addPolyline(polylineOptions);
@@ -312,17 +310,17 @@ public class MapsFragment extends Fragment implements
         renderUserMarker(currentUser);
 
         LatLng latLng = new LatLng(currentUser.getLatitude(), currentUser.getLongitude());
-        if (mapMode.equals("MOVING")) {
+        if (mapManagement.getMapMode().equals(MapMode.MOVING)) {
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 25f));
         }
 
-        if (!isGoingToFriend && destination != null) {
+        if (!mapManagement.isGoingToFriend() && mapManagement.getDestination() != null) {
             MarkerOptions options = new MarkerOptions()
-                    .position(destination)
+                    .position(mapManagement.getDestination())
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
 
             mGoogleMap.addMarker(options);
-            getDirection(latLng, destination);
+            getDirection(latLng, mapManagement.getDestination());
         }
 
         // friend location
@@ -330,9 +328,17 @@ public class MapsFragment extends Fragment implements
             friendLocations.forEach((friend -> {
                 if (friend != null && friend.isSharing()) {
                     renderUserMarker(friend);
-                    if (isGoingToFriend && friend.getId().equals(goingFriendId)) {
+                    if (mapManagement.isGoingToFriend() && friend.getId().equals(mapManagement.getGoingFriendId())) {
                         getDirection(latLng, new LatLng(friend.getLatitude(), friend.getLongitude()));
                     }
+                } else if(!friend.isSharing() && friend.getId().equals(mapManagement.getGoingFriendId())) {
+                    LatLng stoppedSharingFriendLocation = new LatLng(friend.getLatitude(), friend.getLongitude());
+                    MarkerOptions options = new MarkerOptions()
+                            .position(stoppedSharingFriendLocation)
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+
+                    mGoogleMap.addMarker(options);
+                    getDirection(latLng, stoppedSharingFriendLocation);
                 }
             }));
         }
@@ -552,8 +558,8 @@ public class MapsFragment extends Fragment implements
         mGoogleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                if (mapMode.equals("SHOW")) {
-                    isGoingToFriend = false;
+                if (mapManagement.getMapMode().equals(MapMode.SHOW)) {
+                    mapManagement.setGoingToFriend(false);
                     addDestinationPoint(latLng);
                 }
             }
@@ -578,8 +584,8 @@ public class MapsFragment extends Fragment implements
             @Override
             public boolean onMarkerClick(Marker marker) {
                 if (marker.getPosition().latitude != currentUser.getLatitude() || marker.getPosition().longitude != currentUser.getLongitude()) {
-                    isGoingToFriend = true;
-                    goingFriendId = (String) marker.getTag();
+                    mapManagement.setGoingToFriend(true);
+                    mapManagement.setGoingFriendId((String) marker.getTag());
                     renderAllMarker();
                 }
 
