@@ -31,7 +31,6 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
     public static ArrayList<User> mListFriends = new ArrayList<>();
 
     private FriendAdapter mListFriendRecyclerAdapter;
-    //private personAdapter mListPersonAdapter;
 
     private SearchView searchView;
 
@@ -48,13 +47,8 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_find_friends);
 
-        //mListFriends = getListUsers();
-       //UpDataToFirebase();
-
 
        initRecyclerView();
-
-
     }
 
     @Override
@@ -160,8 +154,11 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
     @Override
     public void OnFriendsDetailClick(int position) {
        // Log.d(TAG, "onFriendDetailClick: clicker." + position);
+//        Log.d(TAG, "ID: " + mListFriends.get(position).getId());
 
-        visit_user_id = Integer.toString(position + 1);
+//        visit_user_id = Integer.toString(position + 1);
+
+        visit_user_id = mListFriends.get(position + 1).getId();
         Intent intent = new Intent(this, PersonProfileActivity.class);
         intent.putExtra("visit_user_id", visit_user_id);
         startActivity(intent);

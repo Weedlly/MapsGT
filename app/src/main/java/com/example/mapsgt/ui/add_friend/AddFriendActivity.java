@@ -1,6 +1,10 @@
 package com.example.mapsgt.ui.add_friend;
 
+import static android.content.ContentValues.TAG;
+
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -11,6 +15,7 @@ import com.example.mapsgt.adapter.FriendAdapter;
 import com.example.mapsgt.data.dao.UserDAO;
 import com.example.mapsgt.data.entities.User;
 import com.example.mapsgt.enumeration.UserGenderEnum;
+import com.example.mapsgt.friends.PersonProfileActivity;
 import com.example.mapsgt.ui.add_friend.find_friend.FindUserFragment;
 import com.example.mapsgt.ui.base.BaseActivity;
 import com.google.firebase.database.FirebaseDatabase;
@@ -112,7 +117,14 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
 
     @Override
     public void OnFriendsDetailClick(int position) {
-        visit_user_id = Integer.toString(position + 1);
+        //visit_user_id = Integer.toString(position + 1);
+
+        visit_user_id = filtered_list.get(position + 1).getId();
+        Log.d(TAG, "ID to find: " + visit_user_id);
+        //Intent intent = new Intent(this, PersonProfileActivity.class);
+        //intent.putExtra("visit_user_id", visit_user_id);
+        //startActivity(intent);
+
         Bundle bundle = new Bundle();
         bundle.putString("visit_user_id", visit_user_id);
         //TODO: add bundle to intent and start activity

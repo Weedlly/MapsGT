@@ -4,6 +4,8 @@ import static android.content.ContentValues.TAG;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentResultListener;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,8 +14,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.mapsgt.R;
 import com.example.mapsgt.data.entities.User;
+import com.example.mapsgt.ui.add_friend.find_friend.FindUserFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,7 +42,8 @@ public class PersonProfileActivity extends AppCompatActivity {
 
     private DatabaseReference FriendRequestFef, UsersRef, FriendsFef;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();;
-    private String senderUserId, receiverUserId, CURRENT_STATE, saveCurrentDate;
+    private String senderUserId , CURRENT_STATE, saveCurrentDate;
+    private static String receiverUserId ;
 
 
     @Override
@@ -46,12 +51,14 @@ public class PersonProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_person_profile);
 
-        senderUserId = "0";  //mAuth.getCurrentUser().getUid(); (Demo)
+        senderUserId = "aUGYHuCMN9SE61lS4Q9KeK4DgB62";  //mAuth.getCurrentUser().getUid(); (Demo)
+
+        Log.d(TAG, "Id visit: " + receiverUserId);
         Intent intent = getIntent();
         receiverUserId = intent.getStringExtra("visit_user_id");
-        Log.d(TAG, "Id visit: " + receiverUserId);
 
-        UsersRef = FirebaseDatabase.getInstance().getReference().child("User");
+
+        UsersRef = FirebaseDatabase.getInstance().getReference().child("users");
         FriendRequestFef = FirebaseDatabase.getInstance().getReference().child("FriendRequest");
         FriendsFef = FirebaseDatabase.getInstance().getReference().child("Friends");
 
@@ -63,20 +70,26 @@ public class PersonProfileActivity extends AppCompatActivity {
                 if (snapshot.exists())
                 {
 
-                    // String personProfileImage = snapshot.child("profileimage").getValue().toString(); //Todo
+                    String personProfileImage = snapshot.child("profilePicture").getValue().toString(); //Todo
                     String personUserName = snapshot.child("email").getValue().toString();
                     String personProfileName = snapshot.child("firstName").getValue().toString() + " " + snapshot.child("lastName").getValue().toString();
-                    String personProfileStatus = "Location: " + snapshot.child("lastKnownLocationId").getValue().toString();
-                    // String personDOB = "DOB: " + snapshot.child("dateOfBirth").getValue().toString(); //Todo
+                    String personProfileStatus = "Location: (" + snapshot.child("longitude").getValue().toString() + ", " + snapshot.child("latitude").getValue().toString() + ")";
+                    String personDOB = "DOB: " + snapshot.child("dateOfBirth").getValue().toString(); //Todo
                     String personCountry = "Phone: " + snapshot.child("phone").getValue().toString();
-                    String personGender = snapshot.child("gender").getValue().toString();
+                    String personGender = "General: " + snapshot.child("gender").getValue().toString();
 
-                    //Picasso.with(PersonProfileActivity.this).load(personProfileImage).placeholder(R.drawable.ic_profile);
+                    Picasso.with(PersonProfileActivity.this).load(personProfileImage).placeholder(R.drawable.ic_profile); //Todo
+
+                    Glide.with(PersonProfileActivity.this)
+                            .load(personProfileImage)
+                            .placeholder(R.drawable.ic_profile) // optional placeholder image
+                            .error(R.drawable.google) // optional error image
+                            .into(userProfileImage);
 
                     userName.setText( personUserName);
                     userProfileName.setText(personProfileName);
                     userStatus.setText(personProfileStatus);
-                    //userDOB.setText(personDOB);
+                    userDOB.setText(personDOB);
                     userCountry.setText(personCountry);
                     userGender.setText(personGender);
 
@@ -99,7 +112,7 @@ public class PersonProfileActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     SendFriendRequestBTN.setEnabled(false);
-                    
+
                     if (CURRENT_STATE.equals("not_friends"))
                     {
                         SendFriendRequestToPerson();
@@ -123,6 +136,7 @@ public class PersonProfileActivity extends AppCompatActivity {
             DeclineFriendRequestBTN.setVisibility(View.INVISIBLE);
             SendFriendRequestBTN.setEnabled(false);
         }
+
     }
 
     private void UnFriendAnExistingFriend() {
@@ -284,16 +298,13 @@ public class PersonProfileActivity extends AppCompatActivity {
                                                 DeclineFriendRequestBTN.setEnabled(false);
                                             }
                                         }
-
                                         @Override
                                         public void onCancelled(@NonNull DatabaseError error) {
 
                                         }
                                     });
                         }
-
                     }
-
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
 
@@ -319,7 +330,7 @@ public class PersonProfileActivity extends AppCompatActivity {
                                     {
                                         SendFriendRequestBTN.setEnabled(true);
                                         CURRENT_STATE = "request_sent";
-                                        SendFriendRequestBTN.setText("Unfriend");
+                                        SendFriendRequestBTN.setText("Cancel Sent Request");
 
                                         DeclineFriendRequestBTN.setVisibility(View.INVISIBLE);
                                         DeclineFriendRequestBTN.setEnabled(false);

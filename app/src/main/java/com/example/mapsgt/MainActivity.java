@@ -10,8 +10,8 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.mapsgt.ui.map.MapsFragment;
-import com.example.mapsgt.ui.navigation.FavoriteFragment;
-import com.example.mapsgt.ui.navigation.HistoryFragment;
+import com.example.mapsgt.ui.map.navigation.FavoriteFragment;
+import com.example.mapsgt.ui.map.navigation.HistoryFragment;
 import com.example.mapsgt.ui.auth.AuthActivity;
 import com.example.mapsgt.ui.base.BaseActivity;
 import com.google.android.material.navigation.NavigationView;
