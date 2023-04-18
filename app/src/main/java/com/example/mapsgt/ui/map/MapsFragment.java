@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -91,6 +90,8 @@ public class MapsFragment extends Fragment implements
     List<String> friendIdList = new ArrayList<>();
     List<UserLocation> friendLocations = new ArrayList<>();
     private LatLng destination;
+    private String goingFriendId;
+    private boolean isGoingToFriend;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -126,9 +127,10 @@ public class MapsFragment extends Fragment implements
 
         btn_stop_moving.setOnClickListener(view13 -> {
             mapMode = "SHOW";
+            destination = null;
             btn_stop_moving.setVisibility(View.GONE);
             btn_start_moving.setVisibility(View.GONE);
-            moveToMyLocation();
+            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), 15f));
             renderAllMarker();
             tv_duration.setVisibility(View.GONE);
             tv_distance.setVisibility(View.GONE);
@@ -139,6 +141,7 @@ public class MapsFragment extends Fragment implements
                 startTrackerService();
                 showFriendLocation();
             } else {
+                goingFriendId = null;
                 stopTrackerService();
                 renderAllMarker();
             }
@@ -197,8 +200,8 @@ public class MapsFragment extends Fragment implements
         }
         polylineOptions.add(nextStep, dest);
         tv_duration.setVisibility(View.VISIBLE);
-        tv_duration.setText("Thời gian: " + formatDuration(route.getDuration()));
         tv_distance.setVisibility(View.VISIBLE);
+        tv_duration.setText("Thời gian: " + formatDuration(route.getDuration()));
         tv_distance.setText("Khoảng cách: " + formatDistance(route.getDistance()));
         if (mapMode.equals("SHOW")) {
             btn_start_moving.setVisibility(View.VISIBLE);
@@ -207,6 +210,9 @@ public class MapsFragment extends Fragment implements
     }
 
     private void getDirection(LatLng origin, LatLng dest) {
+        if (origin == null || dest == null) {
+            return;
+        }
         Call<LocationResponse> call = RetrofitClient.getInstance().getMyApi().getMyDirection(String.valueOf(MovingStyleEnum.driving),
                 origin.longitude,
                 origin.latitude,
@@ -305,17 +311,28 @@ public class MapsFragment extends Fragment implements
         // user location
         renderUserMarker(currentUser);
 
+        LatLng latLng = new LatLng(currentUser.getLatitude(), currentUser.getLongitude());
         if (mapMode.equals("MOVING")) {
-            LatLng latLng = new LatLng(currentUser.getLatitude(), currentUser.getLongitude());
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 25f));
+        }
+
+        if (!isGoingToFriend && destination != null) {
+            MarkerOptions options = new MarkerOptions()
+                    .position(destination)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+
+            mGoogleMap.addMarker(options);
             getDirection(latLng, destination);
         }
 
         // friend location
         if (currentUser.isSharing()) {
-            friendLocations.stream().forEach((friend -> {
+            friendLocations.forEach((friend -> {
                 if (friend != null && friend.isSharing()) {
                     renderUserMarker(friend);
+                    if (isGoingToFriend && friend.getId().equals(goingFriendId)) {
+                        getDirection(latLng, new LatLng(friend.getLatitude(), friend.getLongitude()));
+                    }
                 }
             }));
         }
@@ -328,7 +345,8 @@ public class MapsFragment extends Fragment implements
                 .snippet("Marker Snippet")
                 .icon(userLocation.getProfileImg());
 
-        mGoogleMap.addMarker(markerOptions);
+        Marker marker = mGoogleMap.addMarker(markerOptions);
+        marker.setTag(userLocation.getId());
     }
 
     private void requestLocationUpdatesListener() {
@@ -451,19 +469,24 @@ public class MapsFragment extends Fragment implements
         });
     }
 
-    public interface OnBitmapDescriptorLoadedListener {
+    private interface OnBitmapDescriptorLoadedListener {
         void onBitmapDescriptorLoaded(BitmapDescriptor bitmapDescriptor);
     }
 
     private Bitmap getCircularBitmap(Bitmap bitmap) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
-        int radius = Math.min(width, height) / 2;
+        int diameter = 150;
 
-        Bitmap output = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        // Calculate scaling factor to fit the image within the 120px diameter
+        float scale = (float) diameter / Math.min(width, height);
+
+        // Scale the bitmap to fit the 120px diameter
+        Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, Math.round(width * scale), Math.round(height * scale), true);
+
+        Bitmap output = Bitmap.createBitmap(diameter, diameter, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
         Paint paint = new Paint();
-        Rect rect = new Rect(0, 0, width, height);
 
         paint.setAntiAlias(true);
         canvas.drawARGB(0, 0, 0, 0);
@@ -474,16 +497,16 @@ public class MapsFragment extends Fragment implements
 
         // Draw the circle
         paint.setStyle(Paint.Style.FILL);
-        canvas.drawCircle(width / 2f, height / 2f, radius, paint);
+        canvas.drawCircle(diameter / 2f, diameter / 2f, diameter / 2f, paint);
 
         // Draw the border
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(borderWidth);
         paint.setColor(borderColor);
-        canvas.drawCircle(width / 2f, height / 2f, radius - borderWidth / 2f, paint);
+        canvas.drawCircle(diameter / 2f, diameter / 2f, diameter / 2f - borderWidth / 2f, paint);
 
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, rect, rect, paint);
+        canvas.drawBitmap(scaledBitmap, (diameter - scaledBitmap.getWidth()) / 2f, (diameter - scaledBitmap.getHeight()) / 2f, paint);
 
         return output;
     }
@@ -530,6 +553,7 @@ public class MapsFragment extends Fragment implements
             @Override
             public void onMapClick(LatLng latLng) {
                 if (mapMode.equals("SHOW")) {
+                    isGoingToFriend = false;
                     addDestinationPoint(latLng);
                 }
             }
@@ -554,10 +578,9 @@ public class MapsFragment extends Fragment implements
             @Override
             public boolean onMarkerClick(Marker marker) {
                 if (marker.getPosition().latitude != currentUser.getLatitude() || marker.getPosition().longitude != currentUser.getLongitude()) {
-                    marker.showInfoWindow();
-                    destination = marker.getPosition();
+                    isGoingToFriend = true;
+                    goingFriendId = (String) marker.getTag();
                     renderAllMarker();
-                    getDirection(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), marker.getPosition());
                 }
 
                 return true;
