@@ -54,8 +54,6 @@ public class FriendsFragment extends Fragment {
         return view;
     }
 
-
-
     private void DisplayAllFriends() {
 
     }
