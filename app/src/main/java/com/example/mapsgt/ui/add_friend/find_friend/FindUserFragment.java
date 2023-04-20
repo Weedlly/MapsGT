@@ -1,11 +1,7 @@
 package com.example.mapsgt.ui.add_friend.find_friend;
 
-import static android.content.ContentValues.TAG;
-
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,6 +80,7 @@ public class FindUserFragment extends Fragment implements FriendAdapter.OnFriend
     @Override
     public void OnFriendsDetailClick(int position) {
         visit_user_id = users_list.get(position).getId();
+
         Intent intent = new Intent(getContext(), PersonProfileActivity.class);
         intent.putExtra("visit_user_id", visit_user_id);
         startActivity(intent);

@@ -1,4 +1,4 @@
-package com.example.mapsgt.ui.map.navigation;
+package com.example.mapsgt.ui.navigation;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

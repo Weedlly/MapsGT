@@ -2,7 +2,6 @@ package com.example.mapsgt.database;
 
 import androidx.lifecycle.LiveData;
 
-import com.example.mapsgt.data.entities.User;
 import com.google.firebase.database.DatabaseReference;
 
 import java.util.ArrayList;
@@ -26,5 +25,5 @@ public abstract class RealtimeDatabase<T> {
 
     public abstract void deleteAll();
 
-    public abstract LiveData<ArrayList<User>> getAll();
+    public abstract LiveData<ArrayList<T>> getAll();
 }

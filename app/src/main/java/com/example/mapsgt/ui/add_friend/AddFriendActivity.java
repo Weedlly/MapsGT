@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,6 +19,11 @@ import com.example.mapsgt.enumeration.UserGenderEnum;
 import com.example.mapsgt.friends.PersonProfileActivity;
 import com.example.mapsgt.ui.add_friend.find_friend.FindUserFragment;
 import com.example.mapsgt.ui.base.BaseActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
@@ -85,28 +91,38 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
         });
     }
 
-    //    latitude:10.838665
-//    longitude:106.6652783
     public void insertUserIn10km() {
-        for (int i = 0; i < 2; i++) {
-            String id = "user" + i;
+        for (int i = 0; i < 4; i++) {
             String email = "user" + i + "@example.com";
-            String phone = "098765432" + i;
+            String phoneNo = "098765432" + i;
             String firstName = "User " + i;
             String lastName = "Last Name";
-            String dateOfBirth = "Jan 1, 1990 12:00:00 AM";
+            String dob = "Jan 1, 1990";
             UserGenderEnum gender = UserGenderEnum.MALE;
             double latitude = 10.838665 + (Math.random() * 0.1 - 0.05);
             double longitude = 106.6652783 + (Math.random() * 0.1 - 0.05);
             boolean isSharing = Math.random() < 0.5;
 
-            // Create the user object
-            User user = new User(id, email, phone, firstName, lastName, dateOfBirth, gender, latitude, longitude, isSharing);
+            String password = "123456";
+            FirebaseAuth mAuth = FirebaseAuth.getInstance();
+            mAuth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                FirebaseUser authUser = mAuth.getCurrentUser();
 
-            userDAO.insert(user);
-
-            // Set the location of the user in GeoFire
-            userDAO.setLocation(id, latitude, longitude);
+                                if (authUser != null) {
+                                    User user = new User(authUser.getUid(), authUser.getEmail(), phoneNo, firstName, lastName, dob, gender, latitude, longitude, true);
+                                    userDAO.insert(user);
+                                    // Set the location of the user in GeoFire
+                                    userDAO.setLocation(authUser.getUid(), latitude, longitude);
+                                }
+                            } else {
+                                Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                            }
+                        }
+                    });
         }
     }
 
@@ -117,16 +133,10 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
 
     @Override
     public void OnFriendsDetailClick(int position) {
-        //visit_user_id = Integer.toString(position + 1);
+        visit_user_id = filtered_list.get(position).getId();
 
-        visit_user_id = filtered_list.get(position + 1).getId();
-        Log.d(TAG, "ID to find: " + visit_user_id);
-        //Intent intent = new Intent(this, PersonProfileActivity.class);
-        //intent.putExtra("visit_user_id", visit_user_id);
-        //startActivity(intent);
-
-        Bundle bundle = new Bundle();
-        bundle.putString("visit_user_id", visit_user_id);
-        //TODO: add bundle to intent and start activity
+        Intent intent = new Intent(AddFriendActivity.this, PersonProfileActivity.class);
+        intent.putExtra("visit_user_id", visit_user_id);
+        startActivity(intent);
     }
 }
