@@ -1,10 +1,7 @@
 package com.example.mapsgt.friends;
 
-import static android.content.ContentValues.TAG;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -76,7 +73,6 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
                 {
                     User user = dataSnapshot.getValue(User.class);
                     mListFriends.add(user);
-                    //Log.d(TAG, mListFriends.toString());
 
                     mListFriendRecyclerAdapter = new FriendAdapter( mListFriends, FindFriendsActivity.this);
                     mRecyclerView.setAdapter(mListFriendRecyclerAdapter);
@@ -89,7 +85,7 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                // TODO: Handle error
             }
         });
     }
@@ -107,9 +103,7 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
             }
             @Override
             public boolean onQueryTextChange(String newText) {
-                //Log.d(TAG, "Debug Search View 2");
                 mListFriendRecyclerAdapter.getFilter().filter(newText);
-                Log.d(TAG, "queryData: " + mListFriendRecyclerAdapter.getFilter());
 
                 //mListFriends.clear();
 
@@ -118,17 +112,13 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
                 Query queryData = FirebaseDatabase.getInstance().getReference("User").orderByChild("firstName").equalTo(newText);
 
                 queryData.addValueEventListener(new ValueEventListener() {
-
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         mListFriends.clear();
-                        //Log.d(TAG,"Show seach view");
                         for (DataSnapshot dataSnapshot : snapshot.getChildren())
                         {
                             User user = dataSnapshot.getValue(User.class);
                             mListFriends.add(user);
-                            //Log.d(TAG, mListFriends.toString());
-                            Log.d(TAG, "List friend search: " + mListFriends.toString());
 
                             mListFriendRecyclerAdapter = new FriendAdapter( mListFriends, FindFriendsActivity.this);
                             mRecyclerView.setAdapter(mListFriendRecyclerAdapter);
@@ -138,13 +128,11 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
                         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(FindFriendsActivity.this, DividerItemDecoration.VERTICAL);
                         mRecyclerView.addItemDecoration(itemDecoration);
                     }
-
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
 
                     }
                 });
-
                 return false;
             }
         });
@@ -153,9 +141,6 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
 
     @Override
     public void OnFriendsDetailClick(int position) {
-       // Log.d(TAG, "onFriendDetailClick: clicker." + position);
-//        Log.d(TAG, "ID: " + mListFriends.get(position).getId());
-
 //        visit_user_id = Integer.toString(position + 1);
 
         visit_user_id = mListFriends.get(position + 1).getId();

@@ -6,14 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mapsgt.R;
-import com.example.mapsgt.adapter.FriendAdapter;
-import com.example.mapsgt.ui.add_friend.find_friend.FindUserFragment;
 
 public class FriendsFragment extends Fragment {
     private static final String ARG_PARAM = "query";
@@ -47,14 +44,8 @@ public class FriendsFragment extends Fragment {
         View view = inflater.inflate(R.layout.activity_friends, container, false);
         rvFriends = view.findViewById(R.id.friend_list);
         rvFriends.setLayoutManager(new LinearLayoutManager(getContext()));
-
-
-
-
         return view;
     }
-
-
 
     private void DisplayAllFriends() {
 
@@ -70,6 +61,4 @@ public class FriendsFragment extends Fragment {
             mView = itemView;
         }
     }
-
-
 }
