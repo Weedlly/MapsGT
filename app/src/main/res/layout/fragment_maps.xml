@@ -6,13 +6,13 @@
     android:name="com.google.android.gms.maps.SupportMapFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginTop="50dp"
     map:cameraTilt="30"
     map:mapId="@string/map_id"
     map:uiRotateGestures="true"
     map:uiZoomControls="true"
     tools:context="ui.map.MapsFragment"
-    tools:ignore="FragmentTagUsage"
-    tools:layout="@layout/fragment_home">
+    tools:ignore="FragmentTagUsage">
 
     <RelativeLayout
         android:layout_width="match_parent"
