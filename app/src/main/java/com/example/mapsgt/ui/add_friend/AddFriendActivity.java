@@ -133,7 +133,7 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
 
     @Override
     public void OnFriendsDetailClick(int position) {
-        visit_user_id = filtered_list.get(position + 1).getId();
+        visit_user_id = filtered_list.get(position).getId();
 
         Intent intent = new Intent(AddFriendActivity.this, PersonProfileActivity.class);
         intent.putExtra("visit_user_id", visit_user_id);
