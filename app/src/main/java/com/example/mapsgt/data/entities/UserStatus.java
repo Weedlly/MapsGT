@@ -73,11 +73,7 @@ public class UserStatus {
     public Date getCreatedAt() {
         return createdAt;
     }
-
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public static class Feedback {
     }
 }

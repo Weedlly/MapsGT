@@ -1,4 +1,4 @@
-package com.example.mapsgt;
+package com.example.mapsgt.ui.navigation;
 
 
 import static android.content.ContentValues.TAG;
@@ -17,6 +17,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.mapsgt.R;
 import com.example.mapsgt.data.entities.Feedback;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -30,9 +31,7 @@ public class FeedbackActivity extends AppCompatActivity {
     EditText name_data, message_data;
     TextView name_bug, message_bug;
     Button sent_fb, view_details;
-    private DatabaseReference allFBFef = FirebaseDatabase.getInstance().getReference("Feedback");
     private String currentUserId;
-    //private static String email = "";
     @Override
     protected void onCreate (Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -72,7 +71,6 @@ public class FeedbackActivity extends AppCompatActivity {
                                 {
                                     Log.d(TAG, "visible name");
                                     name_bug.setVisibility(View.VISIBLE);
-                                    //return;
                                 }
                                 if (!name_data.getText().toString().isEmpty()){
                                     Log.d(TAG, "Invisible name");
@@ -84,7 +82,6 @@ public class FeedbackActivity extends AppCompatActivity {
                                 {
                                     Log.d(TAG, "visible context");
                                     message_bug.setVisibility(View.VISIBLE);
-                                    //return;
                                 }
                                 if (!message_data.getText().toString().isEmpty()){
                                     Log.d(TAG, "Invisible context");
@@ -93,7 +90,6 @@ public class FeedbackActivity extends AppCompatActivity {
 
                                 Toast.makeText(FeedbackActivity.this, "Name or Message is null! Fail", Toast.LENGTH_SHORT)
                                         .show();
-
                                 return;
                             }
 
@@ -108,7 +104,6 @@ public class FeedbackActivity extends AppCompatActivity {
                             fb.child("Feedback").setValue(hashMap);
                             Toast.makeText(FeedbackActivity.this, "Send feedback successful", Toast.LENGTH_SHORT)
                                     .show();
-
 
                             view_details.setOnClickListener(new View.OnClickListener() {
                                 @Override
@@ -139,6 +134,7 @@ public class FeedbackActivity extends AppCompatActivity {
 
     }
 
+    //Option to call API GG sending Email
     private void OptionFeedbackByGoogleAccount() {
         Intent i = new Intent (Intent.ACTION_SEND);
         i.setType("message/html");

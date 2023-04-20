@@ -50,9 +50,12 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:17.0.0'
 
     implementation platform('com.google.firebase:firebase-bom:31.2.2')
-    implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.firebase:firebase-database'
+    implementation 'com.google.firebase:firebase-analytics:17.2.0'
+    implementation 'com.google.firebase:firebase-storage: 17.0.0'
+    implementation 'com.firebaseui:firebase-ui-database:8.0.0'
+    implementation 'com.google.firebase:firebase-database:20.0.0'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
@@ -76,14 +79,8 @@ dependencies {
     // Continuous update location
     implementation 'io.nlopez.smartlocation:library:3.3.3'
 
+    //Handle image
     implementation 'com.github.bumptech.glide:glide:4.12.0'
-
-
     implementation 'com.squareup.picasso:picasso:2.5.2'
-
-    implementation 'com.google.firebase:firebase-analytics:17.2.0'
-    implementation 'com.google.firebase:firebase-storage: 17.0.0'
-    implementation 'com.firebaseui:firebase-ui-database:8.0.0'
-    implementation 'com.google.firebase:firebase-database:20.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
 }
