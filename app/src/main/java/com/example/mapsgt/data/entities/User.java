@@ -21,7 +21,7 @@ public class User {
     public User() {
     }
 
-    public User(String id, String email, String phone, String firstName, String lastName, String dateOfBirth, UserGenderEnum gender, double latitude, double longitude, boolean isSharing) {
+    public User(String id, String email, String phone, String firstName, String lastName, String dateOfBirth, UserGenderEnum gender, double latitude, double longitude, boolean isSharing, String profilePicture) {
         this.id = id;
         this.email = email;
         this.phone = phone;
@@ -32,7 +32,7 @@ public class User {
         this.latitude = latitude;
         this.longitude = longitude;
         this.isSharing = isSharing;
-        this.profilePicture = "https://raw.githubusercontent.com/gotitinc/aha-assets/master/uifaces/m-10.jpg";
+        this.profilePicture = profilePicture;
     }
 
     public String getId() {

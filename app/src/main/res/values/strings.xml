@@ -20,7 +20,8 @@
     <string name="click_to_login">Click to login</string>
     <string name="click_to_register">You don\'t have an account? \n Go to register</string>
     <string name="forgot_password">Forgot password?</string>
-
+    <string name="search_hint" />
+    <string name="action_search">Search friends</string>
     <string name="nav_home">Home</string>
     <string name="nav_favorite">Favorite</string>
     <string name="nav_history">History</string>

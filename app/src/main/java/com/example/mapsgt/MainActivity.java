@@ -105,4 +105,5 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     public int getLayoutResource() {
         return R.id.main_holder;
     }
+
 }

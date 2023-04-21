@@ -35,14 +35,23 @@
             android:value="AIzaSyCo3yxkR1zXKi4nFel0ukpVJOiKHFx7UFw" />
 
         <service android:name=".service.TrackingService" />
+        <activity
+            android:name=".friends.PersonProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".friends.FindFriendsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.navigation.FeedbackActivity"
+            android:exported="false" />
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/title_activity_maps"
-            android:theme="@style/Theme.Material3.Light.NoActionBar"></activity>
+            android:theme="@style/Theme.Material3.Light.NoActionBar" />
         <activity
-            android:name=".ui.navigation.FeedbackActivity"
+            android:name=".ui.auth.AuthActivity"
             android:exported="true"
             android:theme="@style/Theme.Material3.Light.NoActionBar">
             <intent-filter>
