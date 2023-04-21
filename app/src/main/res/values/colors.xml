@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#CCCCCC</color>
+    <color name="colorPrimary">#ECEAEA</color>
     <color name="colorSecondary">#6A6A6A</color>
     <color name="colorBackground">#FFFFFF</color>
     <color name="colorOnBackground">#000000</color>
@@ -19,4 +19,5 @@
     <color name="light_blue_A200">#FF40C4FF</color>
     <color name="light_blue_A400">#FF00B0FF</color>
     <color name="black_overlay">#66000000</color>
+    <color name="colorProfile">#3B4041</color>
 </resources>
