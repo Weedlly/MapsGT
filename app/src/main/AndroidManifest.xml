@@ -42,7 +42,7 @@
             android:name=".friends.FindFriendsActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.auth.AuthActivity"
+            android:name=".ui.navigation.FeedbackActivity"
             android:exported="false" />
 
         <activity
@@ -51,7 +51,7 @@
             android:label="@string/title_activity_maps"
             android:theme="@style/Theme.Material3.Light.NoActionBar" />
         <activity
-            android:name=".ui.add_friend.AddFriendActivity"
+            android:name=".ui.auth.AuthActivity"
             android:exported="true"
             android:theme="@style/Theme.Material3.Light.NoActionBar">
             <intent-filter>
