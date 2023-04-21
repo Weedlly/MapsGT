@@ -5,7 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorProfile"
-    tools:context=".ui.add_friend.FriendsFragment">
+    tools:context=".ui.add_friend.FriendsActivity">
+
+    <FrameLayout
+        android:id="@+id/main_holder_friend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+    </FrameLayout>
 
     <TextView
         android:id="@+id/all_friends"

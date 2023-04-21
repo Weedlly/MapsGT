@@ -7,10 +7,7 @@ public class Friend {
     public String date;
     public String status;
 
-    public Friend()
-    {
-
-    }
+    public Friend() {}
 
     public void Friend(String senderId, String receiveId,String date, String status) {
         this.senderId = senderId;

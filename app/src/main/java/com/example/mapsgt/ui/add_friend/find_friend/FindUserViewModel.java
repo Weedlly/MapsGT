@@ -13,6 +13,7 @@ public class FindUserViewModel extends ViewModel {
     public FindUserViewModel() {
         userDAO = new UserDAO(FirebaseDatabase.getInstance().getReference("users"));
     }
+
     public LiveData<User> findFriendByEmail(String email) {
         return userDAO.getUserByEmail(email);
     }
@@ -20,4 +21,6 @@ public class FindUserViewModel extends ViewModel {
     public LiveData<User> findFriendByPhone(String id) {
         return userDAO.getUserByPhone(id);
     }
+
+
 }
