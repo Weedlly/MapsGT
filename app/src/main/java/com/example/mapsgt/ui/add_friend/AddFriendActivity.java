@@ -98,6 +98,7 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
             String firstName = "User " + i;
             String lastName = "Last Name";
             String dob = "Jan 1, 1990";
+            String profilePicture = "https://raw.githubusercontent.com/gotitinc/aha-assets/master/uifaces/m-10.jpg";
             UserGenderEnum gender = UserGenderEnum.MALE;
             double latitude = 10.838665 + (Math.random() * 0.1 - 0.05);
             double longitude = 106.6652783 + (Math.random() * 0.1 - 0.05);
@@ -113,7 +114,7 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
                                 FirebaseUser authUser = mAuth.getCurrentUser();
 
                                 if (authUser != null) {
-                                    User user = new User(authUser.getUid(), authUser.getEmail(), phoneNo, firstName, lastName, dob, gender, latitude, longitude, true);
+                                    User user = new User(authUser.getUid(), authUser.getEmail(), phoneNo, firstName, lastName, dob , gender, latitude, longitude, true, profilePicture);
                                     userDAO.insert(user);
                                     // Set the location of the user in GeoFire
                                     userDAO.setLocation(authUser.getUid(), latitude, longitude);

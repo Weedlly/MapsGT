@@ -53,9 +53,8 @@ public class PersonProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_person_profile);
-        // aUGYHuCMN9SE61lS4Q9KeK4DgB62
 
-        senderUserId = "O21R3tAHqjXH7uKEgUMlteCH8r03";  //mAuth.getCurrentUser().getUid(); (Demo)
+        senderUserId = "O21R3tAHqjXH7uKEgUMlteCH8r03";
 
         Log.d(TAG, "Id visit: " + receiverUserId);
         Intent intent = getIntent();

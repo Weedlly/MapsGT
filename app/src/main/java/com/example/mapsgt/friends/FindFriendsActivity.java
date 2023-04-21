@@ -65,10 +65,8 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
         allUserFromDatabaseRef.addValueEventListener(new ValueEventListener() {
-
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                //mListFriends.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren())
                 {
                     User user = dataSnapshot.getValue(User.class);
@@ -78,9 +76,6 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
                     mRecyclerView.setAdapter(mListFriendRecyclerAdapter);
                     SearchData();
                 }
-
-                //RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(FindFriendsActivity.this, DividerItemDecoration.VERTICAL);
-                //mRecyclerView.addItemDecoration(itemDecoration);
             }
 
             @Override
