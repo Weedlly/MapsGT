@@ -10,6 +10,10 @@ import androidx.fragment.app.FragmentTransaction;
 public abstract class BaseActivity extends AppCompatActivity {
 
     public abstract int getLayoutResource();
+    public void startActivityNotFinish(Class<?> activityClass) {
+        Intent intent = new Intent(getApplicationContext(), activityClass);
+        startActivity(intent);
+    }
     public void startActivity(Class<?> activityClass) {
         Intent intent = new Intent(getApplicationContext(), activityClass);
         startActivity(intent);

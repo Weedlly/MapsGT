@@ -11,8 +11,7 @@
     map:mapId="@string/map_id"
     map:uiRotateGestures="true"
     map:uiZoomControls="true"
-    tools:context="ui.map.MapsFragment"
-    tools:ignore="FragmentTagUsage">
+    tools:context="ui.map.MapsFragment">
 
     <RelativeLayout
         android:layout_width="match_parent"

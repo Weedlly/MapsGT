@@ -5,6 +5,7 @@ import static android.content.ContentValues.TAG;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
@@ -47,7 +48,7 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_friend);
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         InitializeFields();
         FriendAdapter suggestFriendAdapter = new FriendAdapter(filtered_list, AddFriendActivity.this);
         rvListSuggestUsers.setAdapter(suggestFriendAdapter);
@@ -139,5 +140,17 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
         Intent intent = new Intent(AddFriendActivity.this, PersonProfileActivity.class);
         intent.putExtra("visit_user_id", visit_user_id);
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                finish();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

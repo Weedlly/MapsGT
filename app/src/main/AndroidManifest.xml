@@ -44,6 +44,9 @@
         <activity
             android:name=".ui.navigation.FeedbackActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.add_friend.AddFriendActivity"
+            android:exported="false" />
 
         <activity
             android:name=".MainActivity"
