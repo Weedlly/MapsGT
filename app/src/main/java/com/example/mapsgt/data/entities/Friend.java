@@ -1,24 +1,20 @@
 package com.example.mapsgt.data.entities;
 
 public class Friend {
-    public String senderId;
 
-    public String receiveId;
-    public String date;
-    public String status;
+    private String id;
+    private String date;
+    private String status;
 
     public Friend() {}
 
-    public void Friend(String senderId, String receiveId,String date, String status) {
-        this.senderId = senderId;
-        this.receiveId = receiveId;
+    public void Friend( String date, String status, String id) {
         this.date = date;
         this.status = status;
+        this.id = id;
     }
 
-    public String getSenderId() { return senderId; }
-
-    public String getReceiveId() { return receiveId; }
+    public String getID() { return id; }
 
     public String getDate() { return date;}
 

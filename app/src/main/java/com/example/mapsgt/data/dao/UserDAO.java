@@ -70,14 +70,14 @@ public class UserDAO extends RealtimeDatabase<User> {
         return usersLiveData;
     }
     public LiveData<User> getUserById(String id) {
-        MutableLiveData<User> curentUserLiveData = new MutableLiveData<>();
+        MutableLiveData<User> currentUserLiveData = new MutableLiveData<>();
         Query query = getDatabaseReference().child(id);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     User user = snapshot.getValue(User.class);
-                    curentUserLiveData.setValue(user);
+                    currentUserLiveData.setValue(user);
                     Log.d("UserDao", "User found: " + user);
                 }
             }
@@ -87,7 +87,7 @@ public class UserDAO extends RealtimeDatabase<User> {
                 Log.e("UserDao", "Error reading users from database", databaseError.toException());
             }
         });
-        return curentUserLiveData;
+        return currentUserLiveData;
     }
     public LiveData<User> getUserByEmail(String emailAddress) {
         Query query = getDatabaseReference().orderByChild("email").equalTo(emailAddress);

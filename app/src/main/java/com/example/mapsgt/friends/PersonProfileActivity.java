@@ -53,9 +53,9 @@ public class PersonProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_person_profile);
-        // aUGYHuCMN9SE61lS4Q9KeK4DgB62
+        // O21R3tAHqjXH7uKEgUMlteCH8r03
 
-        senderUserId = "O21R3tAHqjXH7uKEgUMlteCH8r03";  //mAuth.getCurrentUser().getUid(); (Demo)
+        senderUserId = "v63SkgeB9nXSmm3aICpri24mWfj1";  //mAuth.getCurrentUser().getUid(); (Demo)
 
         Log.d(TAG, "Id visit: " + receiverUserId);
         Intent intent = getIntent();
@@ -224,7 +224,7 @@ public class PersonProfileActivity extends AppCompatActivity {
         Calendar calForDate = Calendar.getInstance();
         SimpleDateFormat currentDate = new SimpleDateFormat("dd-MMMM-yyyy");
         saveCurrentDate = currentDate.format(calForDate.getTime());
-
+        addIdValueToEachUserFriend();
         FriendsFef.child(receiverUserId).child("date").setValue(saveCurrentDate)
             .addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
@@ -458,6 +458,11 @@ public class PersonProfileActivity extends AppCompatActivity {
                 blockFriend();
             }
         });
+    }
+
+    private void addIdValueToEachUserFriend() {
+        FriendsFef.child(receiverUserId).child("id").setValue(receiverUserId);
+        receiverFriendRef.child(senderUserId).child("id").setValue(senderUserId);
     }
 
     private void InitializeFields()
