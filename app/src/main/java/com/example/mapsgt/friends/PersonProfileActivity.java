@@ -2,12 +2,6 @@ package com.example.mapsgt.friends;
 
 import static android.content.ContentValues.TAG;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentResultListener;
-
-import android.bluetooth.BluetoothClass;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,11 +9,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.bumptech.glide.Glide;
 import com.example.mapsgt.R;
-import com.example.mapsgt.data.entities.Friend;
-import com.example.mapsgt.data.entities.User;
-import com.example.mapsgt.ui.add_friend.find_friend.FindUserFragment;
+import com.example.mapsgt.ui.auth.AuthActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,7 +26,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -53,8 +47,11 @@ public class PersonProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_person_profile);
-
-        senderUserId = "O21R3tAHqjXH7uKEgUMlteCH8r03";
+        if (mAuth.getCurrentUser() == null) {
+            finish();
+            startActivity(new Intent(this, AuthActivity.class));
+        }
+        senderUserId = mAuth.getCurrentUser().getUid();
 
         Log.d(TAG, "Id visit: " + receiverUserId);
         Intent intent = getIntent();
