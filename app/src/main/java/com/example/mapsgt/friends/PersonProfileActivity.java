@@ -60,7 +60,7 @@ public class PersonProfileActivity extends AppCompatActivity {
         receiverUserId = intent.getStringExtra("visit_user_id");
 
         usersRef = FirebaseDatabase.getInstance().getReference().child("users");
-        friendRequestRef = FirebaseDatabase.getInstance().getReference().child("FriendRequest");
+        friendRequestRef = FirebaseDatabase.getInstance().getReference().child("friendRequest");
         friendsRef = usersRef.child(senderUserId).child("friends");
         receiverFriendRef = usersRef.child(receiverUserId).child("friends");
         initializeFields();
