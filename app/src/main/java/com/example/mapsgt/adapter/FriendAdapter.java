@@ -27,17 +27,20 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
 
     private ArrayList<User> mListFriend = new ArrayList<>();
     private OnFriendsDetailListener mOnFriendsDetailClick;
+
     public FriendAdapter(ArrayList<User> users, OnFriendsDetailListener mOnFriendsDetailClick) {
-        setmListFriend(users);
+        setListFriend(users);
         this.mOnFriendsDetailClick = mOnFriendsDetailClick;
     }
-    public void setmListFriend(ArrayList<User> mListFriend) {
-        this.mListFriend = mListFriend;
-        notifyDataSetChanged();
-    }
-    public FriendAdapter(ArrayList<User> mListUser){
+
+    public FriendAdapter(ArrayList<User> mListUser) {
         this.mListUser = mListUser;
         this.mListUsersOld = mListUser;
+    }
+
+    public void setListFriend(ArrayList<User> mListFriend) {
+        this.mListFriend = mListFriend;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -59,7 +62,6 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
         String nickname = user.getFirstName() + " " + user.getLastName();
         holder.tvName.setText(nickname);
         holder.tvPhoneNumber.setText(user.getPhone());
-
     }
 
     @Override
@@ -71,7 +73,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     }
 
 
-    public static class FriendViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public static class FriendViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private CircleImageView imgUser;
         private TextView tvName;
@@ -79,9 +81,8 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
 
         OnFriendsDetailListener onFriendsDetailListener;
 
-        public FriendViewHolder(@NonNull View itemView, OnFriendsDetailListener onFriendsDetailListener){
+        public FriendViewHolder(@NonNull View itemView, OnFriendsDetailListener onFriendsDetailListener) {
             super(itemView);
-            //imgUser = itemView.findViewById(R.id.img_user);
 
             tvName = itemView.findViewById(R.id.tv_username);
             tvPhoneNumber = itemView.findViewById(R.id.tv_phone);
@@ -91,7 +92,9 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
         }
 
         @Override
-        public void onClick(View view) { onFriendsDetailListener.OnFriendsDetailClick(getAdapterPosition()); }
+        public void onClick(View view) {
+            onFriendsDetailListener.onFriendsDetailClick(getAdapterPosition());
+        }
     }
 
     @Override
@@ -108,7 +111,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
                         if (user.getFirstName().toLowerCase().contains(strSearch.toLowerCase()) || user.getLastName().toLowerCase().contains(strSearch.toLowerCase())) {
                             list.add(user);
                         }
-                        if (user.getPhone().contains(strSearch)){
+                        if (user.getPhone().contains(strSearch)) {
                             list.add(user);
                         }
                     }
@@ -130,7 +133,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
         };
     }
 
-    public interface OnFriendsDetailListener{
-        void OnFriendsDetailClick(int position);
+    public interface OnFriendsDetailListener {
+        void onFriendsDetailClick(int position);
     }
 }
