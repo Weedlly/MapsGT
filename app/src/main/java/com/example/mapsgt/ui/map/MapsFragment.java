@@ -53,6 +53,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -76,6 +77,9 @@ public class MapsFragment extends Fragment implements
     private static final int ACCESS_FINE_LOCATION_CODE = 100;
     final RoutesItem[] routesItem = {new RoutesItem()};
     private Switch sw_sharing;
+    private Switch sw_movementHistory;
+    private boolean isTurnOnMovementHistory = false;
+    private PolylineOptions movementHistoryPolylineOptions;
     private TextView tv_distance;
     private TextView tv_duration;
     private Button btn_start_moving;
@@ -95,7 +99,9 @@ public class MapsFragment extends Fragment implements
         super.onCreate(savedInstanceState);
         mapManagement = new MapManagement();
         mDatabase = FirebaseDatabase.getInstance().getReference();
-
+        movementHistoryPolylineOptions = new PolylineOptions()
+                .color(Color.LTGRAY)
+                .width(8f);
         //Check whether GPS tracking is enabled
         mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         if (!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -113,6 +119,7 @@ public class MapsFragment extends Fragment implements
         tv_distance = view.findViewById(R.id.tv_distance);
         tv_duration = view.findViewById(R.id.tv_duration);
         sw_sharing = view.findViewById(R.id.sw_sharing);
+        sw_movementHistory = view.findViewById((R.id.sw_movementHistory));
         btn_start_moving = view.findViewById(R.id.btn_start_moving);
         btn_stop_moving = view.findViewById(R.id.btn_stop_moving);
 
@@ -142,6 +149,23 @@ public class MapsFragment extends Fragment implements
                 mapManagement.setGoingFriendId(null);
                 stopTrackerService();
                 renderAllMarker();
+            }
+        });
+        sw_movementHistory.setOnClickListener(view12 -> {
+            if (sw_movementHistory.isChecked()) {
+
+                Toast.makeText(this.getContext(), "on", Toast.LENGTH_SHORT).show();
+                isTurnOnMovementHistory = true;
+                mGoogleMap.addPolyline(movementHistoryPolylineOptions);
+            } else {
+                Toast.makeText(this.getContext(), "off", Toast.LENGTH_SHORT).show();
+                isTurnOnMovementHistory = false;
+                Polyline mPolyline;
+                mPolyline = mGoogleMap.addPolyline(movementHistoryPolylineOptions);
+                mPolyline.remove();
+                movementHistoryPolylineOptions = new PolylineOptions()
+                        .color(Color.LTGRAY)
+                        .width(8f);
             }
         });
 
@@ -371,6 +395,12 @@ public class MapsFragment extends Fragment implements
                 currentUser.setLongitude(location.getLongitude());
                 renderAllMarker();
             }
+        }
+        if(isTurnOnMovementHistory) {
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+            movementHistoryPolylineOptions.add(latLng);
+            mGoogleMap.addPolyline(movementHistoryPolylineOptions);
         }
     }
 

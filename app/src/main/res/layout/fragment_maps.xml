@@ -81,16 +81,28 @@
                 android:layout_height="wrap_content"
                 android:text="Dừng"
                 android:visibility="gone" />
-
-            <Switch
-                android:id="@+id/sw_sharing"
+            <LinearLayout
+                android:id="@+id/sw_panel"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginTop="16dp"
                 android:layout_weight="1"
-                android:text="Share location"
-                android:textSize="14sp" />
-
+                android:background="@color/cardview_light_background"
+                android:orientation="horizontal">
+                <Switch
+                    android:id="@+id/sw_sharing"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="Share location"
+                    android:textSize="14sp" />
+                <Switch
+                    android:id="@+id/sw_movementHistory"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="Movement history"
+                    android:textSize="14sp" />
+            </LinearLayout>
         </LinearLayout>
 
     </RelativeLayout>
