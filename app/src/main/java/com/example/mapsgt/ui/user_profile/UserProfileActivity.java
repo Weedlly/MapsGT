@@ -83,11 +83,7 @@ public class UserProfileActivity extends AppCompatActivity {
                     phoneNumberTv.setText(response.getPhone());
                     locationTv.setText("");
                     DataSnapshot friendsRef = snapshot.child("users").child(currentUserId).child("friends");
-                    if (friendsRef.hasChildren()) {
-                        friendNumberTv.setText(String.valueOf(friendsRef.getChildrenCount()));
-                    } else {
-                        friendNumberTv.setText(0);
-                    }
+                    friendNumberTv.setText(String.valueOf(friendsRef.getChildrenCount()));
                 }
             }
 

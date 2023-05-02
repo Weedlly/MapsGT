@@ -3,18 +3,29 @@ package com.example.mapsgt.ui.user_profile;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.mapsgt.R;
 import com.example.mapsgt.data.entities.User;
 import com.example.mapsgt.enumeration.UserGenderEnum;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.textfield.TextInputEditText;
@@ -24,28 +35,34 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class EditProfileActivity extends AppCompatActivity {
+    private static final int GALLERY_REQUEST_CODE = 123;
+    private static final String TAG = "EditProfileActivity";
+    private ImageView avatarImg;
     private TextInputEditText editFirstName;
     private TextInputEditText editLastName;
     private TextInputEditText editDOB;
     private TextInputEditText editEmail;
     private TextInputEditText editPhoneNumber;
     private Spinner genderSpinner;
-
     private UserGenderEnum gender;
-
     private Button updateBtn;
     private Button cancelBtn;
     private ProgressBar progressBar;
 
     private DatabaseReference mDatabase;
+    private StorageReference mStorage;
+    private String curUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +70,11 @@ public class EditProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_profile);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        mStorage = FirebaseStorage.getInstance().getReference();
 
+        curUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        avatarImg = findViewById(R.id.iv_avatar);
         editFirstName = findViewById(R.id.edt_first_name);
         editLastName = findViewById(R.id.edt_last_name);
         editEmail = findViewById(R.id.edt_email);
@@ -64,10 +85,12 @@ public class EditProfileActivity extends AppCompatActivity {
         cancelBtn = findViewById(R.id.btn_cancel);
         progressBar = findViewById(R.id.progressBar);
 
+        progressBar.setVisibility(View.INVISIBLE);
+
         updateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               updateProfile();
+                updateProfile();
             }
         });
 
@@ -76,6 +99,15 @@ public class EditProfileActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(EditProfileActivity.this, UserProfileActivity.class);
                 startActivity(intent);
+            }
+        });
+
+        avatarImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(galleryIntent, GALLERY_REQUEST_CODE);
             }
         });
 
@@ -94,7 +126,8 @@ public class EditProfileActivity extends AppCompatActivity {
                     editLastName.setText(response.getLastName());
                     editEmail.setText(response.getEmail());
                     editPhoneNumber.setText(response.getPhone());
-                    editDOB.setText(formatOutputDate(response.getDateOfBirth()));
+                    editDOB.setText(response.getDateOfBirth());
+                    gender = response.getGender();
 
                     String[] genders = new String[]{UserGenderEnum.MALE.name(), UserGenderEnum.FEMALE.name(), UserGenderEnum.OTHER.name()};
 
@@ -117,6 +150,15 @@ public class EditProfileActivity extends AppCompatActivity {
                         }
                     });
 
+                    RequestOptions options = new RequestOptions()
+                            .placeholder(R.drawable.ic_profile)
+                            .error(R.drawable.google);
+
+                    Glide.with(EditProfileActivity.this)
+                            .load(response.getProfilePicture())
+                            .apply(options)
+                            .into(avatarImg);
+
                     editDOB.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -135,7 +177,29 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     private void updateProfile() {
+        String emailInput = editEmail.getText().toString().trim();
+        String phoneInput = editPhoneNumber.getText().toString().trim();
+        String firstNameInput = editFirstName.getText().toString().trim();
+        String lastNameInput = editLastName.getText().toString().trim();
+        String dateOfBirthInput = editDOB.getText().toString().trim();
 
+        String updateUrl = "/users/" + curUserId;
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put(updateUrl + "/email", emailInput);
+        childUpdates.put(updateUrl + "/phone", phoneInput);
+        childUpdates.put(updateUrl + "/firstName", firstNameInput);
+        childUpdates.put(updateUrl + "/lastName", lastNameInput);
+        childUpdates.put(updateUrl + "/dateOfBirth", dateOfBirthInput);
+        childUpdates.put(updateUrl + "/gender", gender);
+
+        mDatabase.updateChildren(childUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Intent intent = new Intent(EditProfileActivity.this, UserProfileActivity.class);
+                startActivity(intent);
+                Toast.makeText(getApplicationContext(), "Cập nhật thành công", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void handleSelectDate() {
@@ -154,30 +218,42 @@ public class EditProfileActivity extends AppCompatActivity {
         materialDatePicker.show(EditProfileActivity.this.getSupportFragmentManager(), "tag");
     }
 
-    private Date convertStringToDate(String dateStr) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        try {
-            Date date = dateFormat.parse(dateStr);
-            return date;
-        } catch (Exception e) {
-            e.printStackTrace();
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == GALLERY_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            Uri selectedImage = data.getData();
+            uploadToFirebase(selectedImage);
         }
-        return null;
     }
 
-    private String formatOutputDate(String dateString) {
-        DateFormat inputFormat = new SimpleDateFormat("MMM d, yyyy hh:mm:ss a", Locale.US);
-        DateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
-        String outputDateString = null;
+    private void uploadToFirebase(Uri uri) {
+        StorageReference fileRef = mStorage.child("avatar/" + System.currentTimeMillis() + "." + getFileExtension(uri));
+        fileRef.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                fileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        DatabaseReference userRef = mDatabase.child("users").child(curUserId);
+                        userRef.child("profilePicture").setValue(uri.toString());
+                        Toast.makeText(getApplicationContext(), "Tải ảnh thành công", Toast.LENGTH_SHORT).show();
+                        Glide.with(EditProfileActivity.this).load(uri).into(avatarImg);
+                    }
+                });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getApplicationContext(), "Tải ảnh lỗi!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
-        try {
-            Date date = inputFormat.parse(dateString);
-            outputDateString = outputFormat.format(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        return outputDateString;
+    private String getFileExtension(Uri mUri) {
+        ContentResolver cr = getContentResolver();
+        MimeTypeMap mine = MimeTypeMap.getSingleton();
+        return mine.getExtensionFromMimeType(cr.getType(mUri));
     }
 
 }

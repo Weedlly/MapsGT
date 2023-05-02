@@ -236,15 +236,4 @@ public class RegisterFragment extends Fragment {
         });
         materialDatePicker.show(getActivity().getSupportFragmentManager(), "tag");
     }
-
-    private Date convertStringToDate(String dateStr) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        try {
-            Date date = dateFormat.parse(dateStr);
-            return date;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 }
