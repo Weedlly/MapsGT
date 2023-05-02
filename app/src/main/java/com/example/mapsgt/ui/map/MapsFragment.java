@@ -410,8 +410,8 @@ public class MapsFragment extends Fragment implements
         if (requestCode == ACCESS_FINE_LOCATION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this.getContext(), "Activity Permission Granted", Toast.LENGTH_SHORT).show();
+
             } else {
-                System.exit(0);
                 Toast.makeText(this.getContext(), "Activity Permission Denied", Toast.LENGTH_SHORT).show();
             }
         }

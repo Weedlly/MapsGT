@@ -1,11 +1,16 @@
 package com.example.mapsgt;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -22,6 +27,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static final int ACCESS_FINE_LOCATION_CODE = 100;
     private static final int FRAGMENT_HOME = 0;
     private static final int FRAGMENT_FAVORITE = 1;
     private static final int FRAGMENT_HISTORY = 2;
@@ -61,11 +67,38 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         NavigationView navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        replaceFragment(getLayoutResource(), new MapsFragment());
-
         navigationView.getMenu().findItem(R.id.nav_home).setChecked(true);
+
+        checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, ACCESS_FINE_LOCATION_CODE);
+    }
+    private void checkPermission(String permission, int requestCode) {
+        // Checking if permission is not granted
+        if (ContextCompat.checkSelfPermission(this.getBaseContext(), permission) == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
+            Toast.makeText(this.getBaseContext(), "Permission not granted", Toast.LENGTH_SHORT).show();
+        } else {
+            replaceFragment(getLayoutResource(), new MapsFragment());
+            Toast.makeText(this.getBaseContext(), "Permission already granted", Toast.LENGTH_SHORT).show();
+        }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode,
+                permissions,
+                grantResults);
+
+        if (requestCode == ACCESS_FINE_LOCATION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this.getBaseContext(), "Activity Permission Granted", Toast.LENGTH_SHORT).show();
+                replaceFragment(getLayoutResource(), new MapsFragment());
+            } else {
+                Toast.makeText(this.getBaseContext(), "Activity Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
