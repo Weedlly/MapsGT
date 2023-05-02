@@ -129,7 +129,7 @@ public class EditProfileActivity extends AppCompatActivity {
                     editDOB.setText(response.getDateOfBirth());
                     gender = response.getGender();
 
-                    String[] genders = new String[]{UserGenderEnum.MALE.name(), UserGenderEnum.FEMALE.name(), UserGenderEnum.OTHER.name()};
+                    String[] genders = new String[]{"Nam", "Nữ", "Khác"};
 
                     ArrayAdapter<String> adapter = new ArrayAdapter<String>(EditProfileActivity.this,
                             android.R.layout.simple_spinner_item, genders);
@@ -141,7 +141,11 @@ public class EditProfileActivity extends AppCompatActivity {
                         @Override
                         public void onItemSelected(AdapterView<?> parent, View view,
                                                    int position, long id) {
-                            gender = UserGenderEnum.valueOf((String) parent.getItemAtPosition(position));
+                            switch (position) {
+                                case 0: gender = UserGenderEnum.MALE; break;
+                                case 1: gender = UserGenderEnum.FEMALE; break;
+                                default: gender = UserGenderEnum.OTHER;
+                            }
                         }
 
                         @Override

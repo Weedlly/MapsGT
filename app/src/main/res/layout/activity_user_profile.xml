@@ -169,7 +169,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="25dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
             <ImageView
@@ -193,21 +193,45 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="25dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
             <ImageView
                 android:layout_width="45dp"
                 android:layout_height="45dp"
-                android:src="@drawable/ic_baseline_location_on_24" />
+                android:src="@drawable/ic_baseline_calendar_month_24" />
 
             <TextView
-                android:id="@+id/tv_location"
+                android:id="@+id/tv_dob"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:paddingLeft="15dp"
-                android:text="TP HCM"
+                android:text="19/03/2002"
+                android:textColor="#000"
+                android:textSize="18dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:src="@drawable/ic_baseline_transgender_24" />
+
+            <TextView
+                android:id="@+id/tv_gender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:paddingLeft="15dp"
+                android:text="Nam"
                 android:textColor="#000"
                 android:textSize="18dp" />
 

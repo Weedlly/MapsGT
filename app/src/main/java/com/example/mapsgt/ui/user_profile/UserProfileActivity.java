@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.mapsgt.R;
 import com.example.mapsgt.data.entities.User;
+import com.example.mapsgt.enumeration.UserGenderEnum;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -27,7 +28,8 @@ public class UserProfileActivity extends AppCompatActivity {
     private TextView friendNumberTv;
     private TextView emailTv;
     private TextView phoneNumberTv;
-    private TextView locationTv;
+    private TextView dobTv;
+    private TextView genderTv;
     private Button editBtn;
 
     private DatabaseReference mDatabase;
@@ -44,7 +46,8 @@ public class UserProfileActivity extends AppCompatActivity {
         friendNumberTv = findViewById(R.id.tv_friend_number);
         emailTv = findViewById(R.id.tv_email);
         phoneNumberTv = findViewById(R.id.tv_phone_number);
-        locationTv = findViewById(R.id.tv_location);
+        dobTv = findViewById(R.id.tv_dob);
+        genderTv = findViewById(R.id.tv_gender);
         editBtn = findViewById(R.id.btn_edit_profile);
 
         editBtn.setOnClickListener(new View.OnClickListener() {
@@ -72,7 +75,7 @@ public class UserProfileActivity extends AppCompatActivity {
                             .placeholder(R.drawable.ic_profile)
                             .error(R.drawable.google);
 
-                    Glide.with(UserProfileActivity.this)
+                    Glide.with(getApplicationContext())
                             .load(personProfileImage)
                             .apply(options)
                             .into(avatarImg);
@@ -81,7 +84,8 @@ public class UserProfileActivity extends AppCompatActivity {
 
                     emailTv.setText(response.getEmail());
                     phoneNumberTv.setText(response.getPhone());
-                    locationTv.setText("");
+                    dobTv.setText(response.getDateOfBirth());
+                    genderTv.setText(displayGenderText(response.getGender()));
                     DataSnapshot friendsRef = snapshot.child("users").child(currentUserId).child("friends");
                     friendNumberTv.setText(String.valueOf(friendsRef.getChildrenCount()));
                 }
@@ -92,5 +96,13 @@ public class UserProfileActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private String displayGenderText(UserGenderEnum genderEnum) {
+        switch (genderEnum) {
+            case MALE: return "Nam";
+            case FEMALE: return "Nữ";
+            default: return "Không xác định";
+        }
     }
 }
