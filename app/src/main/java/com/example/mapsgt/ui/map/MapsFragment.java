@@ -153,12 +153,9 @@ public class MapsFragment extends Fragment implements
         });
         sw_movementHistory.setOnClickListener(view12 -> {
             if (sw_movementHistory.isChecked()) {
-
-                Toast.makeText(this.getContext(), "on", Toast.LENGTH_SHORT).show();
                 isTurnOnMovementHistory = true;
                 mGoogleMap.addPolyline(movementHistoryPolylineOptions);
             } else {
-                Toast.makeText(this.getContext(), "off", Toast.LENGTH_SHORT).show();
                 isTurnOnMovementHistory = false;
                 Polyline mPolyline;
                 mPolyline = mGoogleMap.addPolyline(movementHistoryPolylineOptions);
