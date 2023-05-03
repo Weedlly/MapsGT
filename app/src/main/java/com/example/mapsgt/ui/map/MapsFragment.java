@@ -78,7 +78,6 @@ import java.util.Optional;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
 public class MapsFragment extends Fragment implements
         LocationListener, OnMapReadyCallback {
     private static final String TAG = "LocationFragment";
@@ -101,7 +100,6 @@ public class MapsFragment extends Fragment implements
     private Button btn_add_faPlace;
     private Button btn_show_faPlace;
     private LocationManager mLocationManager;
-    private MapView mapView;
     private GoogleMap mGoogleMap;
     private Button mSearchButton;
     private DatabaseReference mDatabase;
@@ -111,7 +109,7 @@ public class MapsFragment extends Fragment implements
     private final List<UserLocation> friendLocations = new ArrayList<>();
     private MapManagement mapManagement;
     private Marker desMarker = null;
-    private ArrayList<Marker> farvouritePlaceMarkers = new ArrayList<Marker>();
+    private List<FavouritePlace> favouritePlaces = new ArrayList<FavouritePlace>();
     private String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     @Override
@@ -197,7 +195,6 @@ public class MapsFragment extends Fragment implements
             builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    // Đóng hộp thoại
                     dialog.cancel();
                 }
             });
@@ -268,10 +265,31 @@ public class MapsFragment extends Fragment implements
 
         renderAllMarker();
         desMarker = mGoogleMap.addMarker(options);
+        // Don't remove this code
+//        for (FavouritePlace place: favouritePlaces ) {
+//            if(place.getLatitude() == latLng.latitude && place.getLongitude() == latLng.longitude){
+//                btn_add_faPlace.setText("Remove favourite place");
+//            }
+//        }
+        detailPlace(latLng);
         placeDetailScrollView.setVisibility(View.VISIBLE);
         getDirection(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), latLng);
     }
-
+    void detailPlace(LatLng latLng){
+        Geocoder geocoder = new Geocoder(getContext());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+            if (addresses.size() > 0) {
+                Address address = addresses.get(0);
+                placeNameView.setText(address.getFeatureName());
+                placeAddressView.setText(address.getAddressLine(0));
+                placePhoneView.setText(address.getPhone());
+                placeWebsiteView.setText(address.getUrl());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     private void drawDirectionLine(LatLng origin, LatLng dest) {
         RoutesItem route = routesItem[0];
         List<List<Double>> coordinates = route.getGeometry().getCoordinates();
@@ -323,8 +341,10 @@ public class MapsFragment extends Fragment implements
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         for (DataSnapshot placeSnapshot : snapshot.getChildren()) {
                             FavouritePlace place = placeSnapshot.getValue(FavouritePlace.class);
-                            renderFavouritePlaceMarker(place);
+                            favouritePlaces.add(place);
+
                         }
+                        renderFavouritePlaceMarker();
                     }
 
                     @Override
@@ -334,7 +354,7 @@ public class MapsFragment extends Fragment implements
                 });
     }
     public void showFavouriteLocation(View view){
-        List<FavouritePlace> favouritePlaces = new ArrayList<>();
+        favouritePlaces.clear();
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Favourite places");
         ListView listView = new ListView(getContext());
@@ -447,6 +467,8 @@ public class MapsFragment extends Fragment implements
         placeDetailScrollView.setVisibility(View.GONE);
         // user location
         renderUserMarker(currentUser);
+        // favourite place
+        renderFavouritePlaceMarker();
 
         LatLng latLng = new LatLng(currentUser.getLatitude(), currentUser.getLongitude());
         if (mapManagement.getMapMode().equals(MapMode.MOVING)) {
@@ -493,22 +515,26 @@ public class MapsFragment extends Fragment implements
         Marker marker = mGoogleMap.addMarker(markerOptions);
         marker.setTag(userLocation.getId());
     }
-    private void renderFavouritePlaceMarker(FavouritePlace favouritePlace) {
-        LatLng latLng = new LatLng(favouritePlace.getLatitude(),favouritePlace.getLongitude());
-        TextView text = new TextView(getContext());
-        text.setText(favouritePlace.getName());
-        IconGenerator generator = new IconGenerator(getContext());
-        generator.setBackground(getContext().getDrawable(R.drawable.favourite_place));
-        generator.setContentView(text);
-        Bitmap icon = generator.makeIcon();
-        int width = 100;
-        int height = 100;
-        Bitmap resizedBitmap = Bitmap.createScaledBitmap(icon, width, height, false);
-
-        MarkerOptions tp = new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromBitmap(resizedBitmap));
-        farvouritePlaceMarkers.add(mGoogleMap.addMarker(tp));
-
+    private void renderFavouritePlaceMarker() {
+        for (FavouritePlace place: favouritePlaces) {
+            LatLng latLng = new LatLng(place.getLatitude(),place.getLongitude());
+            TextView title = new TextView(getContext());
+            title.setText(place.getName());
+            IconGenerator generator = new IconGenerator(getContext());
+            generator.setBackground(getContext().getDrawable(R.drawable.favourite_place));
+            generator.setContentView(title);
+            Bitmap icon = generator.makeIcon();
+            int width = 100;
+            int height = 100;
+            Bitmap resizedBitmap = Bitmap.createScaledBitmap(icon, width, height, false);
+            MarkerOptions tp = new MarkerOptions()
+                    .position(latLng)
+                    .snippet("favourite-place")
+                    .icon(BitmapDescriptorFactory.fromBitmap(resizedBitmap));
+            mGoogleMap.addMarker(tp);
+        }
     }
+
 
     private void requestLocationUpdatesListener() {
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -705,7 +731,11 @@ public class MapsFragment extends Fragment implements
                 new GoogleMap.OnMyLocationButtonClickListener() {
                     @Override
                     public boolean onMyLocationButtonClick() {
-                        moveToMyLocation();
+                        try {
+                            moveToMyLocation();
+                        } catch (Exception e){
+                            Log.d(TAG, "onMyLocationButtonClick: " + e);
+                        }
                         return true;
                     }
                 }
@@ -718,20 +748,6 @@ public class MapsFragment extends Fragment implements
                     mapManagement.setGoingToFriend(false);
                     addDestinationPoint(latLng);
                 }
-                Geocoder geocoder = new Geocoder(getContext());
-                try {
-                    List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
-                    if (addresses.size() > 0) {
-                        Address address = addresses.get(0);
-                        placeNameView.setText(address.getFeatureName());
-                        placeAddressView.setText(address.getAddressLine(0));
-                        placePhoneView.setText(address.getPhone());
-                        placeWebsiteView.setText(address.getUrl());
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
             }
         });
 
@@ -754,12 +770,17 @@ public class MapsFragment extends Fragment implements
         mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                if (marker.getPosition().latitude != currentUser.getLatitude() || marker.getPosition().longitude != currentUser.getLongitude()) {
-                    mapManagement.setGoingToFriend(true);
-                    mapManagement.setGoingFriendId((String) marker.getTag());
-                    renderAllMarker();
-                }
 
+                if (marker.getSnippet() != null){
+                    if ("favourite-place".equals(marker.getSnippet())) {
+                        addDestinationPoint(marker.getPosition());
+                    }
+                    else if (marker.getPosition().latitude != currentUser.getLatitude() || marker.getPosition().longitude != currentUser.getLongitude()) {
+                        mapManagement.setGoingToFriend(true);
+                        mapManagement.setGoingFriendId((String) marker.getTag());
+                        renderAllMarker();
+                    }
+                }
                 return true;
             }
         });
