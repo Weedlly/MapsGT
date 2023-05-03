@@ -25,11 +25,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -73,7 +70,7 @@ public class PersonProfileActivity extends AppCompatActivity {
                     String personUserName = snapshot.child("email").getValue().toString();
                     String personProfileName = snapshot.child("firstName").getValue().toString() + " " + snapshot.child("lastName").getValue().toString();
                     String personProfileStatus = "Location: (" + snapshot.child("longitude").getValue().toString() + ", " + snapshot.child("latitude").getValue().toString() + ")";
-                    String personDOB = "DOB: " + formatDateFromString(snapshot.child("dateOfBirth").getValue().toString());
+                    String personDOB = "DOB: " + snapshot.child("dateOfBirth").getValue().toString();
                     String personCountry = "Phone: " + snapshot.child("phone").getValue().toString();
                     String personGender = "Gender: " + snapshot.child("gender").getValue().toString();
 
@@ -446,30 +443,16 @@ public class PersonProfileActivity extends AppCompatActivity {
     }
 
     private void initializeFields() {
-        userName = (TextView) findViewById(R.id.person_username);
-        userProfileName = (TextView) findViewById(R.id.person_profile_full_name);
-        userStatus = (TextView) findViewById(R.id.person_profile_status);
-        userCountry = (TextView) findViewById(R.id.person_country);
-        userGender = (TextView) findViewById(R.id.person_gender);
-        userDOB = (TextView) findViewById(R.id.person_dob);
-        userProfileImage = (CircleImageView) findViewById(R.id.person_profile_pic);
-        sendFriendRequestBTN = (Button) findViewById(R.id.person_send_friend_request_btn);
-        declineFriendRequestBTN = (Button) findViewById(R.id.person_decline_friend_request_btn);
-        blockFriendBTN = (Button) findViewById(R.id.person_block_friend_btn);
+        userName = findViewById(R.id.person_username);
+        userProfileName = findViewById(R.id.person_profile_full_name);
+        userStatus = findViewById(R.id.person_profile_status);
+        userCountry = findViewById(R.id.person_country);
+        userGender = findViewById(R.id.person_gender);
+        userDOB = findViewById(R.id.person_dob);
+        userProfileImage = findViewById(R.id.person_profile_pic);
+        sendFriendRequestBTN = findViewById(R.id.person_send_friend_request_btn);
+        declineFriendRequestBTN = findViewById(R.id.person_decline_friend_request_btn);
+        blockFriendBTN = findViewById(R.id.person_block_friend_btn);
         currentState = "not_friends";
     }
-
-    private String formatDateFromString(String dateString) {
-        SimpleDateFormat inputFormat = new SimpleDateFormat("MMM d, yyyy", Locale.ENGLISH);
-        SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy");
-        Date date = null;
-        try {
-            date = inputFormat.parse(dateString);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-        String formattedDate = outputFormat.format(date);
-        return formattedDate;
-    }
-
 }
