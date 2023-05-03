@@ -62,6 +62,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.FirebaseApp;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -541,7 +543,6 @@ public class MapsFragment extends Fragment implements
             return;
         }
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-        Log.e("requestLocationUpdatesListener", "change");
     }
 
     @Override
@@ -634,13 +635,20 @@ public class MapsFragment extends Fragment implements
 
     private void getUserInfo() {
         String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-//        Demo code
-        friendIdList.clear();
-        if (currentUserId.equals("aUGYHuCMN9SE61lS4Q9KeK4DgB62")) {
-            friendIdList.add("O21R3tAHqjXH7uKEgUMlteCH8r03");
-        } else if (currentUserId.equals("O21R3tAHqjXH7uKEgUMlteCH8r03")) {
-            friendIdList.add("aUGYHuCMN9SE61lS4Q9KeK4DgB62");
-        }
+        mDatabase.child("users").child(currentUserId).child("friends").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (!task.isSuccessful()) {
+                    Log.e("firebase", "Error getting data", task.getException());
+                } else {
+                    for (DataSnapshot dataSnapshot : task.getResult().getChildren()) {
+                        String friendId = dataSnapshot.getKey();
+                        friendIdList.add(friendId);
+                    }
+                }
+            }
+        });
+
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

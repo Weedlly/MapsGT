@@ -78,7 +78,7 @@ public class FindUserFragment extends Fragment implements FriendAdapter.OnFriend
     }
 
     @Override
-    public void OnFriendsDetailClick(int position) {
+    public void onFriendsDetailClick(int position) {
         visit_user_id = users_list.get(position).getId();
 
         Intent intent = new Intent(getContext(), PersonProfileActivity.class);
