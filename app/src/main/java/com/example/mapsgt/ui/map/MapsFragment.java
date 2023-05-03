@@ -1,7 +1,9 @@
 package com.example.mapsgt.ui.map;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -21,9 +23,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +40,7 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.example.mapsgt.MainActivity;
 import com.example.mapsgt.R;
 import com.example.mapsgt.data.dto.UserLocation;
 import com.example.mapsgt.data.entities.User;
@@ -57,21 +61,17 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.PhotoMetadata;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.net.FetchPlaceRequest;
-import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.ui.IconGenerator;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -98,6 +98,8 @@ public class MapsFragment extends Fragment implements
     private ViewGroup placeDetailScrollView;
     private Button btn_start_moving;
     private Button btn_stop_moving;
+    private Button btn_add_faPlace;
+    private Button btn_show_faPlace;
     private LocationManager mLocationManager;
     private MapView mapView;
     private GoogleMap mGoogleMap;
@@ -105,10 +107,12 @@ public class MapsFragment extends Fragment implements
     private DatabaseReference mDatabase;
     private ValueEventListener mValueEventListener;
     private UserLocation currentUser;
-    private List<String> friendIdList = new ArrayList<>();
-    private List<UserLocation> friendLocations = new ArrayList<>();
+    private final List<String> friendIdList = new ArrayList<>();
+    private final List<UserLocation> friendLocations = new ArrayList<>();
     private MapManagement mapManagement;
     private Marker desMarker = null;
+    private ArrayList<Marker> farvouritePlaceMarkers = new ArrayList<Marker>();
+    private String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -138,10 +142,13 @@ public class MapsFragment extends Fragment implements
         sw_movementHistory = view.findViewById((R.id.sw_movementHistory));
         btn_start_moving = view.findViewById(R.id.btn_start_moving);
         btn_stop_moving = view.findViewById(R.id.btn_stop_moving);
+        btn_add_faPlace = view.findViewById(R.id.btn_add_faPlace);
+        btn_show_faPlace = view.findViewById(R.id.btn_show_faPlace);
         placeNameView = view.findViewById(R.id.place_name);
         placeAddressView = view.findViewById(R.id.place_address);
         placePhoneView = view.findViewById(R.id.place_phone);
         placeWebsiteView = view.findViewById(R.id.place_website);
+
 
         bottomPanel = view.findViewById(R.id.bottom_panel);
         placeDetailScrollView = view.findViewById(R.id.scrollView);
@@ -164,6 +171,38 @@ public class MapsFragment extends Fragment implements
             renderAllMarker();
             tv_duration.setVisibility(View.GONE);
             tv_distance.setVisibility(View.GONE);
+        });
+        btn_show_faPlace.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                showFavouriteLocation(v);
+            }
+        });
+        btn_add_faPlace.setOnClickListener(viewAddFaPlace -> {
+            final EditText input = new EditText(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setTitle("Favourite place");
+            builder.setMessage("Naming your favourite place:");
+            builder.setView(input);
+            builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String namePlace = input.getText().toString();
+                    FirebaseApp firebaseApp = FirebaseApp.getInstance();
+                    DatabaseReference databaseRef = FirebaseDatabase.getInstance(firebaseApp).getReference();
+                    DatabaseReference favoritePlacesRef = databaseRef.child("favourite_places");
+                    FavouritePlace favoritePlace = new FavouritePlace(currentUserId, desMarker.getPosition().latitude, desMarker.getPosition().longitude,namePlace);
+                    favoritePlacesRef.push().setValue(favoritePlace);
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // Đóng hộp thoại
+                    dialog.cancel();
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
         });
 
         sw_sharing.setOnClickListener(view12 -> {
@@ -277,7 +316,59 @@ public class MapsFragment extends Fragment implements
             }
         });
     }
+    public void renderFavouriteLocation(){
+        FirebaseDatabase.getInstance().getReference("favourite_places").orderByChild("userId")
+                .equalTo(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot placeSnapshot : snapshot.getChildren()) {
+                            FavouritePlace place = placeSnapshot.getValue(FavouritePlace.class);
+                            renderFavouritePlaceMarker(place);
+                        }
+                    }
 
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e(TAG, "Failed to get favourite places", error.toException());
+                    }
+                });
+    }
+    public void showFavouriteLocation(View view){
+        List<FavouritePlace> favouritePlaces = new ArrayList<>();
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Favourite places");
+        ListView listView = new ListView(getContext());
+        builder.setView(listView);
+
+        FirebaseDatabase.getInstance().getReference("favourite_places").orderByChild("userId")
+                .equalTo(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot placeSnapshot : snapshot.getChildren()) {
+                            FavouritePlace place = placeSnapshot.getValue(FavouritePlace.class);
+                            favouritePlaces.add(place);
+                        }
+                        FavouritePlaceAdapter adapter = new FavouritePlaceAdapter(getContext(),favouritePlaces);
+                        listView.setAdapter(adapter);
+                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                FavouritePlace place = favouritePlaces.get(position);
+                                LatLng latLng = new LatLng(place.getLatitude(), place.getLongitude());
+                                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f));
+                                addDestinationPoint(latLng);
+                                builder.create().dismiss();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e(TAG, "Failed to get favourite places", error.toException());
+                    }
+                });
+        builder.create().show();
+    }
     public void searchLocation(View view) {
         EditText locationSearch = getView().findViewById(R.id.editText);
         String location = locationSearch.getText().toString().trim();
@@ -305,6 +396,7 @@ public class MapsFragment extends Fragment implements
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f));
 
         renderUserMarker(currentUser);
+        renderFavouriteLocation();
     }
 
     private void showFriendLocation() {
@@ -378,7 +470,7 @@ public class MapsFragment extends Fragment implements
                     if (mapManagement.isGoingToFriend() && friend.getId().equals(mapManagement.getGoingFriendId())) {
                         getDirection(latLng, new LatLng(friend.getLatitude(), friend.getLongitude()));
                     }
-                } else if(!friend.isSharing() && friend.getId().equals(mapManagement.getGoingFriendId())) {
+                } else if (!friend.isSharing() && friend.getId().equals(mapManagement.getGoingFriendId())) {
                     LatLng stoppedSharingFriendLocation = new LatLng(friend.getLatitude(), friend.getLongitude());
                     MarkerOptions options = new MarkerOptions()
                             .position(stoppedSharingFriendLocation)
@@ -401,6 +493,22 @@ public class MapsFragment extends Fragment implements
         Marker marker = mGoogleMap.addMarker(markerOptions);
         marker.setTag(userLocation.getId());
     }
+    private void renderFavouritePlaceMarker(FavouritePlace favouritePlace) {
+        LatLng latLng = new LatLng(favouritePlace.getLatitude(),favouritePlace.getLongitude());
+        TextView text = new TextView(getContext());
+        text.setText(favouritePlace.getName());
+        IconGenerator generator = new IconGenerator(getContext());
+        generator.setBackground(getContext().getDrawable(R.drawable.favourite_place));
+        generator.setContentView(text);
+        Bitmap icon = generator.makeIcon();
+        int width = 100;
+        int height = 100;
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(icon, width, height, false);
+
+        MarkerOptions tp = new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromBitmap(resizedBitmap));
+        farvouritePlaceMarkers.add(mGoogleMap.addMarker(tp));
+
+    }
 
     private void requestLocationUpdatesListener() {
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -419,7 +527,7 @@ public class MapsFragment extends Fragment implements
                 renderAllMarker();
             }
         }
-        if(isTurnOnMovementHistory) {
+        if (isTurnOnMovementHistory) {
             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
             mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
             movementHistoryPolylineOptions.add(latLng);
@@ -525,10 +633,6 @@ public class MapsFragment extends Fragment implements
 
             }
         });
-    }
-
-    private interface OnBitmapDescriptorLoadedListener {
-        void onBitmapDescriptorLoaded(BitmapDescriptor bitmapDescriptor);
     }
 
     private Bitmap getCircularBitmap(Bitmap bitmap) {
@@ -638,6 +742,7 @@ public class MapsFragment extends Fragment implements
             }
         });
 
+
         getUserInfo();
 
         Location locationGPS = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -689,6 +794,10 @@ public class MapsFragment extends Fragment implements
         }
 
         return timeString;
+    }
+
+    private interface OnBitmapDescriptorLoadedListener {
+        void onBitmapDescriptorLoaded(BitmapDescriptor bitmapDescriptor);
     }
 }
 
