@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,6 +47,7 @@ import com.example.mapsgt.network.model.location.RoutesItem;
 import com.example.mapsgt.service.TrackingService;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -55,6 +57,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.PhotoMetadata;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -64,6 +71,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -82,9 +90,16 @@ public class MapsFragment extends Fragment implements
     private PolylineOptions movementHistoryPolylineOptions;
     private TextView tv_distance;
     private TextView tv_duration;
+    private TextView placeNameView;
+    private TextView placeAddressView;
+    private TextView placePhoneView;
+    private TextView placeWebsiteView;
+    private ViewGroup bottomPanel;
+    private ViewGroup placeDetailScrollView;
     private Button btn_start_moving;
     private Button btn_stop_moving;
     private LocationManager mLocationManager;
+    private MapView mapView;
     private GoogleMap mGoogleMap;
     private Button mSearchButton;
     private DatabaseReference mDatabase;
@@ -93,6 +108,7 @@ public class MapsFragment extends Fragment implements
     private List<String> friendIdList = new ArrayList<>();
     private List<UserLocation> friendLocations = new ArrayList<>();
     private MapManagement mapManagement;
+    private Marker desMarker = null;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -122,6 +138,15 @@ public class MapsFragment extends Fragment implements
         sw_movementHistory = view.findViewById((R.id.sw_movementHistory));
         btn_start_moving = view.findViewById(R.id.btn_start_moving);
         btn_stop_moving = view.findViewById(R.id.btn_stop_moving);
+        placeNameView = view.findViewById(R.id.place_name);
+        placeAddressView = view.findViewById(R.id.place_address);
+        placePhoneView = view.findViewById(R.id.place_phone);
+        placeWebsiteView = view.findViewById(R.id.place_website);
+
+        bottomPanel = view.findViewById(R.id.bottom_panel);
+        placeDetailScrollView = view.findViewById(R.id.scrollView);
+
+        placeDetailScrollView.setVisibility(View.GONE);
 
         btn_start_moving.setOnClickListener(view1 -> {
             mapManagement.setMapMode(MapMode.MOVING);
@@ -203,7 +228,8 @@ public class MapsFragment extends Fragment implements
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
 
         renderAllMarker();
-        mGoogleMap.addMarker(options);
+        desMarker = mGoogleMap.addMarker(options);
+        placeDetailScrollView.setVisibility(View.VISIBLE);
         getDirection(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), latLng);
     }
 
@@ -326,7 +352,7 @@ public class MapsFragment extends Fragment implements
     private void renderAllMarker() {
         // clear marker
         mGoogleMap.clear();
-
+        placeDetailScrollView.setVisibility(View.GONE);
         // user location
         renderUserMarker(currentUser);
 
@@ -456,7 +482,6 @@ public class MapsFragment extends Fragment implements
         mDatabase.child("users").child(currentUser.getId()).child("isSharing").setValue(true);
         Toast.makeText(getContext(), "Start sharing", Toast.LENGTH_SHORT).show();
 
-        // Todo: Schedule a task to stop the service after 15 minutes
     }
 
     private void stopTrackerService() {
@@ -589,6 +614,20 @@ public class MapsFragment extends Fragment implements
                     mapManagement.setGoingToFriend(false);
                     addDestinationPoint(latLng);
                 }
+                Geocoder geocoder = new Geocoder(getContext());
+                try {
+                    List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+                    if (addresses.size() > 0) {
+                        Address address = addresses.get(0);
+                        placeNameView.setText(address.getFeatureName());
+                        placeAddressView.setText(address.getAddressLine(0));
+                        placePhoneView.setText(address.getPhone());
+                        placeWebsiteView.setText(address.getUrl());
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             }
         });
 
