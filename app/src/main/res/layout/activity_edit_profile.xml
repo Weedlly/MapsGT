@@ -128,22 +128,30 @@
         android:visibility="gone" />
 
     <LinearLayout
+        android:id="@+id/action_buttons"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/btn_cancel"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:background="@color/colorSecondary"
-            android:text="Cancel" />
+            android:layout_weight="1"
+            android:backgroundTint="@color/colorTextBehind"
+            android:text="Hủy" />
+
+        <View
+            android:layout_width="8dp"
+            android:layout_height="match_parent" />
 
         <Button
             android:id="@+id/btn_update"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:layout_weight="1"
             android:text="@string/update_text" />
     </LinearLayout>
 

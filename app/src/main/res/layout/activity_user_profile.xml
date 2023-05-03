@@ -77,7 +77,7 @@
                         android:id="@+id/tv_friend_number"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="23"
+                        android:text="0"
                         android:textColor="#2196F3"
                         android:textSize="27dp"
                         android:textStyle="bold" />
@@ -101,7 +101,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="123"
+                        android:text="0"
                         android:textColor="#2196F3"
                         android:textSize="27dp"
                         android:textStyle="bold" />
@@ -125,7 +125,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="23"
+                        android:text="0"
                         android:textColor="#2196F3"
                         android:textSize="27dp"
                         android:textStyle="bold" />
@@ -159,7 +159,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:paddingLeft="15dp"
-                android:text="kgofficial@gmail.com"
+                android:text="huy@gmail.com"
                 android:textColor="#000"
                 android:textSize="18dp" />
 
@@ -183,7 +183,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:paddingLeft="15dp"
-                android:text="+92345-1234567"
+                android:text="0912345678"
                 android:textColor="#000"
                 android:textSize="18dp" />
 

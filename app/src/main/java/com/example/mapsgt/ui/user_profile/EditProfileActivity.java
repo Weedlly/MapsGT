@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -59,6 +60,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private Button updateBtn;
     private Button cancelBtn;
     private ProgressBar progressBar;
+    private LinearLayout btnActions;
 
     private DatabaseReference mDatabase;
     private StorageReference mStorage;
@@ -84,8 +86,7 @@ public class EditProfileActivity extends AppCompatActivity {
         updateBtn = findViewById(R.id.btn_update);
         cancelBtn = findViewById(R.id.btn_cancel);
         progressBar = findViewById(R.id.progressBar);
-
-        progressBar.setVisibility(View.INVISIBLE);
+        btnActions = findViewById(R.id.action_buttons);
 
         updateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -181,6 +182,7 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     private void updateProfile() {
+        turnOnLoading();
         String emailInput = editEmail.getText().toString().trim();
         String phoneInput = editPhoneNumber.getText().toString().trim();
         String firstNameInput = editFirstName.getText().toString().trim();
@@ -202,8 +204,19 @@ public class EditProfileActivity extends AppCompatActivity {
                 Intent intent = new Intent(EditProfileActivity.this, UserProfileActivity.class);
                 startActivity(intent);
                 Toast.makeText(getApplicationContext(), "Cập nhật thành công", Toast.LENGTH_SHORT).show();
+                turnOffLoading();
             }
         });
+    }
+
+    private void turnOnLoading() {
+        progressBar.setVisibility(View.VISIBLE);
+        btnActions.setVisibility(View.INVISIBLE);
+    }
+
+    private void turnOffLoading() {
+        progressBar.setVisibility(View.INVISIBLE);
+        btnActions.setVisibility(View.VISIBLE);
     }
 
     private void handleSelectDate() {
