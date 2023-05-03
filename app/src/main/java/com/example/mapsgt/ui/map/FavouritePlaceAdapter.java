@@ -5,10 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
-
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mapsgt.R;
 
@@ -45,7 +42,6 @@ public class FavouritePlaceAdapter extends BaseAdapter {
             convertView = mInflater.inflate(R.layout.favourite_place_item, parent, false);
             holder = new ViewHolder();
             holder.nameTextView = convertView.findViewById(R.id.place_name_tv);
-//            holder.latLngTextView = convertView.findViewById(R.id.place_name_tv);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -54,13 +50,11 @@ public class FavouritePlaceAdapter extends BaseAdapter {
         FavouritePlace favouritePlace = getItem(position);
 
         holder.nameTextView.setText(favouritePlace.getName());
-//        holder.latLngTextView.setText(favouritePlace.getLatitude() + ", " + favouritePlace.getLongitude());
 
         return convertView;
     }
 
     private static class ViewHolder {
         TextView nameTextView;
-//        TextView latLngTextView;
     }
 }
