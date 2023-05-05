@@ -1,4 +1,7 @@
 package com.example.mapsgt.ui.map;
+
+import com.google.android.gms.maps.model.LatLng;
+
 public class FavouritePlace {
     private String userId;
     private double latitude;
@@ -43,5 +46,6 @@ public class FavouritePlace {
     public String getName() {
         return name;
     }
+
 }
 

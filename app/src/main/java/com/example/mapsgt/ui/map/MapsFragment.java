@@ -61,6 +61,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -69,6 +71,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.ui.IconGenerator;
 
@@ -80,6 +83,10 @@ import java.util.Optional;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+enum FavouritePlaceEnum{
+    Remove,
+    Add
+}
 public class MapsFragment extends Fragment implements
         LocationListener, OnMapReadyCallback {
     private static final String TAG = "LocationFragment";
@@ -113,6 +120,7 @@ public class MapsFragment extends Fragment implements
     private Marker desMarker = null;
     private List<FavouritePlace> favouritePlaces = new ArrayList<FavouritePlace>();
     private String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    private FavouritePlaceEnum favouritePlaceEnum = FavouritePlaceEnum.Add;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -178,30 +186,71 @@ public class MapsFragment extends Fragment implements
             }
         });
         btn_add_faPlace.setOnClickListener(viewAddFaPlace -> {
-            final EditText input = new EditText(getContext());
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setTitle("Favourite place");
-            builder.setMessage("Naming your favourite place:");
-            builder.setView(input);
-            builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    String namePlace = input.getText().toString();
-                    FirebaseApp firebaseApp = FirebaseApp.getInstance();
-                    DatabaseReference databaseRef = FirebaseDatabase.getInstance(firebaseApp).getReference();
-                    DatabaseReference favoritePlacesRef = databaseRef.child("favourite_places");
-                    FavouritePlace favoritePlace = new FavouritePlace(currentUserId, desMarker.getPosition().latitude, desMarker.getPosition().longitude,namePlace);
-                    favoritePlacesRef.push().setValue(favoritePlace);
-                }
-            });
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            if(favouritePlaceEnum == FavouritePlaceEnum.Add) {
+                final EditText input = new EditText(getContext());
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Favourite place");
+                builder.setMessage("Naming your favourite place:");
+                builder.setView(input);
+                builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String namePlace = input.getText().toString();
+                        FirebaseApp firebaseApp = FirebaseApp.getInstance();
+                        DatabaseReference databaseRef = FirebaseDatabase.getInstance(firebaseApp).getReference();
+                        DatabaseReference favoritePlacesRef = databaseRef.child("favourite_places");
+                        FavouritePlace favoritePlace = new FavouritePlace(currentUserId, desMarker.getPosition().latitude, desMarker.getPosition().longitude, namePlace);
+                        favoritePlacesRef.push().setValue(favoritePlace);
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+            else if(favouritePlaceEnum == FavouritePlaceEnum.Remove){
+                Log.d(TAG, desMarker.getPosition().toString());
+                LatLng latLng = desMarker.getPosition();
+                Query query = FirebaseDatabase.getInstance().getReference("favourite_places")
+                        .orderByChild("userId")
+                        .equalTo(currentUserId);
+                query.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                String favouritePlaceId = dataSnapshot.getKey();
+
+                                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                                DatabaseReference favouritePlaceRef = database.getReference("favourite_places").child(currentUserId).child(favouritePlaceId);
+                                favouritePlaceRef.removeValue()
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Log.d(TAG, "Favourite place removed successfully");
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.e(TAG, "Error removing favourite place", e);
+                                            }
+                                        });
+                            }
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e(TAG, "Error removing favourite place");
+                    }
+                });
+
+
+            }
         });
 
         sw_sharing.setOnClickListener(view12 -> {
@@ -268,11 +317,18 @@ public class MapsFragment extends Fragment implements
         renderAllMarker();
         desMarker = mGoogleMap.addMarker(options);
         // Don't remove this code
-//        for (FavouritePlace place: favouritePlaces ) {
-//            if(place.getLatitude() == latLng.latitude && place.getLongitude() == latLng.longitude){
-//                btn_add_faPlace.setText("Remove favourite place");
-//            }
-//        }
+        boolean isFavouriteMarker = false;
+        for (FavouritePlace place: favouritePlaces ) {
+            if(place.getLatitude() == latLng.latitude && place.getLongitude() == latLng.longitude){
+                btn_add_faPlace.setText("Remove favourite place");
+                favouritePlaceEnum = FavouritePlaceEnum.Remove;
+                isFavouriteMarker = true;
+            }
+        }
+        if(isFavouriteMarker == false){
+            btn_add_faPlace.setText("Add favourite place");
+            favouritePlaceEnum = FavouritePlaceEnum.Add;
+        }
         detailPlace(latLng);
         placeDetailScrollView.setVisibility(View.VISIBLE);
         getDirection(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), latLng);
@@ -344,7 +400,6 @@ public class MapsFragment extends Fragment implements
                         for (DataSnapshot placeSnapshot : snapshot.getChildren()) {
                             FavouritePlace place = placeSnapshot.getValue(FavouritePlace.class);
                             favouritePlaces.add(place);
-
                         }
                         renderFavouritePlaceMarker();
                     }
@@ -516,6 +571,13 @@ public class MapsFragment extends Fragment implements
 
         Marker marker = mGoogleMap.addMarker(markerOptions);
         marker.setTag(userLocation.getId());
+    }
+    private void removeFavouritePlace(LatLng latLng){
+        for (FavouritePlace place:favouritePlaces) {
+            if(place.getLongitude() == latLng.longitude &&  place.getLatitude() == latLng.latitude){
+                favouritePlaces.remove(place);
+            }
+        }
     }
     private void renderFavouritePlaceMarker() {
         for (FavouritePlace place: favouritePlaces) {
