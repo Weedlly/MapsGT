@@ -6,24 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".ui.communicate.ChatActivity">
 
-<!--    <include-->
-<!--        android:id="@+id/chat_bar_layout"-->
-<!--        layout="@layout/layout_maps_nav">-->
-<!--    </include>-->
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/chat_bar_layout"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
-
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/message_list_users"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/chat_bar_layout"
+
         android:layout_above="@+id/myLinearLayout"
         android:layout_centerHorizontal="true"/>
 

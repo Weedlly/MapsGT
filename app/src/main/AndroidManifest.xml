@@ -39,6 +39,9 @@
             android:name=".friends.PersonProfileActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.communicate.ChatActivity"
+            android:exported="false" />
+        <activity
             android:name=".friends.FindFriendsActivity"
             android:exported="false" />
         <activity

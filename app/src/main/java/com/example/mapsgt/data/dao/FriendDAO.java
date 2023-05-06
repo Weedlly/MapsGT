@@ -17,7 +17,6 @@ import java.util.ArrayList;
 
 public class FriendDAO extends RealtimeDatabase<Friend> {
     private final MutableLiveData<ArrayList<Friend>> friendsLiveData = new MutableLiveData<>();
-    private final MutableLiveData<Friend> findLiveData = new MutableLiveData<>();
 
     public FriendDAO(DatabaseReference databaseReference) {
         super(databaseReference);
@@ -34,7 +33,7 @@ public class FriendDAO extends RealtimeDatabase<Friend> {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("UserDao", "Error reading users from database", error.toException());
+                Log.e("FriendDao", "Error reading users from database", error.toException());
             }
         };
         getDatabaseReference().addValueEventListener(valueEventListener);

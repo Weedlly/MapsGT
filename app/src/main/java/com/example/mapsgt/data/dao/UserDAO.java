@@ -1,5 +1,7 @@
 package com.example.mapsgt.data.dao;
 
+import static android.content.ContentValues.TAG;
+
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -75,11 +77,9 @@ public class UserDAO extends RealtimeDatabase<User> {
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    User user = snapshot.getValue(User.class);
-                    currentUserLiveData.setValue(user);
-                    Log.d("UserDao", "User found: " + user);
-                }
+                User user = dataSnapshot.getValue(User.class);
+                currentUserLiveData.setValue(user);
+                Log.d("UserDao", "User found: " + user);
             }
 
             @Override

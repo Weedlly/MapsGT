@@ -10,16 +10,12 @@ import androidx.fragment.app.FragmentResultListener;
 import android.bluetooth.BluetoothClass;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.mapsgt.R;
-import com.example.mapsgt.data.entities.Friend;
-import com.example.mapsgt.data.entities.User;
-import com.example.mapsgt.ui.add_friend.find_friend.FindUserFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,7 +38,7 @@ public class PersonProfileActivity extends AppCompatActivity {
     private CircleImageView userProfileImage;
     private Button SendFriendRequestBTN, DeclineFriendRequestBTN, BlockFriendBTN;
 
-    private DatabaseReference FriendRequestFef, UsersRef, FriendsFef, receiverFriendRef;
+    private DatabaseReference FriendRequestFef, UsersRef, FriendsFef, senderFriendRef ,receiverFriendRef;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private String senderUserId , CURRENT_STATE, saveCurrentDate;
     private static String receiverUserId ;
@@ -53,18 +49,18 @@ public class PersonProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_person_profile);
-        // O21R3tAHqjXH7uKEgUMlteCH8r03
 
-        senderUserId = "v63SkgeB9nXSmm3aICpri24mWfj1";  //mAuth.getCurrentUser().getUid(); (Demo)
+        //TODO: change mAuth.getCurrentUser().getUid(); by below ID to testing
+        senderUserId = "v63SkgeB9nXSmm3aICpri24mWfj1";
 
-        Log.d(TAG, "Id visit: " + receiverUserId);
         Intent intent = getIntent();
         receiverUserId = intent.getStringExtra("visit_user_id");
 
         UsersRef = FirebaseDatabase.getInstance().getReference().child("users");
+        FriendsFef = FirebaseDatabase.getInstance().getReference().child("FriendRelationship");
         FriendRequestFef = FirebaseDatabase.getInstance().getReference().child("FriendRequest");
-        FriendsFef = UsersRef.child(senderUserId).child("Friends");
-        receiverFriendRef = UsersRef.child(receiverUserId).child("Friends");
+        senderFriendRef = FriendsFef.child(senderUserId).child("Friends");
+        receiverFriendRef = FriendsFef.child(receiverUserId).child("Friends");
         InitializeFields();
 
         UsersRef.child(receiverUserId).addValueEventListener(new ValueEventListener() {
@@ -144,7 +140,7 @@ public class PersonProfileActivity extends AppCompatActivity {
     }
 
     private void unblockFriend() {
-        FriendsFef.child(receiverUserId)
+        senderFriendRef.child(receiverUserId)
             .child("status")
             .removeValue()
             .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -172,7 +168,7 @@ public class PersonProfileActivity extends AppCompatActivity {
     private void blockFriend() {
         String block = "Blocked";
         String beBlock = "beBlocked";
-        FriendsFef.child(receiverUserId).child("status").setValue(block)
+        senderFriendRef.child(receiverUserId).child("status").setValue(block)
             .addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
@@ -196,7 +192,7 @@ public class PersonProfileActivity extends AppCompatActivity {
             });
     }
     private void UnFriendAnExistingFriend() {
-        FriendsFef.child(receiverUserId)
+        senderFriendRef.child(receiverUserId)
                 .removeValue()
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -225,7 +221,7 @@ public class PersonProfileActivity extends AppCompatActivity {
         SimpleDateFormat currentDate = new SimpleDateFormat("dd-MMMM-yyyy");
         saveCurrentDate = currentDate.format(calForDate.getTime());
         addIdValueToEachUserFriend();
-        FriendsFef.child(receiverUserId).child("date").setValue(saveCurrentDate)
+        senderFriendRef.child(receiverUserId).child("date").setValue(saveCurrentDate)
             .addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
@@ -330,7 +326,7 @@ public class PersonProfileActivity extends AppCompatActivity {
                             });
                         }
                     } else {
-                        FriendsFef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        senderFriendRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 if (snapshot.hasChild(receiverUserId)) {
@@ -338,7 +334,6 @@ public class PersonProfileActivity extends AppCompatActivity {
 
 
                                     if (!isBlocked) {
-                                        Log.d(TAG, "Block: " + isBlocked);
                                         backToFriendState();
                                     }
                                 }
@@ -356,7 +351,7 @@ public class PersonProfileActivity extends AppCompatActivity {
 
     private void validBeBlockedFriend() //For sender block
     {
-        FriendsFef.child(receiverUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+        senderFriendRef.child(receiverUserId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.hasChild("status")) {
@@ -461,7 +456,7 @@ public class PersonProfileActivity extends AppCompatActivity {
     }
 
     private void addIdValueToEachUserFriend() {
-        FriendsFef.child(receiverUserId).child("id").setValue(receiverUserId);
+        senderFriendRef.child(receiverUserId).child("id").setValue(receiverUserId);
         receiverFriendRef.child(senderUserId).child("id").setValue(senderUserId);
     }
 
