@@ -58,14 +58,14 @@
         <activity
             android:name=".ui.user_profile.EditProfileActivity"
             android:exported="false" />
-        <activity
-            android:name=".ui.add_friend.FriendsActivity"
-            android:exported="false" />
+<!--        <activity-->
+<!--            android:name=".ui.add_friend.FriendsActivity"-->
+<!--            android:exported="false" />-->
         <activity
             android:name=".MainActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.auth.AuthActivity"
+            android:name=".ui.add_friend.FriendsActivity"
             android:exported="true"
             android:theme="@style/Theme.Material3.Light.NoActionBar" >
             <intent-filter>
