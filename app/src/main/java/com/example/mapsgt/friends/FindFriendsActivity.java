@@ -22,7 +22,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class FindFriendsActivity extends AppCompatActivity implements FriendAdapter.OnFriendsDetailListener{
+public class FindFriendsActivity extends AppCompatActivity implements FriendAdapter.OnFriendsDetailListener {
     private RecyclerView mRecyclerView;
 
     public static ArrayList<User> mListFriends = new ArrayList<>();
@@ -36,16 +36,14 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
 
     public static String visit_user_id;
 
-    private DatabaseReference allUserFromDatabaseRef = ListUserData.getReference("User");
-
+    private DatabaseReference allUserFromDatabaseRef = ListUserData.getReference("users");
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_find_friends);
 
-
-       initRecyclerView();
+        initRecyclerView();
     }
 
     @Override
@@ -57,7 +55,6 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
     }
 
     private void initRecyclerView() {
-
         mRecyclerView = findViewById(R.id.search_result_list);
         mRecyclerView.setHasFixedSize(true);
 
@@ -65,7 +62,6 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
         allUserFromDatabaseRef.addValueEventListener(new ValueEventListener() {
-
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren())
@@ -73,9 +69,9 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
                     User user = dataSnapshot.getValue(User.class);
                     mListFriends.add(user);
 
-                    mListFriendRecyclerAdapter = new FriendAdapter( mListFriends, FindFriendsActivity.this);
+                    mListFriendRecyclerAdapter = new FriendAdapter(mListFriends, FindFriendsActivity.this);
                     mRecyclerView.setAdapter(mListFriendRecyclerAdapter);
-                    SearchData();
+                    searchData();
                 }
             }
 
@@ -86,44 +82,37 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
         });
     }
 
-    private void SearchData() {
+    private void searchData() {
         searchView = findViewById(R.id.search_view);
         searchView.clearFocus();
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                //mListFriendRecyclerAdapter.getFilter().filter(query);
-
                 return false;
             }
+
             @Override
             public boolean onQueryTextChange(String newText) {
                 mListFriendRecyclerAdapter.getFilter().filter(newText);
 
-                //mListFriends.clear();
-
-               // mRecyclerView.setAdapter(mListFriendRecyclerAdapter);
-
-                Query queryData = FirebaseDatabase.getInstance().getReference("User").orderByChild("firstName").equalTo(newText);
-
+                Query queryData = allUserFromDatabaseRef.orderByChild("firstName").equalTo(newText);
                 queryData.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         mListFriends.clear();
-                        for (DataSnapshot dataSnapshot : snapshot.getChildren())
-                        {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             User user = dataSnapshot.getValue(User.class);
                             mListFriends.add(user);
 
-                            mListFriendRecyclerAdapter = new FriendAdapter( mListFriends, FindFriendsActivity.this);
+                            mListFriendRecyclerAdapter = new FriendAdapter(mListFriends, FindFriendsActivity.this);
                             mRecyclerView.setAdapter(mListFriendRecyclerAdapter);
-
                         }
 
                         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(FindFriendsActivity.this, DividerItemDecoration.VERTICAL);
                         mRecyclerView.addItemDecoration(itemDecoration);
                     }
+
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
 
@@ -136,9 +125,7 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
     }
 
     @Override
-    public void OnFriendsDetailClick(int position) {
-//        visit_user_id = Integer.toString(position + 1);
-
+    public void onFriendsDetailClick(int position) {
         visit_user_id = mListFriends.get(position + 1).getId();
         Intent intent = new Intent(this, PersonProfileActivity.class);
         intent.putExtra("visit_user_id", visit_user_id);

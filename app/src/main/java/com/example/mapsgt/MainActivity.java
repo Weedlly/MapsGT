@@ -9,11 +9,14 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.example.mapsgt.ui.map.MapsFragment;
-import com.example.mapsgt.ui.navigation.FavoriteFragment;
-import com.example.mapsgt.ui.navigation.HistoryFragment;
+import com.example.mapsgt.ui.add_friend.AddFriendActivity;
 import com.example.mapsgt.ui.auth.AuthActivity;
 import com.example.mapsgt.ui.base.BaseActivity;
+import com.example.mapsgt.ui.map.MapsFragment;
+import com.example.mapsgt.ui.navigation.FavoriteFragment;
+import com.example.mapsgt.ui.navigation.FeedbackActivity;
+import com.example.mapsgt.ui.navigation.HistoryFragment;
+import com.example.mapsgt.ui.user_profile.UserProfileActivity;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -23,7 +26,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private static final int FRAGMENT_HOME = 0;
     private static final int FRAGMENT_FAVORITE = 1;
     private static final int FRAGMENT_HISTORY = 2;
-
+    private static final int ACTIVITY_ADD_FRIEND = 3;
+    private static final int ACTIVITY_FEEDBACK = 4;
+    private static final int ACTIVITY_PROFILE = 5;
     private static final int LOGOUT = 7;
 
     private int mCurrentFragment = FRAGMENT_HOME;
@@ -85,7 +90,18 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             if (mCurrentFragment != LOGOUT) {
                 auth.signOut();
                 startActivity(AuthActivity.class);
-                finish();
+            }
+        } else if (id == R.id.nav_add_friend) {
+            if (mCurrentFragment != ACTIVITY_ADD_FRIEND) {
+                startActivityNotFinish(AddFriendActivity.class);
+            }
+        } else if (id == R.id.nav_my_profile) {
+            if (mCurrentFragment != ACTIVITY_PROFILE) {
+                startActivityNotFinish(UserProfileActivity.class);
+            }
+        } else if (id == R.id.nav_feedback) {
+            if (mCurrentFragment != ACTIVITY_FEEDBACK) {
+                startActivityNotFinish(FeedbackActivity.class);
             }
         }
         mDrawerLayout.closeDrawer(GravityCompat.START);

@@ -5,6 +5,7 @@ import static android.content.ContentValues.TAG;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
@@ -47,7 +48,7 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_friend);
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         InitializeFields();
         FriendAdapter suggestFriendAdapter = new FriendAdapter(filtered_list, AddFriendActivity.this);
         rvListSuggestUsers.setAdapter(suggestFriendAdapter);
@@ -98,6 +99,7 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
             String firstName = "User " + i;
             String lastName = "Last Name";
             String dob = "Jan 1, 1990";
+            String profilePicture = "https://raw.githubusercontent.com/gotitinc/aha-assets/master/uifaces/m-10.jpg";
             UserGenderEnum gender = UserGenderEnum.MALE;
             double latitude = 10.838665 + (Math.random() * 0.1 - 0.05);
             double longitude = 106.6652783 + (Math.random() * 0.1 - 0.05);
@@ -113,7 +115,7 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
                                 FirebaseUser authUser = mAuth.getCurrentUser();
 
                                 if (authUser != null) {
-                                    User user = new User(authUser.getUid(), authUser.getEmail(), phoneNo, firstName, lastName, dob, gender, latitude, longitude, true);
+                                    User user = new User(authUser.getUid(), authUser.getEmail(), phoneNo, firstName, lastName, dob , gender, latitude, longitude, true, profilePicture);
                                     userDAO.insert(user);
                                     // Set the location of the user in GeoFire
                                     userDAO.setLocation(authUser.getUid(), latitude, longitude);
@@ -132,11 +134,23 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
     }
 
     @Override
-    public void OnFriendsDetailClick(int position) {
+    public void onFriendsDetailClick(int position) {
         visit_user_id = filtered_list.get(position).getId();
 
         Intent intent = new Intent(AddFriendActivity.this, PersonProfileActivity.class);
         intent.putExtra("visit_user_id", visit_user_id);
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                finish();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

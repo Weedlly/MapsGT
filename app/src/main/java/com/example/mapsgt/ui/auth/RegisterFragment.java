@@ -187,7 +187,7 @@ public class RegisterFragment extends Fragment {
                             FirebaseUser authUser = mAuth.getCurrentUser();
 
                             if (authUser != null) {
-                                User user = new User(authUser.getUid(), authUser.getEmail(), phoneNo, firstName, lastName, dob, gender, -1, -1, false);
+                                User user = new User(authUser.getUid(), authUser.getEmail(), phoneNo, firstName, lastName, dob, gender, -1, -1, false, "https://raw.githubusercontent.com/gotitinc/aha-assets/master/uifaces/m-10.jpg");
                                 createUserOnFirebase(user);
                             }
                         } else {
@@ -235,16 +235,5 @@ public class RegisterFragment extends Fragment {
             }
         });
         materialDatePicker.show(getActivity().getSupportFragmentManager(), "tag");
-    }
-
-    private Date convertStringToDate(String dateStr) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        try {
-            Date date = dateFormat.parse(dateStr);
-            return date;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 }
