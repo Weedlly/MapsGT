@@ -157,7 +157,6 @@ public class MapsFragment extends Fragment implements
         placePhoneView = view.findViewById(R.id.place_phone);
         placeWebsiteView = view.findViewById(R.id.place_website);
 
-
         bottomPanel = view.findViewById(R.id.bottom_panel);
         placeDetailScrollView = view.findViewById(R.id.scrollView);
 
@@ -201,6 +200,14 @@ public class MapsFragment extends Fragment implements
                         DatabaseReference favoritePlacesRef = databaseRef.child("favourite_places");
                         FavouritePlace favoritePlace = new FavouritePlace(currentUserId, desMarker.getPosition().latitude, desMarker.getPosition().longitude, namePlace);
                         favoritePlacesRef.push().setValue(favoritePlace);
+                        renderFavouriteLocation();
+                        renderAllMarker();
+                        LatLng latLng = desMarker.getPosition();
+                        detailPlace(latLng);
+                        placeDetailScrollView.setVisibility(View.VISIBLE);
+                        getDirection(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), latLng);
+                        btn_add_faPlace.setText("Remove favourite place");
+                        favouritePlaceEnum = FavouritePlaceEnum.Remove;
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -224,22 +231,26 @@ public class MapsFragment extends Fragment implements
                         if (snapshot.exists()) {
                             for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                 String favouritePlaceId = dataSnapshot.getKey();
-
-                                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                                DatabaseReference favouritePlaceRef = database.getReference("favourite_places").child(currentUserId).child(favouritePlaceId);
-                                favouritePlaceRef.removeValue()
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                Log.d(TAG, "Favourite place removed successfully");
-                                            }
-                                        })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Log.e(TAG, "Error removing favourite place", e);
-                                            }
-                                        });
+                                FavouritePlace place = dataSnapshot.getValue(FavouritePlace.class);
+                                if (place.getLatitude() == desMarker.getPosition().latitude && place.getLongitude() == desMarker.getPosition().longitude){
+                                    FirebaseDatabase database = FirebaseDatabase.getInstance();
+                                    DatabaseReference favouritePlaceRef = database.getReference("favourite_places").child(favouritePlaceId);
+                                    favouritePlaceRef.removeValue()
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Log.d(TAG, "Favourite place removed successfully");
+                                                    renderFavouriteLocation();
+                                                    renderAllMarker();
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.e(TAG, "Error removing favourite place", e);
+                                                }
+                                            });
+                                }
                             }
                         }
                     }
@@ -308,7 +319,6 @@ public class MapsFragment extends Fragment implements
 
     private void addDestinationPoint(LatLng latLng) {
         mapManagement.setDestination(latLng);
-
         // Creating MarkerOptions
         MarkerOptions options = new MarkerOptions()
                 .position(latLng)
@@ -318,7 +328,7 @@ public class MapsFragment extends Fragment implements
         desMarker = mGoogleMap.addMarker(options);
         // Don't remove this code
         boolean isFavouriteMarker = false;
-        for (FavouritePlace place: favouritePlaces ) {
+        for (FavouritePlace place: favouritePlaces) {
             if(place.getLatitude() == latLng.latitude && place.getLongitude() == latLng.longitude){
                 btn_add_faPlace.setText("Remove favourite place");
                 favouritePlaceEnum = FavouritePlaceEnum.Remove;
@@ -393,6 +403,7 @@ public class MapsFragment extends Fragment implements
         });
     }
     public void renderFavouriteLocation(){
+        favouritePlaces.clear();
         FirebaseDatabase.getInstance().getReference("favourite_places").orderByChild("userId")
                 .equalTo(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
