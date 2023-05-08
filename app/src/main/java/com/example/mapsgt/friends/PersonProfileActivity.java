@@ -51,7 +51,7 @@ public class PersonProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_person_profile);
 
         //TODO: change mAuth.getCurrentUser().getUid(); by below ID to testing
-        senderUserId = "v63SkgeB9nXSmm3aICpri24mWfj1";
+        senderUserId = mAuth.getCurrentUser().getUid();
 
         Intent intent = getIntent();
         receiverUserId = intent.getStringExtra("visit_user_id");

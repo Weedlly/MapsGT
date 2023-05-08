@@ -64,7 +64,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     public void onBindViewHolder(@NonNull MessageViewHolder holder, int position)
     {
         //TODO: change mAuth.getCurrentUser().getUid(); by below ID to testing
-        String messageSenderID = "v63SkgeB9nXSmm3aICpri24mWfj1";
+        String messageSenderID = mAuth.getCurrentUser().getUid();
         Message message = userMessageList.get(position);
 
         String fromUserID = message.getFrom();

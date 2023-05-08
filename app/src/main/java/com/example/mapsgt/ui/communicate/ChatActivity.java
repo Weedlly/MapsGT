@@ -71,7 +71,7 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         //TODO: change mAuth.getCurrentUser().getUid(); by below ID to testing
-        messageSenderID = "v63SkgeB9nXSmm3aICpri24mWfj1";
+        messageSenderID = mAuth.getCurrentUser().getUid();
 
         RootRof = FirebaseDatabase.getInstance().getReference();
 

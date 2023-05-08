@@ -8,13 +8,14 @@ import com.example.mapsgt.data.dao.FriendDAO;
 import com.example.mapsgt.data.dao.UserDAO;
 import com.example.mapsgt.data.entities.Friend;
 import com.example.mapsgt.data.entities.User;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class FriendsViewHolder extends ViewModel {
     private final FriendDAO friendDAO;
-
+    private FirebaseAuth mAuth;
     public FriendsViewHolder() {
-        friendDAO = new FriendDAO(FirebaseDatabase.getInstance().getReference("users").child("O21R3tAHqjXH7uKEgUMlteCH8r03").child("Friends"));
+        friendDAO = new FriendDAO(FirebaseDatabase.getInstance().getReference("users").child(mAuth.getCurrentUser().getUid()).child("Friends"));
     }
 
 }

@@ -34,7 +34,7 @@ public class FriendsActivity extends BaseActivity implements FriendAdapter.OnFri
     public static String userName;
 
     //TODO: change mAuth.getCurrentUser().getUid();
-    String senderID = "v63SkgeB9nXSmm3aICpri24mWfj1";
+    String senderID = mAuth.getCurrentUser().getUid();
     private final FriendDAO friendDAO = new FriendDAO(FirebaseDatabase.getInstance().getReference("FriendRelationship").child(senderID).child("Friends"));
     private final UserDAO userDAO = new UserDAO(FirebaseDatabase.getInstance().getReference("users"));
     private RecyclerView rcvFriends;
@@ -76,7 +76,6 @@ public class FriendsActivity extends BaseActivity implements FriendAdapter.OnFri
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         rcvFriends.setLayoutManager(linearLayoutManager);
     }
-
     @Override
     public int getLayoutResource() {
         return R.id.main_holder_friend;
