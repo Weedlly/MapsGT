@@ -14,6 +14,7 @@ import android.widget.Button;
 import com.example.mapsgt.R;
 
 public class MainAuthFragment extends Fragment {
+    public static final int RC_SIGN_IN = 1;
     private Button ggSignInBtn;
     private Button emailSignInBtn;
     private AuthActivity mAuthActivity;
@@ -38,7 +39,7 @@ public class MainAuthFragment extends Fragment {
         ggSignInBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                mAuthActivity.signIn();
             }
         });
 

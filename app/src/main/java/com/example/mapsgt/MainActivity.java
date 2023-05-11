@@ -17,6 +17,7 @@ import com.example.mapsgt.ui.navigation.FavoriteFragment;
 import com.example.mapsgt.ui.navigation.FeedbackActivity;
 import com.example.mapsgt.ui.navigation.HistoryFragment;
 import com.example.mapsgt.ui.user_profile.UserProfileActivity;
+import com.example.mapsgt.utils.AccountFirebaseUtil;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -30,6 +31,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private static final int ACTIVITY_FEEDBACK = 4;
     private static final int ACTIVITY_PROFILE = 5;
     private static final int LOGOUT = 7;
+    private static final String TAG = "MainActivity";
 
     private int mCurrentFragment = FRAGMENT_HOME;
     private DrawerLayout mDrawerLayout;
@@ -42,6 +44,13 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         user = auth.getCurrentUser();
         if (user == null) {
             startActivity(AuthActivity.class);
+        }
+        else {
+            AccountFirebaseUtil.checkEmailExists(user.getEmail(), (Boolean exists) -> {
+                if (!exists) {
+                    startActivity(AuthActivity.class);
+                }
+            });
         }
     }
 
