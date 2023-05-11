@@ -1,4 +1,4 @@
-package com.example.mapsgt.friends;
+package com.example.mapsgt.ui.friends;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -64,8 +64,7 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
         allUserFromDatabaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren())
-                {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
                     mListFriends.add(user);
 

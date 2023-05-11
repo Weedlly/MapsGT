@@ -1,7 +1,5 @@
 package com.example.mapsgt.data.dao;
 
-import static android.content.ContentValues.TAG;
-
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -47,6 +45,7 @@ public class UserDAO extends RealtimeDatabase<User> {
         };
         getDatabaseReference().addValueEventListener(valueEventListener);
     }
+
     @Override
     public void insert(User user) {
         getDatabaseReference().child(user.getId()).setValue(user);
@@ -71,6 +70,7 @@ public class UserDAO extends RealtimeDatabase<User> {
     public LiveData<ArrayList<User>> getAll() {
         return usersLiveData;
     }
+
     public LiveData<User> getUserById(String id) {
         MutableLiveData<User> currentUserLiveData = new MutableLiveData<>();
         Query query = getDatabaseReference().child(id);
@@ -89,6 +89,7 @@ public class UserDAO extends RealtimeDatabase<User> {
         });
         return currentUserLiveData;
     }
+
     public LiveData<User> getUserByEmail(String emailAddress) {
         Query query = getDatabaseReference().orderByChild("email").equalTo(emailAddress);
         query.addListenerForSingleValueEvent(new ValueEventListener() {

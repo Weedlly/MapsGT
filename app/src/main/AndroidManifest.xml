@@ -38,21 +38,17 @@
         <service android:name=".service.TrackingService" />
 
         <activity
-            android:name=".friends.PersonProfileActivity"
+            android:name=".ui.friends.PersonProfileActivity"
             android:exported="false" />
         <activity
             android:name=".ui.communicate.ChatActivity"
             android:exported="false" />
         <activity
-            android:name=".friends.FindFriendsActivity"
+            android:name=".ui.friends.FindFriendsActivity"
             android:exported="false" />
         <activity
             android:name=".ui.navigation.FeedbackActivity"
             android:exported="false" />
-        <activity
-            android:name=".MainActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Material3.Light.NoActionBar"/>
         <activity
             android:name=".ui.user_profile.UserProfileActivity"
             android:exported="false" />
@@ -65,6 +61,11 @@
         <activity
             android:name=".ui.add_friend.FriendsActivity"
             android:exported="false" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/title_activity_maps"
+            android:theme="@style/Theme.Material3.Light.NoActionBar" />
         <activity
             android:name=".ui.auth.AuthActivity"
             android:exported="true"

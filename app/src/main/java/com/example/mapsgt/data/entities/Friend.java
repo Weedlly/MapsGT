@@ -6,17 +6,24 @@ public class Friend {
     private String date;
     private String status;
 
-    public Friend() {}
+    public Friend() {
+    }
 
-    public void Friend( String date, String status, String id) {
+    public void Friend(String date, String status, String id) {
         this.date = date;
         this.status = status;
         this.id = id;
     }
 
-    public String getID() { return id; }
+    public String getId() {
+        return id;
+    }
 
-    public String getDate() { return date;}
+    public String getDate() {
+        return date;
+    }
 
-    public String getStatus() { return status; }
+    public String getStatus() {
+        return status;
+    }
 }

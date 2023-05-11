@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mapsgt.R;
 import com.example.mapsgt.adapter.FriendAdapter;
 import com.example.mapsgt.data.entities.User;
-import com.example.mapsgt.friends.PersonProfileActivity;
+import com.example.mapsgt.ui.friends.PersonProfileActivity;
 
 import java.util.ArrayList;
 

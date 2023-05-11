@@ -41,17 +41,17 @@ public class FriendDAO extends RealtimeDatabase<Friend> {
 
     @Override
     public void insert(Friend friend) {
-        getDatabaseReference().child(friend.getID()).setValue(friend);
+        getDatabaseReference().child(friend.getId()).setValue(friend);
     }
 
     @Override
     public void update(Friend friend) {
-        getDatabaseReference().child(friend.getID()).setValue(friend);
+        getDatabaseReference().child(friend.getId()).setValue(friend);
     }
 
     @Override
     public void delete(Friend friend) {
-        getDatabaseReference().child(friend.getID()).removeValue();
+        getDatabaseReference().child(friend.getId()).removeValue();
     }
 
     @Override

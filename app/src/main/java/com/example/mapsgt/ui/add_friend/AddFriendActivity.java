@@ -17,7 +17,7 @@ import com.example.mapsgt.adapter.FriendAdapter;
 import com.example.mapsgt.data.dao.UserDAO;
 import com.example.mapsgt.data.entities.User;
 import com.example.mapsgt.enumeration.UserGenderEnum;
-import com.example.mapsgt.friends.PersonProfileActivity;
+import com.example.mapsgt.ui.friends.PersonProfileActivity;
 import com.example.mapsgt.ui.add_friend.find_friend.FindUserFragment;
 import com.example.mapsgt.ui.base.BaseActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
