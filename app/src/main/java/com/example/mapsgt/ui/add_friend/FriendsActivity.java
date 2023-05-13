@@ -24,13 +24,12 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
-
 public class FriendsActivity extends BaseActivity implements FriendAdapter.OnFriendsDetailListener {
     private static final String ARG_PARAM = "query";
+    private static final String TAG = "FriendsActivity";
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     public static String visitUserId;
     public static String userName;
-
     String senderId = mAuth.getCurrentUser().getUid();
     private final FriendDAO friendDAO = new FriendDAO(FirebaseDatabase.getInstance().getReference("FriendRelationship").child(senderId).child("Friends"));
     private final UserDAO userDAO = new UserDAO(FirebaseDatabase.getInstance().getReference("users"));
@@ -50,8 +49,8 @@ public class FriendsActivity extends BaseActivity implements FriendAdapter.OnFri
 
         friendList.clear();
         userList.clear();
-        friendDAO.getAll().observe(this, Friend -> {
-            friendList.addAll(Friend);
+        friendDAO.getAll().observe(this, friends -> {
+            friendList.addAll(friends);
 
             for (Friend friend : friendList) {
                 userDAO.getUserById(friend.getId()).observe(this, user -> {

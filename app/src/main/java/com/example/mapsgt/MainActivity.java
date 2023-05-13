@@ -10,6 +10,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.mapsgt.ui.add_friend.AddFriendActivity;
+import com.example.mapsgt.ui.add_friend.FriendsActivity;
 import com.example.mapsgt.ui.auth.AuthActivity;
 import com.example.mapsgt.ui.base.BaseActivity;
 import com.example.mapsgt.ui.map.MapsFragment;
@@ -29,6 +30,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private static final int ACTIVITY_ADD_FRIEND = 3;
     private static final int ACTIVITY_FEEDBACK = 4;
     private static final int ACTIVITY_PROFILE = 5;
+    private static final int ACTIVITY_CHAT = 6;
     private static final int LOGOUT = 7;
 
     private int mCurrentFragment = FRAGMENT_HOME;
@@ -98,6 +100,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         } else if (id == R.id.nav_my_profile) {
             if (mCurrentFragment != ACTIVITY_PROFILE) {
                 startActivityNotFinish(UserProfileActivity.class);
+            }
+        } else if (id == R.id.nav_chat) {
+            if (mCurrentFragment != ACTIVITY_CHAT) {
+                startActivityNotFinish(FriendsActivity.class);
             }
         } else if (id == R.id.nav_feedback) {
             if (mCurrentFragment != ACTIVITY_FEEDBACK) {

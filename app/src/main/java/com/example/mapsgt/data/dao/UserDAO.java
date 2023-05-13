@@ -78,7 +78,7 @@ public class UserDAO extends RealtimeDatabase<User> {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
-                currentUserLiveData.setValue(user);
+                currentUserLiveData.postValue(user);
                 Log.d("UserDao", "User found: " + user);
             }
 
@@ -97,7 +97,7 @@ public class UserDAO extends RealtimeDatabase<User> {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     User user = snapshot.getValue(User.class);
-                    userLiveData.setValue(user);
+                    userLiveData.postValue(user);
                     Log.d("UserDao", "User found: " + user);
                 }
             }

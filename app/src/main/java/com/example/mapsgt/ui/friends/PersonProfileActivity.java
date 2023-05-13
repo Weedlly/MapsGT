@@ -32,7 +32,7 @@ public class PersonProfileActivity extends AppCompatActivity {
     private CircleImageView userProfileImage;
     private Button sendFriendRequestBtn, declineFriendRequestBtn, blockFriendBtn;
 
-    private DatabaseReference friendRequestFef, usersRef, friendsRef, senderFriendRef, receiverFriendRef;
+    private DatabaseReference friendRequestRef, usersRef, friendsRef, senderFriendRef, receiverFriendRef;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private String senderUserId, currentState, saveCurrentDate;
     private static String receiverUserId;
@@ -51,7 +51,7 @@ public class PersonProfileActivity extends AppCompatActivity {
 
         usersRef = FirebaseDatabase.getInstance().getReference().child("users");
         friendsRef = FirebaseDatabase.getInstance().getReference().child("FriendRelationship");
-        friendRequestFef = FirebaseDatabase.getInstance().getReference().child("FriendRequest");
+        friendRequestRef = FirebaseDatabase.getInstance().getReference().child("FriendRequest");
         senderFriendRef = friendsRef.child(senderUserId).child("Friends");
         receiverFriendRef = friendsRef.child(receiverUserId).child("Friends");
         initializeFields();
@@ -215,13 +215,13 @@ public class PersonProfileActivity extends AppCompatActivity {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()) {
-                                                friendRequestFef.child(senderUserId).child(receiverUserId)
+                                                friendRequestRef.child(senderUserId).child(receiverUserId)
                                                         .removeValue()
                                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                             @Override
                                                             public void onComplete(@NonNull Task<Void> task) {
                                                                 if (task.isSuccessful()) {
-                                                                    friendRequestFef.child(receiverUserId).child(senderUserId)
+                                                                    friendRequestRef.child(receiverUserId).child(senderUserId)
                                                                             .removeValue()
                                                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                                                 @Override
@@ -244,13 +244,13 @@ public class PersonProfileActivity extends AppCompatActivity {
     }
 
     private void cancelFriendRequest() {
-        friendRequestFef.child(senderUserId).child(receiverUserId)
+        friendRequestRef.child(senderUserId).child(receiverUserId)
                 .removeValue()
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            friendRequestFef.child(receiverUserId).child(senderUserId)
+                            friendRequestRef.child(receiverUserId).child(senderUserId)
                                     .removeValue()
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
@@ -272,7 +272,7 @@ public class PersonProfileActivity extends AppCompatActivity {
     }
 
     private void maintenanceOfButton() {
-        friendRequestFef.child(senderUserId)
+        friendRequestRef.child(senderUserId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -312,7 +312,6 @@ public class PersonProfileActivity extends AppCompatActivity {
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                                     if (snapshot.hasChild(receiverUserId)) {
                                         validBeBlockedFriend();
-
 
                                         if (!isBlocked) {
                                             backToFriendState();
@@ -387,13 +386,13 @@ public class PersonProfileActivity extends AppCompatActivity {
     }
 
     private void sendFriendRequestToPerson() {
-        friendRequestFef.child(senderUserId).child(receiverUserId)
+        friendRequestRef.child(senderUserId).child(receiverUserId)
                 .child("request_type").setValue("sent")
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            friendRequestFef.child(receiverUserId).child(senderUserId)
+                            friendRequestRef.child(receiverUserId).child(senderUserId)
                                     .child("request_type").setValue("received")
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override

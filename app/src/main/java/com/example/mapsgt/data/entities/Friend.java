@@ -1,7 +1,6 @@
 package com.example.mapsgt.data.entities;
 
 public class Friend {
-
     private String id;
     private String date;
     private String status;
