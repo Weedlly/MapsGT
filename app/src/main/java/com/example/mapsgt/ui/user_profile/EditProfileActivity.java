@@ -2,6 +2,7 @@ package com.example.mapsgt.ui.user_profile;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
 
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.mapsgt.R;
+import com.example.mapsgt.data.dao.NewUserDAO;
 import com.example.mapsgt.data.entities.User;
 import com.example.mapsgt.enumeration.UserGenderEnum;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -31,11 +33,8 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -65,6 +64,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     private StorageReference mStorage;
     private String curUserId;
+    private NewUserDAO userDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +73,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorage = FirebaseStorage.getInstance().getReference();
+        userDAO = new NewUserDAO();
 
         curUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -87,6 +88,37 @@ public class EditProfileActivity extends AppCompatActivity {
         cancelBtn = findViewById(R.id.btn_cancel);
         progressBar = findViewById(R.id.progressBar);
         btnActions = findViewById(R.id.action_buttons);
+
+        String[] genders = new String[]{"Nam", "Nữ", "Khác"};
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(EditProfileActivity.this,
+                android.R.layout.simple_spinner_item, genders);
+
+        genderSpinner.setAdapter(adapter);
+
+        genderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                switch (position) {
+                    case 0: gender = UserGenderEnum.MALE; break;
+                    case 1: gender = UserGenderEnum.FEMALE; break;
+                    default: gender = UserGenderEnum.OTHER;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // TODO Auto-generated method stub
+            }
+        });
+
+        editDOB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                handleSelectDate();
+            }
+        });
 
         updateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,68 +148,24 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     private void getUserInfo() {
-        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        LiveData<User> userLiveData = userDAO.getUserById(curUserId);
+        userLiveData.observe(this, response -> {
+            editFirstName.setText(response.getFirstName());
+            editLastName.setText(response.getLastName());
+            editEmail.setText(response.getEmail());
+            editPhoneNumber.setText(response.getPhone());
+            editDOB.setText(response.getDateOfBirth());
+            gender = response.getGender();
+            genderSpinner.setSelection(response.getGender().ordinal());
 
-        mDatabase.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                User response = snapshot.child("users").child(currentUserId).getValue(User.class);
-                if (response != null) {
-                    editFirstName.setText(response.getFirstName());
-                    editLastName.setText(response.getLastName());
-                    editEmail.setText(response.getEmail());
-                    editPhoneNumber.setText(response.getPhone());
-                    editDOB.setText(response.getDateOfBirth());
-                    gender = response.getGender();
+            RequestOptions options = new RequestOptions()
+                    .placeholder(R.drawable.ic_profile)
+                    .error(R.drawable.google);
 
-                    String[] genders = new String[]{"Nam", "Nữ", "Khác"};
-
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(EditProfileActivity.this,
-                            android.R.layout.simple_spinner_item, genders);
-
-                    genderSpinner.setAdapter(adapter);
-                    genderSpinner.setSelection(response.getGender().ordinal());
-
-                    genderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> parent, View view,
-                                                   int position, long id) {
-                            switch (position) {
-                                case 0: gender = UserGenderEnum.MALE; break;
-                                case 1: gender = UserGenderEnum.FEMALE; break;
-                                default: gender = UserGenderEnum.OTHER;
-                            }
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> parent) {
-                            // TODO Auto-generated method stub
-                        }
-                    });
-
-                    RequestOptions options = new RequestOptions()
-                            .placeholder(R.drawable.ic_profile)
-                            .error(R.drawable.google);
-
-                    Glide.with(EditProfileActivity.this)
-                            .load(response.getProfilePicture())
-                            .apply(options)
-                            .into(avatarImg);
-
-                    editDOB.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            handleSelectDate();
-                        }
-                    });
-
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
+            Glide.with(EditProfileActivity.this)
+                    .load(response.getProfilePicture())
+                    .apply(options)
+                    .into(avatarImg);
         });
     }
 
