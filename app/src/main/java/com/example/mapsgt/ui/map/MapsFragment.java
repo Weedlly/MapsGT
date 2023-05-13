@@ -38,7 +38,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.mapsgt.R;
-import com.example.mapsgt.data.dao.DAOCallback;
 import com.example.mapsgt.data.dao.FriendRelationshipDAO;
 import com.example.mapsgt.data.dao.NewUserDAO;
 import com.example.mapsgt.data.dto.UserLocation;
@@ -60,8 +59,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
@@ -70,6 +67,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -96,6 +94,7 @@ public class MapsFragment extends Fragment implements
     private MapManagement mapManagement;
     private NewUserDAO userDAO;
     private FriendRelationshipDAO friendRelationshipDAO;
+    private String currentUserId;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -104,6 +103,8 @@ public class MapsFragment extends Fragment implements
         mDatabase = FirebaseDatabase.getInstance().getReference();
         userDAO = new NewUserDAO();
         friendRelationshipDAO = new FriendRelationshipDAO();
+
+        currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         //Check whether GPS tracking is enabled
         mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -420,8 +421,7 @@ public class MapsFragment extends Fragment implements
         getContext().startService(intent);
 
         //Notify the user that tracking has been enabled
-        currentUser.setIsSharing(true);
-        mDatabase.child("users").child(currentUser.getId()).child("isSharing").setValue(true);
+        userDAO.setIsSharing(currentUserId, true);
         Toast.makeText(getContext(), "Start sharing", Toast.LENGTH_SHORT).show();
 
         // Todo: Schedule a task to stop the service after 15 minutes
@@ -435,15 +435,13 @@ public class MapsFragment extends Fragment implements
             mDatabase.removeEventListener(mValueEventListener);
         }
 
-        currentUser.setIsSharing(false);
-        mDatabase.child("users").child(currentUser.getId()).child("isSharing").setValue(false);
+        userDAO.setIsSharing(currentUserId, false);
         Toast.makeText(getContext(), "Stop sharing", Toast.LENGTH_SHORT).show();
     }
 
 
     private void getUserInfo() {
-        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
+        AtomicBoolean loadFirstTime = new AtomicBoolean(true);
         LiveData<List<Friend>> friendListLiveData = friendRelationshipDAO.getFriendList(currentUserId);
         friendListLiveData.observe(this, friendListRes -> {
             friendList.addAll(friendListRes);
@@ -454,7 +452,10 @@ public class MapsFragment extends Fragment implements
             currentUser = new UserLocation(user);
             getBitmapDescriptorImg(user.getProfilePicture(), (BitmapDescriptor bitmapDescriptor) -> {
                 currentUser.setProfileImg(bitmapDescriptor);
-                moveToMyLocation();
+                if(loadFirstTime.get()) {
+                    moveToMyLocation();
+                    loadFirstTime.set(false);
+                }
             });
         });
     }

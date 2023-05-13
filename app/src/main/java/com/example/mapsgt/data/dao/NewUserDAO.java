@@ -91,6 +91,10 @@ public class NewUserDAO {
         return user;
     }
 
+    public void setIsSharing(String id, Boolean isSharing) {
+        databaseRef.child(id).child("isSharing").setValue(isSharing);
+    }
+
 //    public LiveData<User> getUserByEmail(String emailAddress) {
 //        Query query = getDatabaseReference().orderByChild("email").equalTo(emailAddress);
 //        query.addListenerForSingleValueEvent(new ValueEventListener() {
