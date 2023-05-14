@@ -1,20 +1,16 @@
-package com.example.mapsgt.friends;
-
-import static android.content.ContentValues.TAG;
-
-import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+package com.example.mapsgt.ui.friends;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
 import com.bumptech.glide.Glide;
 import com.example.mapsgt.R;
-import com.example.mapsgt.ui.auth.AuthActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,9 +30,9 @@ public class PersonProfileActivity extends AppCompatActivity {
 
     private TextView userName, userProfileName, userStatus, userCountry, userGender, userDOB;
     private CircleImageView userProfileImage;
-    private Button sendFriendRequestBTN, declineFriendRequestBTN, blockFriendBTN;
+    private Button sendFriendRequestBtn, declineFriendRequestBtn, blockFriendBtn;
 
-    private DatabaseReference friendRequestRef, usersRef, friendsRef, receiverFriendRef;
+    private DatabaseReference friendRequestRef, usersRef, friendsRef, senderFriendRef, receiverFriendRef;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private String senderUserId, currentState, saveCurrentDate;
     private static String receiverUserId;
@@ -47,19 +43,17 @@ public class PersonProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_person_profile);
-        if (mAuth.getCurrentUser() == null) {
-            finish();
-            startActivity(new Intent(this, AuthActivity.class));
-        }
+
         senderUserId = mAuth.getCurrentUser().getUid();
 
         Intent intent = getIntent();
         receiverUserId = intent.getStringExtra("visit_user_id");
 
         usersRef = FirebaseDatabase.getInstance().getReference().child("users");
-        friendRequestRef = FirebaseDatabase.getInstance().getReference().child("friendRequest");
-        friendsRef = usersRef.child(senderUserId).child("friends");
-        receiverFriendRef = usersRef.child(receiverUserId).child("friends");
+        friendsRef = FirebaseDatabase.getInstance().getReference().child("FriendRelationship");
+        friendRequestRef = FirebaseDatabase.getInstance().getReference().child("FriendRequest");
+        senderFriendRef = friendsRef.child(senderUserId).child("Friends");
+        receiverFriendRef = friendsRef.child(receiverUserId).child("Friends");
         initializeFields();
 
         usersRef.child(receiverUserId).addValueEventListener(new ValueEventListener() {
@@ -72,7 +66,7 @@ public class PersonProfileActivity extends AppCompatActivity {
                     String personProfileStatus = "Location: (" + snapshot.child("longitude").getValue().toString() + ", " + snapshot.child("latitude").getValue().toString() + ")";
                     String personDOB = "DOB: " + snapshot.child("dateOfBirth").getValue().toString();
                     String personCountry = "Phone: " + snapshot.child("phone").getValue().toString();
-                    String personGender = "Gender: " + snapshot.child("gender").getValue().toString();
+                    String personGender = "General: " + snapshot.child("gender").getValue().toString();
 
                     Picasso.with(PersonProfileActivity.this).load(personProfileImage).placeholder(R.drawable.ic_profile);
 
@@ -90,6 +84,7 @@ public class PersonProfileActivity extends AppCompatActivity {
                     userGender.setText(personGender);
 
                     maintenanceOfButton();
+
                 }
             }
 
@@ -99,16 +94,16 @@ public class PersonProfileActivity extends AppCompatActivity {
             }
         });
 
-        declineFriendRequestBTN.setVisibility(View.INVISIBLE);
-        declineFriendRequestBTN.setEnabled(false);
-        blockFriendBTN.setVisibility(View.INVISIBLE);
-        blockFriendBTN.setEnabled(false);
+        declineFriendRequestBtn.setVisibility(View.INVISIBLE);
+        declineFriendRequestBtn.setEnabled(false);
+        blockFriendBtn.setVisibility(View.INVISIBLE);
+        blockFriendBtn.setEnabled(false);
 
         if (!senderUserId.equals(receiverUserId)) {
-            sendFriendRequestBTN.setOnClickListener(new View.OnClickListener() {
+            sendFriendRequestBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    sendFriendRequestBTN.setEnabled(false);
+                    sendFriendRequestBtn.setEnabled(false);
 
                     if (currentState.equals("not_friends")) {
                         sendFriendRequestToPerson();
@@ -125,14 +120,14 @@ public class PersonProfileActivity extends AppCompatActivity {
                 }
             });
         } else {
-            declineFriendRequestBTN.setVisibility(View.INVISIBLE);
-            sendFriendRequestBTN.setVisibility(View.INVISIBLE);
-            blockFriendBTN.setVisibility(View.INVISIBLE);
+            declineFriendRequestBtn.setVisibility(View.INVISIBLE);
+            sendFriendRequestBtn.setVisibility(View.INVISIBLE);
+            blockFriendBtn.setVisibility(View.INVISIBLE);
         }
     }
 
     private void unblockFriend() {
-        friendsRef.child(receiverUserId)
+        senderFriendRef.child(receiverUserId)
                 .child("status")
                 .removeValue()
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -158,7 +153,7 @@ public class PersonProfileActivity extends AppCompatActivity {
     private void blockFriend() {
         String block = "Blocked";
         String beBlock = "beBlocked";
-        friendsRef.child(receiverUserId).child("status").setValue(block)
+        senderFriendRef.child(receiverUserId).child("status").setValue(block)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -167,13 +162,13 @@ public class PersonProfileActivity extends AppCompatActivity {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
-                                            sendFriendRequestBTN.setVisibility(View.INVISIBLE);
-                                            sendFriendRequestBTN.setEnabled(false);
-                                            declineFriendRequestBTN.setVisibility(View.INVISIBLE);
-                                            declineFriendRequestBTN.setEnabled(false);
+                                            sendFriendRequestBtn.setVisibility(View.INVISIBLE);
+                                            sendFriendRequestBtn.setEnabled(false);
+                                            declineFriendRequestBtn.setVisibility(View.INVISIBLE);
+                                            declineFriendRequestBtn.setEnabled(false);
 
-                                            blockFriendBTN.setEnabled(true);
-                                            blockFriendBTN.setText("UnBlocked");
+                                            blockFriendBtn.setEnabled(true);
+                                            blockFriendBtn.setText("UnBlocked");
                                         }
                                     }
                                 });
@@ -182,7 +177,7 @@ public class PersonProfileActivity extends AppCompatActivity {
     }
 
     private void unFriendAnExistingFriend() {
-        friendsRef.child(receiverUserId)
+        senderFriendRef.child(receiverUserId)
                 .removeValue()
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -209,8 +204,8 @@ public class PersonProfileActivity extends AppCompatActivity {
         Calendar calForDate = Calendar.getInstance();
         SimpleDateFormat currentDate = new SimpleDateFormat("dd-MMMM-yyyy");
         saveCurrentDate = currentDate.format(calForDate.getTime());
-
-        friendsRef.child(receiverUserId).child("date").setValue(saveCurrentDate)
+        addIdValueToEachUserFriend();
+        senderFriendRef.child(receiverUserId).child("date").setValue(saveCurrentDate)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -261,12 +256,12 @@ public class PersonProfileActivity extends AppCompatActivity {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()) {
-                                                sendFriendRequestBTN.setEnabled(true);
+                                                sendFriendRequestBtn.setEnabled(true);
                                                 currentState = "not_friends";
-                                                sendFriendRequestBTN.setText("Send Friend Request");
+                                                sendFriendRequestBtn.setText("Send Friend Request");
 
-                                                declineFriendRequestBTN.setVisibility(View.INVISIBLE);
-                                                declineFriendRequestBTN.setEnabled(false);
+                                                declineFriendRequestBtn.setVisibility(View.INVISIBLE);
+                                                declineFriendRequestBtn.setEnabled(false);
                                             }
                                         }
                                     });
@@ -286,25 +281,25 @@ public class PersonProfileActivity extends AppCompatActivity {
 
                             if (request_type.equals("sent")) {
                                 currentState = "request_sent";
-                                sendFriendRequestBTN.setText("Cancel friend request");
+                                sendFriendRequestBtn.setText("Cancel friend request");
 
-                                declineFriendRequestBTN.setVisibility(View.INVISIBLE);
-                                declineFriendRequestBTN.setEnabled(false);
+                                declineFriendRequestBtn.setVisibility(View.INVISIBLE);
+                                declineFriendRequestBtn.setEnabled(false);
 
-                                blockFriendBTN.setVisibility(View.INVISIBLE);
-                                blockFriendBTN.setEnabled(false);
+                                blockFriendBtn.setVisibility(View.INVISIBLE);
+                                blockFriendBtn.setEnabled(false);
 
                             } else if (request_type.equals("received")) {
                                 currentState = "request_received";
-                                sendFriendRequestBTN.setText("Accept friend request");
+                                sendFriendRequestBtn.setText("Accept friend request");
 
-                                declineFriendRequestBTN.setVisibility(View.VISIBLE);
-                                declineFriendRequestBTN.setEnabled(true);
+                                declineFriendRequestBtn.setVisibility(View.VISIBLE);
+                                declineFriendRequestBtn.setEnabled(true);
 
-                                blockFriendBTN.setVisibility(View.INVISIBLE);
-                                blockFriendBTN.setEnabled(false);
+                                blockFriendBtn.setVisibility(View.INVISIBLE);
+                                blockFriendBtn.setEnabled(false);
 
-                                declineFriendRequestBTN.setOnClickListener(new View.OnClickListener() {
+                                declineFriendRequestBtn.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
                                         cancelFriendRequest();
@@ -312,15 +307,13 @@ public class PersonProfileActivity extends AppCompatActivity {
                                 });
                             }
                         } else {
-                            friendsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            senderFriendRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                                     if (snapshot.hasChild(receiverUserId)) {
                                         validBeBlockedFriend();
 
-
                                         if (!isBlocked) {
-                                            Log.d(TAG, "Block: " + isBlocked);
                                             backToFriendState();
                                         }
                                     }
@@ -340,27 +333,27 @@ public class PersonProfileActivity extends AppCompatActivity {
 
     }
 
-    private void validBeBlockedFriend() //For sender block
-    {
-        friendsRef.child(receiverUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+    //For sender block
+    private void validBeBlockedFriend() {
+        senderFriendRef.child(receiverUserId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.hasChild("status")) {
                     String status = snapshot.child("status").getValue().toString();
                     if (status.equals("Blocked")) {
                         currentState = "blocked";
-                        sendFriendRequestBTN.setVisibility(View.INVISIBLE);
-                        sendFriendRequestBTN.setEnabled(false);
+                        sendFriendRequestBtn.setVisibility(View.INVISIBLE);
+                        sendFriendRequestBtn.setEnabled(false);
 
-                        declineFriendRequestBTN.setVisibility(View.INVISIBLE);
-                        declineFriendRequestBTN.setEnabled(false);
+                        declineFriendRequestBtn.setVisibility(View.INVISIBLE);
+                        declineFriendRequestBtn.setEnabled(false);
 
-                        blockFriendBTN.setVisibility(View.VISIBLE);
-                        blockFriendBTN.setEnabled(true);
-                        blockFriendBTN.setText("UnBlocked");
+                        blockFriendBtn.setVisibility(View.VISIBLE);
+                        blockFriendBtn.setEnabled(true);
+                        blockFriendBtn.setText("UnBlocked");
                         isBlocked = true;
 
-                        blockFriendBTN.setOnClickListener(new View.OnClickListener() {
+                        blockFriendBtn.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
                                 isBlocked = false;
@@ -371,15 +364,15 @@ public class PersonProfileActivity extends AppCompatActivity {
                     }
                     if (status.equals("beBlocked")) {
                         currentState = "blocked";
-                        sendFriendRequestBTN.setVisibility(View.INVISIBLE);
-                        sendFriendRequestBTN.setEnabled(false);
+                        sendFriendRequestBtn.setVisibility(View.INVISIBLE);
+                        sendFriendRequestBtn.setEnabled(false);
 
-                        declineFriendRequestBTN.setVisibility(View.INVISIBLE);
-                        declineFriendRequestBTN.setEnabled(false);
+                        declineFriendRequestBtn.setVisibility(View.INVISIBLE);
+                        declineFriendRequestBtn.setEnabled(false);
 
-                        blockFriendBTN.setVisibility(View.VISIBLE);
-                        blockFriendBTN.setEnabled(false);
-                        blockFriendBTN.setText("You are be blocked");
+                        blockFriendBtn.setVisibility(View.VISIBLE);
+                        blockFriendBtn.setEnabled(false);
+                        blockFriendBtn.setText("You are be blocked");
                         isBlocked = true;
                     }
                 }
@@ -405,12 +398,12 @@ public class PersonProfileActivity extends AppCompatActivity {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()) {
-                                                sendFriendRequestBTN.setEnabled(true);
+                                                sendFriendRequestBtn.setEnabled(true);
                                                 currentState = "request_sent";
-                                                sendFriendRequestBTN.setText("Cancel Sent Request");
+                                                sendFriendRequestBtn.setText("Cancel Sent Request");
 
-                                                declineFriendRequestBTN.setVisibility(View.INVISIBLE);
-                                                declineFriendRequestBTN.setEnabled(false);
+                                                declineFriendRequestBtn.setVisibility(View.INVISIBLE);
+                                                declineFriendRequestBtn.setEnabled(false);
                                             }
                                         }
                                     });
@@ -421,38 +414,46 @@ public class PersonProfileActivity extends AppCompatActivity {
     }
 
     private void backToFriendState() {
-        sendFriendRequestBTN.setEnabled(true);
-        sendFriendRequestBTN.setVisibility(View.VISIBLE);
+        sendFriendRequestBtn.setEnabled(true);
+        sendFriendRequestBtn.setVisibility(View.VISIBLE);
         currentState = "friends";
-        sendFriendRequestBTN.setText("Unfriend this person");
+        sendFriendRequestBtn.setText("Unfriend this person");
 
-        declineFriendRequestBTN.setVisibility(View.INVISIBLE);
-        declineFriendRequestBTN.setEnabled(false);
+        declineFriendRequestBtn.setVisibility(View.INVISIBLE);
+        declineFriendRequestBtn.setEnabled(false);
 
-        blockFriendBTN.setVisibility(View.VISIBLE);
-        blockFriendBTN.setEnabled(true);
-        blockFriendBTN.setText("Blocked");
-        blockFriendBTN.setOnClickListener(new View.OnClickListener() {
+        //TODO
+        blockFriendBtn.setVisibility(View.VISIBLE);
+        blockFriendBtn.setEnabled(true);
+        blockFriendBtn.setText("Blocked");
+        blockFriendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                blockFriendBTN.setEnabled(false);
+                blockFriendBtn.setEnabled(false);
                 currentState = "blocked";
                 blockFriend();
             }
         });
     }
 
+    private void addIdValueToEachUserFriend() {
+        senderFriendRef.child(receiverUserId).child("id").setValue(receiverUserId);
+        receiverFriendRef.child(senderUserId).child("id").setValue(senderUserId);
+    }
+
     private void initializeFields() {
-        userName = findViewById(R.id.person_username);
-        userProfileName = findViewById(R.id.person_profile_full_name);
-        userStatus = findViewById(R.id.person_profile_status);
-        userCountry = findViewById(R.id.person_country);
-        userGender = findViewById(R.id.person_gender);
-        userDOB = findViewById(R.id.person_dob);
-        userProfileImage = findViewById(R.id.person_profile_pic);
-        sendFriendRequestBTN = findViewById(R.id.person_send_friend_request_btn);
-        declineFriendRequestBTN = findViewById(R.id.person_decline_friend_request_btn);
-        blockFriendBTN = findViewById(R.id.person_block_friend_btn);
+        userName = (TextView) findViewById(R.id.person_username);
+        userProfileName = (TextView) findViewById(R.id.person_profile_full_name);
+        userStatus = (TextView) findViewById(R.id.person_profile_status);
+        userCountry = (TextView) findViewById(R.id.person_country);
+        userGender = (TextView) findViewById(R.id.person_gender);
+        userDOB = (TextView) findViewById(R.id.person_dob);
+        userProfileImage = (CircleImageView) findViewById(R.id.person_profile_pic);
+        sendFriendRequestBtn = (Button) findViewById(R.id.person_send_friend_request_btn);
+        declineFriendRequestBtn = (Button) findViewById(R.id.person_decline_friend_request_btn);
+        blockFriendBtn = (Button) findViewById(R.id.person_block_friend_btn);
         currentState = "not_friends";
     }
+
+
 }
