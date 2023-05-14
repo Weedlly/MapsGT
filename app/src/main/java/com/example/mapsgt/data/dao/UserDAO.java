@@ -10,7 +10,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.mapsgt.data.entities.User;
-import com.example.mapsgt.database.NewRealtimeDatabase;
+import com.example.mapsgt.database.RealtimeDatabase;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
@@ -25,7 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserDAO extends NewRealtimeDatabase<User> {
+public class UserDAO extends RealtimeDatabase<User> {
 
     public LiveData<User> getByEmail(String email) {
         MutableLiveData<User> liveData = new MutableLiveData<>();

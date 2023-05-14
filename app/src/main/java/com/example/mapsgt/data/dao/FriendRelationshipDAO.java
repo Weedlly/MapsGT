@@ -7,7 +7,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.mapsgt.data.entities.Friend;
-import com.example.mapsgt.database.NewRealtimeDatabase;
+import com.example.mapsgt.database.RealtimeDatabase;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -15,7 +15,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FriendRelationshipDAO extends NewRealtimeDatabase<Friend> {
+public class FriendRelationshipDAO extends RealtimeDatabase<Friend> {
 
     public LiveData<List<Friend>> getFriendList(String userId) {
         MutableLiveData<List<Friend>> friendList = new MutableLiveData<>();
