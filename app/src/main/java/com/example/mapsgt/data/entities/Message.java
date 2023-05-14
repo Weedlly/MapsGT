@@ -1,68 +1,56 @@
 package com.example.mapsgt.data.entities;
 
-import java.util.Date;
-
 public class Message {
-    private int id;
-    private String senderId;
-    private String receiverId;
-    private String messageContent;
-    private Date dateSent;
-    private boolean isRead;
+    public String data, time, type, message, from;
 
-    public Message(String senderId, String receiverId, String messageContent, Date dateSent, boolean isRead) {
-        this.senderId = senderId;
-        this.receiverId = receiverId;
-        this.messageContent = messageContent;
-        this.dateSent = dateSent;
-        this.isRead = isRead;
+    public Message() {
     }
 
-    public int getId() {
-        return id;
+    public Message(String data, String time, String type, String message, String from) {
+        this.data = data;
+        this.time = time;
+        this.type = type;
+        this.message = message;
+        this.from = from;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public String getData() {
+        return data;
     }
 
-    public String getSenderId() {
-        return senderId;
+    public void setData(String data) {
+        this.data = data;
     }
 
-    public void setSenderId(String senderId) {
-        this.senderId = senderId;
+    public String getTime() {
+        return time;
     }
 
-    public String getReceiverId() {
-        return receiverId;
+    public void setTime(String time) {
+        this.time = time;
     }
 
-    public void setReceiverId(String receiverId) {
-        this.receiverId = receiverId;
+    public String getType() {
+        return type;
     }
 
-    public String getMessageContent() {
-        return messageContent;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public void setMessageContent(String messageContent) {
-        this.messageContent = messageContent;
+    public String getMessage() {
+        return message;
     }
 
-    public Date getDateSent() {
-        return dateSent;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
-    public void setDateSent(Date dateSent) {
-        this.dateSent = dateSent;
+    public String getFrom() {
+        return from;
     }
 
-    public boolean isRead() {
-        return isRead;
-    }
-
-    public void setRead(boolean read) {
-        isRead = read;
+    public void setFrom(String from) {
+        this.from = from;
     }
 }

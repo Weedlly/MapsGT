@@ -8,21 +8,15 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.mapsgt.MainActivity;
 import com.example.mapsgt.R;
-import com.example.mapsgt.data.entities.User;
+import com.example.mapsgt.data.dao.FriendRelationshipDAO;
+import com.example.mapsgt.data.dao.UserDAO;
 import com.example.mapsgt.enumeration.UserGenderEnum;
 import com.example.mapsgt.ui.base.BaseActivity;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 public class UserProfileActivity extends BaseActivity {
     private ImageView avatarImg;
@@ -33,8 +27,8 @@ public class UserProfileActivity extends BaseActivity {
     private TextView dobTv;
     private TextView genderTv;
     private Button editBtn;
-
-    private DatabaseReference mDatabase;
+    private UserDAO userDAO;
+    private FriendRelationshipDAO friendRelationshipDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +37,8 @@ public class UserProfileActivity extends BaseActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Trang cá nhân");
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        userDAO = new UserDAO();
+        friendRelationshipDAO = new FriendRelationshipDAO();
 
         avatarImg = findViewById(R.id.iv_avatar);
         nameTv = findViewById(R.id.tv_name);
@@ -68,47 +63,42 @@ public class UserProfileActivity extends BaseActivity {
     private void getUserInfo() {
         String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        mDatabase.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                User response = snapshot.child("users").child(currentUserId).getValue(User.class);
-                if (response != null) {
-                    String personProfileImage = response.getProfilePicture();
+        userDAO.getByKey(currentUserId).observe(this, user -> {
+            String personProfileImage = user.getProfilePicture();
 
-                    RequestOptions options = new RequestOptions()
-                            .placeholder(R.drawable.ic_profile)
-                            .error(R.drawable.google);
+            RequestOptions options = new RequestOptions()
+                    .placeholder(R.drawable.ic_profile)
+                    .error(R.drawable.google);
 
-                    Glide.with(getApplicationContext())
-                            .load(personProfileImage)
-                            .apply(options)
-                            .into(avatarImg);
+            Glide.with(getApplicationContext())
+                    .load(personProfileImage)
+                    .apply(options)
+                    .into(avatarImg);
 
-                    nameTv.setText(response.getFirstName() + " " + response.getLastName());
+            nameTv.setText(user.getFirstName() + " " + user.getLastName());
 
-                    emailTv.setText(response.getEmail());
-                    phoneNumberTv.setText(response.getPhone());
-                    dobTv.setText(response.getDateOfBirth());
-                    genderTv.setText(displayGenderText(response.getGender()));
-                    DataSnapshot friendsRef = snapshot.child("users").child(currentUserId).child("friends");
-                    friendNumberTv.setText(String.valueOf(friendsRef.getChildrenCount()));
-                }
-            }
+            emailTv.setText(user.getEmail());
+            phoneNumberTv.setText(user.getPhone());
+            dobTv.setText(user.getDateOfBirth());
+            genderTv.setText(displayGenderText(user.getGender()));
+        });
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
+        friendRelationshipDAO.getFriendList(currentUserId).observe(this, friendList -> {
+            friendNumberTv.setText(String.valueOf(friendList.size()));
         });
     }
 
     private String displayGenderText(UserGenderEnum genderEnum) {
         switch (genderEnum) {
-            case MALE: return "Nam";
-            case FEMALE: return "Nữ";
-            default: return "Không xác định";
+            case MALE:
+                return "Nam";
+            case FEMALE:
+                return "Nữ";
+            default:
+                return "Không xác định";
         }
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

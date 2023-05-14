@@ -1,29 +1,97 @@
 package com.example.mapsgt.database;
 
-import androidx.lifecycle.LiveData;
+import static androidx.fragment.app.FragmentManager.TAG;
 
+import android.annotation.SuppressLint;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
+
 
 public abstract class RealtimeDatabase<T> {
-    private final DatabaseReference databaseReference;
+    private DatabaseReference mDatabaseReference;
 
-    public RealtimeDatabase(DatabaseReference databaseReference) {
-        this.databaseReference = databaseReference;
+    public RealtimeDatabase() {
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference();
     }
 
-    public DatabaseReference getDatabaseReference() {
-        return databaseReference;
+    public abstract String getFirebaseNode();
+
+    public void insert(T item) {
+        DatabaseReference newItemRef = mDatabaseReference.child(getFirebaseNode()).push();
+        newItemRef.setValue(item);
     }
 
-    public abstract void insert(T object);
+    public void update(String key, T item) {
+        DatabaseReference itemRef = mDatabaseReference.child(getFirebaseNode()).child(key);
+        itemRef.setValue(item);
+    }
 
-    public abstract void update(T object);
+    public void delete(String key) {
+        DatabaseReference itemRef = mDatabaseReference.child(getFirebaseNode()).child(key);
+        itemRef.removeValue();
+    }
 
-    public abstract void delete(T object);
+    public LiveData<List<T>> getAll() {
+        MutableLiveData<List<T>> liveData = new MutableLiveData<>();
+        DatabaseReference itemsRef = mDatabaseReference.child(getFirebaseNode());
+        itemsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<T> itemList = new ArrayList<>();
+                for (DataSnapshot itemSnapshot : snapshot.getChildren()) {
+                    T item = itemSnapshot.getValue(getGenericType());
+                    itemList.add(item);
+                }
+                liveData.setValue(itemList);
+            }
 
-    public abstract void deleteAll();
+            @SuppressLint("RestrictedApi")
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "onCancelled: ", error.toException());
+            }
+        });
+        return liveData;
+    }
 
-    public abstract LiveData<ArrayList<T>> getAll();
+    public LiveData<T> getByKey(String key) {
+        MutableLiveData<T> liveData = new MutableLiveData<>();
+        DatabaseReference itemRef = mDatabaseReference.child(getFirebaseNode()).child(key);
+        itemRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    T item = snapshot.getValue(getGenericType());
+                    liveData.setValue(item);
+                } else {
+                    liveData.setValue(null);
+                }
+            }
+
+            @SuppressLint("RestrictedApi")
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "onCancelled: ", error.toException());
+            }
+        });
+        return liveData;
+    }
+
+    protected abstract Class<T> getGenericType();
+
+    public DatabaseReference getDBRef() {
+        return mDatabaseReference;
+    }
 }
