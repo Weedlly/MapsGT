@@ -32,7 +32,6 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LiveData;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -440,8 +439,7 @@ public class MapsFragment extends Fragment implements
 
     private void getUserInfo() {
         AtomicBoolean loadFirstTime = new AtomicBoolean(true);
-        LiveData<List<Friend>> friendListLiveData = friendRelationshipDAO.getFriendList(currentUserId);
-        friendListLiveData.observe(this, friendListRes -> {
+        friendRelationshipDAO.getFriendList(currentUserId).observe(this, friendListRes -> {
             friendList.addAll(friendListRes);
         });
 

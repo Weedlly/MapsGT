@@ -8,20 +8,15 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.lifecycle.LiveData;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.mapsgt.MainActivity;
 import com.example.mapsgt.R;
 import com.example.mapsgt.data.dao.FriendRelationshipDAO;
 import com.example.mapsgt.data.dao.UserDAO;
-import com.example.mapsgt.data.entities.Friend;
 import com.example.mapsgt.enumeration.UserGenderEnum;
 import com.example.mapsgt.ui.base.BaseActivity;
 import com.google.firebase.auth.FirebaseAuth;
-
-import java.util.List;
 
 public class UserProfileActivity extends BaseActivity {
     private ImageView avatarImg;
@@ -88,8 +83,7 @@ public class UserProfileActivity extends BaseActivity {
             genderTv.setText(displayGenderText(user.getGender()));
         });
 
-        LiveData<List<Friend>> friendListLiveData = friendRelationshipDAO.getFriendList(currentUserId);
-        friendListLiveData.observe(this, friendList -> {
+        friendRelationshipDAO.getFriendList(currentUserId).observe(this, friendList -> {
             friendNumberTv.setText(String.valueOf(friendList.size()));
         });
     }

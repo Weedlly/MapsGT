@@ -7,26 +7,19 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.mapsgt.data.entities.Friend;
+import com.example.mapsgt.database.NewRealtimeDatabase;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FriendRelationshipDAO {
-    private DatabaseReference databaseRef;
-
-    public FriendRelationshipDAO() {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        databaseRef = database.getReference("FriendRelationship");
-    }
+public class FriendRelationshipDAO extends NewRealtimeDatabase<Friend> {
 
     public LiveData<List<Friend>> getFriendList(String userId) {
         MutableLiveData<List<Friend>> friendList = new MutableLiveData<>();
-        databaseRef.child(userId).child("Friends").addListenerForSingleValueEvent(new ValueEventListener() {
+        getDBRef().child(getFirebaseNode()).child(userId).child("Friends").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 List<Friend> userList = new ArrayList<>();
@@ -43,5 +36,15 @@ public class FriendRelationshipDAO {
             }
         });
         return friendList;
+    }
+
+    @Override
+    public String getFirebaseNode() {
+        return "FriendRelationship";
+    }
+
+    @Override
+    protected Class<Friend> getGenericType() {
+        return null;
     }
 }
