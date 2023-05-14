@@ -32,17 +32,15 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LiveData;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.mapsgt.R;
 import com.example.mapsgt.data.dao.FriendRelationshipDAO;
-import com.example.mapsgt.data.dao.NewUserDAO;
+import com.example.mapsgt.data.dao.UserDAO;
 import com.example.mapsgt.data.dto.UserLocation;
 import com.example.mapsgt.data.entities.Friend;
-import com.example.mapsgt.data.entities.User;
 import com.example.mapsgt.enumeration.MovingStyleEnum;
 import com.example.mapsgt.network.RetrofitClient;
 import com.example.mapsgt.network.model.location.LocationResponse;
@@ -92,7 +90,7 @@ public class MapsFragment extends Fragment implements
     private List<Friend> friendList = new ArrayList<>();
     private List<UserLocation> friendLocations = new ArrayList<>();
     private MapManagement mapManagement;
-    private NewUserDAO userDAO;
+    private UserDAO userDAO;
     private FriendRelationshipDAO friendRelationshipDAO;
     private String currentUserId;
 
@@ -101,7 +99,7 @@ public class MapsFragment extends Fragment implements
         super.onCreate(savedInstanceState);
         mapManagement = new MapManagement();
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        userDAO = new NewUserDAO();
+        userDAO = new UserDAO();
         friendRelationshipDAO = new FriendRelationshipDAO();
 
         currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -274,8 +272,7 @@ public class MapsFragment extends Fragment implements
         Boolean isTracking = currentUser.isSharing();
         if (isTracking) {
             friendList.forEach((friendItem) -> {
-                LiveData<User> friendRes = userDAO.getUserById(friendItem.getId());
-                friendRes.observe(getViewLifecycleOwner(), friend -> {
+                userDAO.getByKey(friendItem.getId()).observe(getViewLifecycleOwner(), friend -> {
                     Optional<UserLocation> friendOptional = friendLocations.stream().filter(item -> item.getId().equals(friend.getId())).findFirst();
                     if (friendOptional.isPresent()) {
                         UserLocation foundFriend = friendOptional.get();
@@ -442,17 +439,15 @@ public class MapsFragment extends Fragment implements
 
     private void getUserInfo() {
         AtomicBoolean loadFirstTime = new AtomicBoolean(true);
-        LiveData<List<Friend>> friendListLiveData = friendRelationshipDAO.getFriendList(currentUserId);
-        friendListLiveData.observe(this, friendListRes -> {
+        friendRelationshipDAO.getFriendList(currentUserId).observe(this, friendListRes -> {
             friendList.addAll(friendListRes);
         });
 
-        LiveData<User> userLiveData = userDAO.getUserById(currentUserId);
-        userLiveData.observe(this, user -> {
+        userDAO.getByKey(currentUserId).observe(this, user -> {
             currentUser = new UserLocation(user);
             getBitmapDescriptorImg(user.getProfilePicture(), (BitmapDescriptor bitmapDescriptor) -> {
                 currentUser.setProfileImg(bitmapDescriptor);
-                if(loadFirstTime.get()) {
+                if (loadFirstTime.get()) {
                     moveToMyLocation();
                     loadFirstTime.set(false);
                 }

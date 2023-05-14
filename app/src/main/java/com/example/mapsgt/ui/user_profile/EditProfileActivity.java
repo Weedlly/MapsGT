@@ -2,7 +2,6 @@ package com.example.mapsgt.ui.user_profile;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LiveData;
 
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -22,8 +21,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.mapsgt.R;
-import com.example.mapsgt.data.dao.NewUserDAO;
-import com.example.mapsgt.data.entities.User;
+import com.example.mapsgt.data.dao.UserDAO;
 import com.example.mapsgt.enumeration.UserGenderEnum;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -64,7 +62,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     private StorageReference mStorage;
     private String curUserId;
-    private NewUserDAO userDAO;
+    private UserDAO userDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +71,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorage = FirebaseStorage.getInstance().getReference();
-        userDAO = new NewUserDAO();
+        userDAO = new UserDAO();
 
         curUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -114,8 +112,7 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     private void getUserInfo() {
-        LiveData<User> userLiveData = userDAO.getUserById(curUserId);
-        userLiveData.observe(this, response -> {
+        userDAO.getByKey(curUserId).observe(this, response -> {
             editFirstName.setText(response.getFirstName());
             editLastName.setText(response.getLastName());
             editEmail.setText(response.getEmail());

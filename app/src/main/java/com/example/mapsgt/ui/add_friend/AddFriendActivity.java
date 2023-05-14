@@ -25,7 +25,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -50,7 +49,7 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
         setContentView(R.layout.activity_add_friend);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        userDAO = new UserDAO(FirebaseDatabase.getInstance().getReference("users"));
+        userDAO = new UserDAO();
 
         initializeFields();
         FriendAdapter suggestFriendAdapter = new FriendAdapter(this, filteredList, AddFriendActivity.this);
