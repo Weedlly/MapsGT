@@ -68,7 +68,7 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
                     User user = dataSnapshot.getValue(User.class);
                     mListFriends.add(user);
 
-                    mListFriendRecyclerAdapter = new FriendAdapter(mListFriends, FindFriendsActivity.this);
+                    mListFriendRecyclerAdapter = new FriendAdapter(getApplicationContext(), mListFriends, FindFriendsActivity.this);
                     mRecyclerView.setAdapter(mListFriendRecyclerAdapter);
                     searchData();
                 }
@@ -104,7 +104,7 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
                             User user = dataSnapshot.getValue(User.class);
                             mListFriends.add(user);
 
-                            mListFriendRecyclerAdapter = new FriendAdapter(mListFriends, FindFriendsActivity.this);
+                            mListFriendRecyclerAdapter = new FriendAdapter(getApplicationContext(), mListFriends, FindFriendsActivity.this);
                             mRecyclerView.setAdapter(mListFriendRecyclerAdapter);
                         }
 

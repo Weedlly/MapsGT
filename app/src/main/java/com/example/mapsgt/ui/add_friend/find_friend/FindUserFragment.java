@@ -61,7 +61,7 @@ public class FindUserFragment extends Fragment implements FriendAdapter.OnFriend
         mViewModel.findFriendByEmail(mQuery).observe(getViewLifecycleOwner(), users -> {
             users_list.clear();
             users_list.add(users);
-            FriendAdapter friendAdapter = new FriendAdapter(users_list, this);
+            FriendAdapter friendAdapter = new FriendAdapter(getContext(), users_list, this);
             rvUsers.setAdapter(friendAdapter);
             //friendAdapter.notifyDataSetChanged();
         });
@@ -69,7 +69,7 @@ public class FindUserFragment extends Fragment implements FriendAdapter.OnFriend
         mViewModel.findFriendByPhone(mQuery).observe(getViewLifecycleOwner(), users -> {
             users_list.clear();
             users_list.add(users);
-            FriendAdapter friendAdapter = new FriendAdapter(users_list, this);
+            FriendAdapter friendAdapter = new FriendAdapter(getContext(), users_list, this);
             rvUsers.setAdapter(friendAdapter);
             //friendAdapter.notifyDataSetChanged();
         });

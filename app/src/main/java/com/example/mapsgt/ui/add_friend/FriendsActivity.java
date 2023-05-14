@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.MutableLiveData;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,18 +26,17 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 
 public class FriendsActivity extends BaseActivity implements FriendAdapter.OnFriendsDetailListener {
-    private static final String ARG_PARAM = "query";
     private static final String TAG = "FriendsActivity";
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private FirebaseAuth mAuth;
     public static String visitUserId;
     public static String userName;
-    String senderId = mAuth.getCurrentUser().getUid();
-    private final FriendDAO friendDAO = new FriendDAO(FirebaseDatabase.getInstance().getReference("FriendRelationship").child(senderId).child("Friends"));
-    private final UserDAO userDAO = new UserDAO(FirebaseDatabase.getInstance().getReference("users"));
+    String senderId;
+    private FriendDAO friendDAO;
+    private UserDAO userDAO;
     private RecyclerView friendsRcv;
 
-    private ArrayList<User> userList = new ArrayList<>();
-    private ArrayList<Friend> friendList = new ArrayList<>();
+    private ArrayList<User> userList;
+    private ArrayList<Friend> friendList;
 
     private final MutableLiveData<ArrayList<User>> friendsLiveData = new MutableLiveData<>();
 
@@ -45,21 +45,28 @@ public class FriendsActivity extends BaseActivity implements FriendAdapter.OnFri
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends);
 
+        mAuth = FirebaseAuth.getInstance();
+        senderId = mAuth.getCurrentUser().getUid();
+
+        friendDAO = new FriendDAO(FirebaseDatabase.getInstance().getReference("FriendRelationship").child(senderId).child("Friends"));
+        userDAO = new UserDAO(FirebaseDatabase.getInstance().getReference("users"));
+
+        userList = new ArrayList<>();
+        friendList = new ArrayList<>();
+
         initializeFields();
 
         friendList.clear();
         userList.clear();
         friendDAO.getAll().observe(this, friends -> {
             friendList.addAll(friends);
-
             for (Friend friend : friendList) {
                 userDAO.getUserById(friend.getId()).observe(this, user -> {
                     userList.add(user);
+                    FriendAdapter suggestFriendAdapter = new FriendAdapter(this, userList, FriendsActivity.this);
+                    friendsRcv.setAdapter(suggestFriendAdapter);
                 });
             }
-
-            FriendAdapter suggestFriendAdapter = new FriendAdapter(userList, FriendsActivity.this);
-            friendsRcv.setAdapter(suggestFriendAdapter);
         });
     }
 
@@ -68,6 +75,9 @@ public class FriendsActivity extends BaseActivity implements FriendAdapter.OnFri
         friendsRcv.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         friendsRcv.setLayoutManager(linearLayoutManager);
+
+        DividerItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
+        friendsRcv.addItemDecoration(itemDecoration);
     }
 
     @Override

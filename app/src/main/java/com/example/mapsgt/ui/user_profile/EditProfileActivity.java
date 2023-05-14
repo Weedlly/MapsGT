@@ -77,41 +77,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
         curUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        avatarImg = findViewById(R.id.iv_avatar);
-        editFirstName = findViewById(R.id.edt_first_name);
-        editLastName = findViewById(R.id.edt_last_name);
-        editEmail = findViewById(R.id.edt_email);
-        editPhoneNumber = findViewById(R.id.edt_phone);
-        editDOB = findViewById(R.id.edt_dob);
-        genderSpinner = findViewById(R.id.gender_spinner);
-        updateBtn = findViewById(R.id.btn_update);
-        cancelBtn = findViewById(R.id.btn_cancel);
-        progressBar = findViewById(R.id.progressBar);
-        btnActions = findViewById(R.id.action_buttons);
-
-        String[] genders = new String[]{"Nam", "Nữ", "Khác"};
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(EditProfileActivity.this,
-                android.R.layout.simple_spinner_item, genders);
-
-        genderSpinner.setAdapter(adapter);
-
-        genderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                       int position, long id) {
-                switch (position) {
-                    case 0: gender = UserGenderEnum.MALE; break;
-                    case 1: gender = UserGenderEnum.FEMALE; break;
-                    default: gender = UserGenderEnum.OTHER;
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // TODO Auto-generated method stub
-            }
-        });
+        init();
 
         editDOB.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -259,6 +225,44 @@ public class EditProfileActivity extends AppCompatActivity {
         ContentResolver cr = getContentResolver();
         MimeTypeMap mine = MimeTypeMap.getSingleton();
         return mine.getExtensionFromMimeType(cr.getType(mUri));
+    }
+
+    private void init() {
+        avatarImg = findViewById(R.id.iv_avatar);
+        editFirstName = findViewById(R.id.edt_first_name);
+        editLastName = findViewById(R.id.edt_last_name);
+        editEmail = findViewById(R.id.edt_email);
+        editPhoneNumber = findViewById(R.id.edt_phone);
+        editDOB = findViewById(R.id.edt_dob);
+        genderSpinner = findViewById(R.id.gender_spinner);
+        updateBtn = findViewById(R.id.btn_update);
+        cancelBtn = findViewById(R.id.btn_cancel);
+        progressBar = findViewById(R.id.progressBar);
+        btnActions = findViewById(R.id.action_buttons);
+
+        String[] genders = new String[]{"Nam", "Nữ", "Khác"};
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(EditProfileActivity.this,
+                android.R.layout.simple_spinner_item, genders);
+
+        genderSpinner.setAdapter(adapter);
+
+        genderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                switch (position) {
+                    case 0: gender = UserGenderEnum.MALE; break;
+                    case 1: gender = UserGenderEnum.FEMALE; break;
+                    default: gender = UserGenderEnum.OTHER;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // TODO Auto-generated method stub
+            }
+        });
     }
 
 }

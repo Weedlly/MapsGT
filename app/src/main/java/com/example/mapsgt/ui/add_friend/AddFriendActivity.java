@@ -53,7 +53,7 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
         userDAO = new UserDAO(FirebaseDatabase.getInstance().getReference("users"));
 
         initializeFields();
-        FriendAdapter suggestFriendAdapter = new FriendAdapter(filteredList, AddFriendActivity.this);
+        FriendAdapter suggestFriendAdapter = new FriendAdapter(this, filteredList, AddFriendActivity.this);
         rvListSuggestUsers.setAdapter(suggestFriendAdapter);
 
         // Search user
