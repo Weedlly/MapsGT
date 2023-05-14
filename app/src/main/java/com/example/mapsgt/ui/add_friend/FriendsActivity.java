@@ -49,7 +49,7 @@ public class FriendsActivity extends BaseActivity implements FriendAdapter.OnFri
         senderId = mAuth.getCurrentUser().getUid();
 
         friendDAO = new FriendDAO(FirebaseDatabase.getInstance().getReference("FriendRelationship").child(senderId).child("Friends"));
-        userDAO = new UserDAO(FirebaseDatabase.getInstance().getReference("users"));
+        userDAO = new UserDAO();
 
         userList = new ArrayList<>();
         friendList = new ArrayList<>();
@@ -61,7 +61,7 @@ public class FriendsActivity extends BaseActivity implements FriendAdapter.OnFri
         friendDAO.getAll().observe(this, friends -> {
             friendList.addAll(friends);
             for (Friend friend : friendList) {
-                userDAO.getUserById(friend.getId()).observe(this, user -> {
+                userDAO.getByKey(friend.getId()).observe(this, user -> {
                     userList.add(user);
                     FriendAdapter suggestFriendAdapter = new FriendAdapter(this, userList, FriendsActivity.this);
                     friendsRcv.setAdapter(suggestFriendAdapter);

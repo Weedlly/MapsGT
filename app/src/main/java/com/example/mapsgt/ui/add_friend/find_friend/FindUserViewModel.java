@@ -5,21 +5,20 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.mapsgt.data.dao.UserDAO;
 import com.example.mapsgt.data.entities.User;
-import com.google.firebase.database.FirebaseDatabase;
 
 public class FindUserViewModel extends ViewModel {
     private final UserDAO userDAO;
 
     public FindUserViewModel() {
-        userDAO = new UserDAO(FirebaseDatabase.getInstance().getReference("users"));
+        userDAO = new UserDAO();
     }
 
     public LiveData<User> findFriendByEmail(String email) {
-        return userDAO.getUserByEmail(email);
+        return userDAO.getByEmail(email);
     }
 
     public LiveData<User> findFriendByPhone(String id) {
-        return userDAO.getUserByPhone(id);
+        return userDAO.getByPhone(id);
     }
 
 
