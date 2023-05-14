@@ -1,19 +1,17 @@
 package com.example.mapsgt.ui.add_friend;
 
-
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mapsgt.R;
 import com.example.mapsgt.adapter.FriendAdapter;
-import com.example.mapsgt.data.dao.FriendDAO;
+import com.example.mapsgt.data.dao.FriendRelationshipDAO;
 import com.example.mapsgt.data.dao.UserDAO;
 import com.example.mapsgt.data.entities.Friend;
 import com.example.mapsgt.data.entities.User;
@@ -21,7 +19,6 @@ import com.example.mapsgt.ui.friends.PersonProfileActivity;
 import com.example.mapsgt.ui.base.BaseActivity;
 import com.example.mapsgt.ui.communicate.ChatActivity;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -31,14 +28,12 @@ public class FriendsActivity extends BaseActivity implements FriendAdapter.OnFri
     public static String visitUserId;
     public static String userName;
     String senderId;
-    private FriendDAO friendDAO;
+    private FriendRelationshipDAO friendRelationshipDAO;
     private UserDAO userDAO;
     private RecyclerView friendsRcv;
 
     private ArrayList<User> userList;
     private ArrayList<Friend> friendList;
-
-    private final MutableLiveData<ArrayList<User>> friendsLiveData = new MutableLiveData<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +43,8 @@ public class FriendsActivity extends BaseActivity implements FriendAdapter.OnFri
         mAuth = FirebaseAuth.getInstance();
         senderId = mAuth.getCurrentUser().getUid();
 
-        friendDAO = new FriendDAO(FirebaseDatabase.getInstance().getReference("FriendRelationship").child(senderId).child("Friends"));
         userDAO = new UserDAO();
+        friendRelationshipDAO = new FriendRelationshipDAO();
 
         userList = new ArrayList<>();
         friendList = new ArrayList<>();
@@ -58,7 +53,8 @@ public class FriendsActivity extends BaseActivity implements FriendAdapter.OnFri
 
         friendList.clear();
         userList.clear();
-        friendDAO.getAll().observe(this, friends -> {
+
+        friendRelationshipDAO.getFriendList(senderId).observe(this, friends -> {
             friendList.addAll(friends);
             for (Friend friend : friendList) {
                 userDAO.getByKey(friend.getId()).observe(this, user -> {
