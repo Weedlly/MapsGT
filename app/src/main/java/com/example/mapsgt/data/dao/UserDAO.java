@@ -45,6 +45,7 @@ public class UserDAO extends RealtimeDatabase<User> {
         };
         getDatabaseReference().addValueEventListener(valueEventListener);
     }
+
     @Override
     public void insert(User user) {
         getDatabaseReference().child(user.getId()).setValue(user);
@@ -69,17 +70,16 @@ public class UserDAO extends RealtimeDatabase<User> {
     public LiveData<ArrayList<User>> getAll() {
         return usersLiveData;
     }
+
     public LiveData<User> getUserById(String id) {
-        MutableLiveData<User> curentUserLiveData = new MutableLiveData<>();
+        MutableLiveData<User> currentUserLiveData = new MutableLiveData<>();
         Query query = getDatabaseReference().child(id);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    User user = snapshot.getValue(User.class);
-                    curentUserLiveData.setValue(user);
-                    Log.d("UserDao", "User found: " + user);
-                }
+                User user = dataSnapshot.getValue(User.class);
+                currentUserLiveData.postValue(user);
+                Log.d("UserDao", "User found: " + user);
             }
 
             @Override
@@ -87,8 +87,9 @@ public class UserDAO extends RealtimeDatabase<User> {
                 Log.e("UserDao", "Error reading users from database", databaseError.toException());
             }
         });
-        return curentUserLiveData;
+        return currentUserLiveData;
     }
+
     public LiveData<User> getUserByEmail(String emailAddress) {
         Query query = getDatabaseReference().orderByChild("email").equalTo(emailAddress);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -96,7 +97,7 @@ public class UserDAO extends RealtimeDatabase<User> {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     User user = snapshot.getValue(User.class);
-                    userLiveData.setValue(user);
+                    userLiveData.postValue(user);
                     Log.d("UserDao", "User found: " + user);
                 }
             }

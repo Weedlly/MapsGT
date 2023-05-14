@@ -32,12 +32,16 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.mapsgt.R;
+import com.example.mapsgt.data.dao.FriendRelationshipDAO;
+import com.example.mapsgt.data.dao.NewUserDAO;
 import com.example.mapsgt.data.dto.UserLocation;
+import com.example.mapsgt.data.entities.Friend;
 import com.example.mapsgt.data.entities.User;
 import com.example.mapsgt.enumeration.MovingStyleEnum;
 import com.example.mapsgt.network.RetrofitClient;
@@ -54,11 +58,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
@@ -67,6 +67,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -88,15 +89,22 @@ public class MapsFragment extends Fragment implements
     private DatabaseReference mDatabase;
     private ValueEventListener mValueEventListener;
     private UserLocation currentUser;
-    private List<String> friendIdList = new ArrayList<>();
+    private List<Friend> friendList = new ArrayList<>();
     private List<UserLocation> friendLocations = new ArrayList<>();
     private MapManagement mapManagement;
+    private NewUserDAO userDAO;
+    private FriendRelationshipDAO friendRelationshipDAO;
+    private String currentUserId;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mapManagement = new MapManagement();
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        userDAO = new NewUserDAO();
+        friendRelationshipDAO = new FriendRelationshipDAO();
+
+        currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         //Check whether GPS tracking is enabled
         mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -263,45 +271,32 @@ public class MapsFragment extends Fragment implements
     }
 
     private void showFriendLocation() {
-        mValueEventListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Boolean isTracking = snapshot.child("users").child(currentUser.getId()).getValue(User.class).getIsSharing();
+        Boolean isTracking = currentUser.isSharing();
+        if (isTracking) {
+            friendList.forEach((friendItem) -> {
+                LiveData<User> friendRes = userDAO.getUserById(friendItem.getId());
+                friendRes.observe(getViewLifecycleOwner(), friend -> {
+                    Optional<UserLocation> friendOptional = friendLocations.stream().filter(item -> item.getId().equals(friend.getId())).findFirst();
+                    if (friendOptional.isPresent()) {
+                        UserLocation foundFriend = friendOptional.get();
 
-                if (isTracking) {
-                    friendIdList.forEach((friendId) -> {
-                        User friend = snapshot.child("users").child(friendId).getValue(User.class);
-                        if (friend != null) {
-                            Optional<UserLocation> friendOptional = friendLocations.stream().filter(item -> item.getId().equals(friendId)).findFirst();
-                            if (friendOptional.isPresent()) {
-                                UserLocation foundFriend = friendOptional.get();
+                        foundFriend.setIsSharing(friend.getIsSharing());
+                        foundFriend.setLatitude(friend.getLatitude());
+                        foundFriend.setLongitude(friend.getLongitude());
 
-                                foundFriend.setIsSharing(friend.getIsSharing());
-                                foundFriend.setLatitude(friend.getLatitude());
-                                foundFriend.setLongitude(friend.getLongitude());
+                        renderAllMarker();
+                    } else {
+                        UserLocation friendLocation = new UserLocation(friend);
 
-                                renderAllMarker();
-                            } else {
-                                UserLocation friendLocation = new UserLocation(friend);
-
-                                getBitmapDescriptorImg(friend.getProfilePicture(), (BitmapDescriptor bitmapDescriptor) -> {
-                                    friendLocation.setProfileImg(bitmapDescriptor);
-                                    friendLocations.add(friendLocation);
-                                    renderAllMarker();
-                                });
-                            }
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // Getting Location failed, log a message
-                Log.w(TAG, "loadLocation:onCancelled", error.toException());
-            }
-        };
-        mDatabase.addValueEventListener(mValueEventListener);
+                        getBitmapDescriptorImg(friend.getProfilePicture(), (BitmapDescriptor bitmapDescriptor) -> {
+                            friendLocation.setProfileImg(bitmapDescriptor);
+                            friendLocations.add(friendLocation);
+                            renderAllMarker();
+                        });
+                    }
+                });
+            });
+        }
     }
 
     private void renderAllMarker() {
@@ -426,8 +421,7 @@ public class MapsFragment extends Fragment implements
         getContext().startService(intent);
 
         //Notify the user that tracking has been enabled
-        currentUser.setIsSharing(true);
-        mDatabase.child("users").child(currentUser.getId()).child("isSharing").setValue(true);
+        userDAO.setIsSharing(currentUserId, true);
         Toast.makeText(getContext(), "Start sharing", Toast.LENGTH_SHORT).show();
 
         // Todo: Schedule a task to stop the service after 15 minutes
@@ -441,45 +435,28 @@ public class MapsFragment extends Fragment implements
             mDatabase.removeEventListener(mValueEventListener);
         }
 
-        currentUser.setIsSharing(false);
-        mDatabase.child("users").child(currentUser.getId()).child("isSharing").setValue(false);
+        userDAO.setIsSharing(currentUserId, false);
         Toast.makeText(getContext(), "Stop sharing", Toast.LENGTH_SHORT).show();
     }
 
 
     private void getUserInfo() {
-        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        mDatabase.child("users").child(currentUserId).child("friends").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DataSnapshot> task) {
-                if (!task.isSuccessful()) {
-                    Log.e("firebase", "Error getting data", task.getException());
-                } else {
-                    for (DataSnapshot dataSnapshot : task.getResult().getChildren()) {
-                        String friendId = dataSnapshot.getKey();
-                        friendIdList.add(friendId);
-                    }
-                }
-            }
+        AtomicBoolean loadFirstTime = new AtomicBoolean(true);
+        LiveData<List<Friend>> friendListLiveData = friendRelationshipDAO.getFriendList(currentUserId);
+        friendListLiveData.observe(this, friendListRes -> {
+            friendList.addAll(friendListRes);
         });
 
-        mDatabase.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                User response = snapshot.child("users").child(currentUserId).getValue(User.class);
-                if (response != null && currentUser == null) {
-                    currentUser = new UserLocation(response);
-                    getBitmapDescriptorImg(response.getProfilePicture(), (BitmapDescriptor bitmapDescriptor) -> {
-                        currentUser.setProfileImg(bitmapDescriptor);
-                        moveToMyLocation();
-                    });
+        LiveData<User> userLiveData = userDAO.getUserById(currentUserId);
+        userLiveData.observe(this, user -> {
+            currentUser = new UserLocation(user);
+            getBitmapDescriptorImg(user.getProfilePicture(), (BitmapDescriptor bitmapDescriptor) -> {
+                currentUser.setProfileImg(bitmapDescriptor);
+                if(loadFirstTime.get()) {
+                    moveToMyLocation();
+                    loadFirstTime.set(false);
                 }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
+            });
         });
     }
 

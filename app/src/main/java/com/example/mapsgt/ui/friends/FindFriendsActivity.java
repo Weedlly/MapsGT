@@ -1,4 +1,4 @@
-package com.example.mapsgt.friends;
+package com.example.mapsgt.ui.friends;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -34,7 +34,7 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
     FirebaseDatabase ListUserData = FirebaseDatabase.getInstance();
     private DatabaseReference allUserDatabaseRef = ListUserData.getReference();
 
-    public static String visit_user_id;
+    public static String visitUserId;
 
     private DatabaseReference allUserFromDatabaseRef = ListUserData.getReference("users");
 
@@ -68,7 +68,7 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
                     User user = dataSnapshot.getValue(User.class);
                     mListFriends.add(user);
 
-                    mListFriendRecyclerAdapter = new FriendAdapter(mListFriends, FindFriendsActivity.this);
+                    mListFriendRecyclerAdapter = new FriendAdapter(getApplicationContext(), mListFriends, FindFriendsActivity.this);
                     mRecyclerView.setAdapter(mListFriendRecyclerAdapter);
                     searchData();
                 }
@@ -104,7 +104,7 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
                             User user = dataSnapshot.getValue(User.class);
                             mListFriends.add(user);
 
-                            mListFriendRecyclerAdapter = new FriendAdapter(mListFriends, FindFriendsActivity.this);
+                            mListFriendRecyclerAdapter = new FriendAdapter(getApplicationContext(), mListFriends, FindFriendsActivity.this);
                             mRecyclerView.setAdapter(mListFriendRecyclerAdapter);
                         }
 
@@ -125,9 +125,9 @@ public class FindFriendsActivity extends AppCompatActivity implements FriendAdap
 
     @Override
     public void onFriendsDetailClick(int position) {
-        visit_user_id = mListFriends.get(position + 1).getId();
+        visitUserId = mListFriends.get(position + 1).getId();
         Intent intent = new Intent(this, PersonProfileActivity.class);
-        intent.putExtra("visit_user_id", visit_user_id);
+        intent.putExtra("visit_user_id", visitUserId);
         startActivity(intent);
     }
 }

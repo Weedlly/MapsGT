@@ -2,6 +2,7 @@ package com.example.mapsgt.adapter;
 
 import static android.content.ContentValues.TAG;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.mapsgt.R;
 import com.example.mapsgt.data.entities.User;
 
@@ -23,19 +26,18 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendViewHolder> implements Filterable {
 
     private ArrayList<User> mListUser;
-    private ArrayList<User> mListUsersOld;
-
     private ArrayList<User> mListFriend = new ArrayList<>();
     private OnFriendsDetailListener mOnFriendsDetailClick;
+    private Context mContext;
 
-    public FriendAdapter(ArrayList<User> users, OnFriendsDetailListener mOnFriendsDetailClick) {
+    public FriendAdapter(Context context, ArrayList<User> users, OnFriendsDetailListener mOnFriendsDetailClick) {
         setListFriend(users);
+        mContext = context;
         this.mOnFriendsDetailClick = mOnFriendsDetailClick;
     }
 
     public FriendAdapter(ArrayList<User> mListUser) {
         this.mListUser = mListUser;
-        this.mListUsersOld = mListUser;
     }
 
     public void setListFriend(ArrayList<User> mListFriend) {
@@ -47,7 +49,6 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     @Override
     public FriendViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_friends, parent, false);
-
         return new FriendViewHolder(view, mOnFriendsDetailClick);
     }
 
@@ -58,7 +59,15 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
             return;
         }
 
-        //holder.imgUser.setImageResource(user.getProfilePicture()); ((TODO: add picture image))
+        RequestOptions options = new RequestOptions()
+                .placeholder(R.drawable.ic_profile)
+                .error(R.drawable.google);
+
+        Glide.with(mContext)
+                .load(user.getProfilePicture())
+                .apply(options)
+                .into(holder.imgUser);
+
         String nickname = user.getFirstName() + " " + user.getLastName();
         holder.tvName.setText(nickname);
         holder.tvPhoneNumber.setText(user.getPhone());
@@ -72,7 +81,6 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
         return 0;
     }
 
-
     public static class FriendViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private CircleImageView imgUser;
@@ -84,6 +92,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
         public FriendViewHolder(@NonNull View itemView, OnFriendsDetailListener onFriendsDetailListener) {
             super(itemView);
 
+            imgUser = itemView.findViewById(R.id.img_user);
             tvName = itemView.findViewById(R.id.tv_username);
             tvPhoneNumber = itemView.findViewById(R.id.tv_phone);
             this.onFriendsDetailListener = onFriendsDetailListener;

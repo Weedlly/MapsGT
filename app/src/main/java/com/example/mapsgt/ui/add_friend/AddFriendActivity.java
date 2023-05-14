@@ -17,7 +17,7 @@ import com.example.mapsgt.adapter.FriendAdapter;
 import com.example.mapsgt.data.dao.UserDAO;
 import com.example.mapsgt.data.entities.User;
 import com.example.mapsgt.enumeration.UserGenderEnum;
-import com.example.mapsgt.friends.PersonProfileActivity;
+import com.example.mapsgt.ui.friends.PersonProfileActivity;
 import com.example.mapsgt.ui.add_friend.find_friend.FindUserFragment;
 import com.example.mapsgt.ui.base.BaseActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -32,14 +32,14 @@ import java.util.ArrayList;
 public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnFriendsDetailListener {
     private SearchView svUserSearch;
     private RecyclerView rvListSuggestUsers;
-    public static String visit_user_id;
-    private final UserDAO userDAO = new UserDAO(FirebaseDatabase.getInstance().getReference("users"));
-    private ArrayList<User> suggest_list = new ArrayList<>();
-    private ArrayList<User> filtered_list = new ArrayList<>();
+    public static String visitUserId;
+    private UserDAO userDAO;
+    private ArrayList<User> suggestList = new ArrayList<>();
+    private ArrayList<User> filteredList = new ArrayList<>();
     private User currentUser;
 
     // Initialize fields
-    private void InitializeFields() {
+    private void initializeFields() {
         svUserSearch = findViewById(R.id.sv_user_search);
         rvListSuggestUsers = findViewById(R.id.rcv_list_users);
     }
@@ -49,8 +49,11 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_friend);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        InitializeFields();
-        FriendAdapter suggestFriendAdapter = new FriendAdapter(filtered_list, AddFriendActivity.this);
+
+        userDAO = new UserDAO(FirebaseDatabase.getInstance().getReference("users"));
+
+        initializeFields();
+        FriendAdapter suggestFriendAdapter = new FriendAdapter(this, filteredList, AddFriendActivity.this);
         rvListSuggestUsers.setAdapter(suggestFriendAdapter);
 
         // Search user
@@ -63,16 +66,16 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                filtered_list.clear();
+                filteredList.clear();
                 if (newText.isEmpty()) {
-                    filtered_list.addAll(suggest_list);
+                    filteredList.addAll(suggestList);
                 } else {
-                    for (User user : suggest_list) {
+                    for (User user : suggestList) {
                         if (user.getLastName().toLowerCase().contains(newText.toLowerCase())) {
-                            filtered_list.add(user);
+                            filteredList.add(user);
                         }
                         if (user.getFirstName().toLowerCase().contains(newText.toLowerCase())) {
-                            filtered_list.add(user);
+                            filteredList.add(user);
                         }
                     }
                 }
@@ -84,10 +87,10 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
 
         // TODO: get current user
         userDAO.getSuggestedUsers(10.838665, 106.6652783).observe(this, users -> {
-            suggest_list.clear();
-            filtered_list.clear();
-            suggest_list.addAll(users);
-            filtered_list.addAll(users);
+            suggestList.clear();
+            filteredList.clear();
+            suggestList.addAll(users);
+            filteredList.addAll(users);
             suggestFriendAdapter.notifyDataSetChanged();
         });
     }
@@ -115,7 +118,7 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
                                 FirebaseUser authUser = mAuth.getCurrentUser();
 
                                 if (authUser != null) {
-                                    User user = new User(authUser.getUid(), authUser.getEmail(), phoneNo, firstName, lastName, dob , gender, latitude, longitude, true, profilePicture);
+                                    User user = new User(authUser.getUid(), authUser.getEmail(), phoneNo, firstName, lastName, dob, gender, latitude, longitude, true, profilePicture);
                                     userDAO.insert(user);
                                     // Set the location of the user in GeoFire
                                     userDAO.setLocation(authUser.getUid(), latitude, longitude);
@@ -135,10 +138,10 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
 
     @Override
     public void onFriendsDetailClick(int position) {
-        visit_user_id = filtered_list.get(position).getId();
+        visitUserId = filteredList.get(position).getId();
 
         Intent intent = new Intent(AddFriendActivity.this, PersonProfileActivity.class);
-        intent.putExtra("visit_user_id", visit_user_id);
+        intent.putExtra("visit_user_id", visitUserId);
         startActivity(intent);
     }
 
