@@ -1,5 +1,8 @@
 package com.example.mapsgt.data.dao;
 
+import static androidx.fragment.app.FragmentManager.TAG;
+
+import android.annotation.SuppressLint;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -7,7 +10,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.mapsgt.data.entities.User;
-import com.example.mapsgt.database.RealtimeDatabase;
+import com.example.mapsgt.database.NewRealtimeDatabase;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
@@ -20,118 +23,62 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class UserDAO extends RealtimeDatabase<User> {
-    private final MutableLiveData<ArrayList<User>> usersLiveData = new MutableLiveData<>();
-    private final MutableLiveData<User> userLiveData = new MutableLiveData<>();
+public class UserDAO extends NewRealtimeDatabase<User> {
 
-    public UserDAO(DatabaseReference databaseReference) {
-        super(databaseReference);
-        ValueEventListener valueEventListener = new ValueEventListener() {
+    public LiveData<User> getByEmail(String email) {
+        MutableLiveData<User> liveData = new MutableLiveData<>();
+        Query query = getDBRef().child(getFirebaseNode()).orderByChild("email").equalTo(email);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                ArrayList<User> userList = new ArrayList<>();
-                for (DataSnapshot userSnapshot : snapshot.getChildren()) {
-                    User user = userSnapshot.getValue(User.class);
-                    userList.add(user);
+                if (snapshot.exists()) {
+                    User user = snapshot.getValue(User.class);
+                    liveData.setValue(user);
+                } else {
+                    liveData.setValue(null);
                 }
-                usersLiveData.setValue(userList);
             }
 
+            @SuppressLint("RestrictedApi")
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("UserDao", "Error reading users from database", error.toException());
-            }
-        };
-        getDatabaseReference().addValueEventListener(valueEventListener);
-    }
-
-    @Override
-    public void insert(User user) {
-        getDatabaseReference().child(user.getId()).setValue(user);
-    }
-
-    @Override
-    public void update(User user) {
-        getDatabaseReference().child(user.getId()).setValue(user);
-    }
-
-    @Override
-    public void delete(User user) {
-        getDatabaseReference().child(user.getId()).removeValue();
-    }
-
-    @Override
-    public void deleteAll() {
-        getDatabaseReference().removeValue();
-    }
-
-    @Override
-    public LiveData<ArrayList<User>> getAll() {
-        return usersLiveData;
-    }
-
-    public LiveData<User> getUserById(String id) {
-        MutableLiveData<User> currentUserLiveData = new MutableLiveData<>();
-        Query query = getDatabaseReference().child(id);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                currentUserLiveData.postValue(user);
-                Log.d("UserDao", "User found: " + user);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e("UserDao", "Error reading users from database", databaseError.toException());
+                Log.e(TAG, "onCancelled: ", error.toException());
             }
         });
-        return currentUserLiveData;
+        return liveData;
     }
 
-    public LiveData<User> getUserByEmail(String emailAddress) {
-        Query query = getDatabaseReference().orderByChild("email").equalTo(emailAddress);
+    public LiveData<User> getByPhone(String phone) {
+        MutableLiveData<User> liveData = new MutableLiveData<>();
+        Query query = getDBRef().child(getFirebaseNode()).orderByChild("phone").equalTo(phone);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
                     User user = snapshot.getValue(User.class);
-                    userLiveData.postValue(user);
-                    Log.d("UserDao", "User found: " + user);
+                    liveData.setValue(user);
+                } else {
+                    liveData.setValue(null);
                 }
             }
 
+            @SuppressLint("RestrictedApi")
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e("UserDao", "Error reading users from database", databaseError.toException());
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "onCancelled: ", error.toException());
             }
         });
-        return userLiveData;
+        return liveData;
     }
 
-    public LiveData<User> getUserByPhone(String phoneNumber) {
-        Query query = getDatabaseReference().orderByChild("phone").equalTo(phoneNumber);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    User user = snapshot.getValue(User.class);
-                    userLiveData.setValue(user);
-                    Log.d("UserDao", "User found: " + user);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e("UserDao", "Error reading users from database", databaseError.toException());
-            }
-        });
-        return userLiveData;
+    public void setIsSharing(String id, Boolean isSharing) {
+        getDBRef().child(getFirebaseNode()).child(id).child("isSharing").setValue(isSharing);
     }
 
-    public LiveData<ArrayList<User>> getSuggestedUsers(double latitude, double longitude) {
-        MutableLiveData<ArrayList<User>> suggestedUsersLiveData = new MutableLiveData<>();
+    public LiveData<List<User>> getSuggestedUsers(double latitude, double longitude) {
+        MutableLiveData<List<User>> suggestedUsersLiveData = new MutableLiveData<>();
 
         GeoFire geoFire = new GeoFire(FirebaseDatabase.getInstance().getReference("geofire"));
         GeoLocation center = new GeoLocation(latitude, longitude);
@@ -145,7 +92,7 @@ public class UserDAO extends RealtimeDatabase<User> {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         // Lấy thông tin của người dùng từ snapshot và hiển thị trong danh sách gợi ý
                         User user = snapshot.getValue(User.class);
-                        ArrayList<User> suggestedUsers = suggestedUsersLiveData.getValue();
+                        List<User> suggestedUsers = suggestedUsersLiveData.getValue();
                         if (suggestedUsers == null) {
                             suggestedUsers = new ArrayList<>();
                         }
@@ -188,5 +135,15 @@ public class UserDAO extends RealtimeDatabase<User> {
         DatabaseReference geoFireRef = FirebaseDatabase.getInstance().getReference().child("geofire");
         GeoFire geoFire = new GeoFire(geoFireRef);
         geoFire.setLocation(id, new GeoLocation(latitude, longitude));
+    }
+
+    @Override
+    public String getFirebaseNode() {
+        return "users";
+    }
+
+    @Override
+    protected Class<User> getGenericType() {
+        return User.class;
     }
 }
