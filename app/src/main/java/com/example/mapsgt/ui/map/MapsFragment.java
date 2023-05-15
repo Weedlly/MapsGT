@@ -165,8 +165,7 @@ public class MapsFragment extends Fragment implements
 
         bottomPanel = view.findViewById(R.id.bottom_panel);
         placeDetailScrollView = view.findViewById(R.id.scrollView);
-
-        placeDetailScrollView.setVisibility(View.GONE);
+        TurnOffPlaceDetailView();
 
         btn_start_moving.setOnClickListener(view1 -> {
             mapManagement.setMapMode(MapMode.MOVING);
@@ -209,8 +208,7 @@ public class MapsFragment extends Fragment implements
                         renderFavouriteLocation();
                         renderAllMarker();
                         LatLng latLng = desMarker.getPosition();
-                        detailPlace(latLng);
-                        placeDetailScrollView.setVisibility(View.VISIBLE);
+                        TurnOnPlaceDetailView(latLng);
                         getDirection(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), latLng);
                         btn_add_faPlace.setText("Remove favourite place");
                         favouritePlaceEnum = FavouritePlaceEnum.Remove;
@@ -226,7 +224,6 @@ public class MapsFragment extends Fragment implements
                 dialog.show();
             }
             else if(favouritePlaceEnum == FavouritePlaceEnum.Remove){
-                Log.d(TAG, desMarker.getPosition().toString());
                 Query query = FirebaseDatabase.getInstance().getReference("favourite_places")
                         .orderByChild("userId")
                         .equalTo(currentUserId);
@@ -235,9 +232,10 @@ public class MapsFragment extends Fragment implements
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
                             for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                LatLng latLng = desMarker.getPosition();
                                 String favouritePlaceId = dataSnapshot.getKey();
                                 FavouritePlace place = dataSnapshot.getValue(FavouritePlace.class);
-                                if (place.getLatitude() == desMarker.getPosition().latitude && place.getLongitude() == desMarker.getPosition().longitude){
+                                if (place.getLatitude() == latLng.latitude && place.getLongitude() == latLng.longitude){
                                     FirebaseDatabase database = FirebaseDatabase.getInstance();
                                     DatabaseReference favouritePlaceRef = database.getReference("favourite_places").child(favouritePlaceId);
                                     favouritePlaceRef.removeValue()
@@ -245,6 +243,7 @@ public class MapsFragment extends Fragment implements
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
                                                     Log.d(TAG, "Favourite place removed successfully");
+                                                    TurnOnPlaceDetailView(latLng);
                                                     renderFavouriteLocation();
                                                     renderAllMarker();
                                                 }
@@ -329,22 +328,37 @@ public class MapsFragment extends Fragment implements
 
         renderAllMarker();
         desMarker = mGoogleMap.addMarker(options);
-        // Don't remove this code
-        boolean isFavouriteMarker = false;
+
+        FavouritePlaceEnum faPlaceEnum = GetStatusOfFavouritePlace(latLng);
+        SetStatusForFavouritePlaceButton(faPlaceEnum);
+        TurnOnPlaceDetailView(latLng);
+
+        getDirection(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), latLng);
+    }
+    FavouritePlaceEnum GetStatusOfFavouritePlace(LatLng latLng){
         for (FavouritePlace place: favouritePlaces) {
             if(place.getLatitude() == latLng.latitude && place.getLongitude() == latLng.longitude){
-                btn_add_faPlace.setText("Remove favourite place");
-                favouritePlaceEnum = FavouritePlaceEnum.Remove;
-                isFavouriteMarker = true;
+                return FavouritePlaceEnum.Remove;
             }
         }
-        if(isFavouriteMarker == false){
-            btn_add_faPlace.setText("Add favourite place");
-            favouritePlaceEnum = FavouritePlaceEnum.Add;
+        return FavouritePlaceEnum.Add;
+    }
+    void SetStatusForFavouritePlaceButton(FavouritePlaceEnum faPlaceEnum){
+        if (faPlaceEnum == FavouritePlaceEnum.Remove){
+            favouritePlaceEnum = FavouritePlaceEnum.Remove;
+            btn_add_faPlace.setText("Remove favourite place");
         }
+        else{
+            favouritePlaceEnum = FavouritePlaceEnum.Add;
+            btn_add_faPlace.setText("Add favourite place");
+        }
+    }
+    void TurnOnPlaceDetailView(LatLng latLng){
         detailPlace(latLng);
         placeDetailScrollView.setVisibility(View.VISIBLE);
-        getDirection(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), latLng);
+    }
+    void TurnOffPlaceDetailView(){
+        placeDetailScrollView.setVisibility(View.GONE);
     }
     void detailPlace(LatLng latLng){
         Geocoder geocoder = new Geocoder(getContext());
@@ -361,6 +375,7 @@ public class MapsFragment extends Fragment implements
             e.printStackTrace();
         }
     }
+
     private void drawDirectionLine(LatLng origin, LatLng dest) {
         RoutesItem route = routesItem[0];
         List<List<Double>> coordinates = route.getGeometry().getCoordinates();
@@ -521,7 +536,7 @@ public class MapsFragment extends Fragment implements
     private void renderAllMarker() {
         // clear marker
         mGoogleMap.clear();
-        placeDetailScrollView.setVisibility(View.GONE);
+        TurnOffPlaceDetailView();
         // user location
         renderUserMarker(currentUser);
         // favourite place
@@ -871,4 +886,3 @@ public class MapsFragment extends Fragment implements
         void onBitmapDescriptorLoaded(BitmapDescriptor bitmapDescriptor);
     }
 }
-
