@@ -60,6 +60,8 @@ public class RegisterFragment extends Fragment {
 
     private FirebaseAuth mAuth;
     private AuthActivity mAuthActivity;
+    private boolean hasGoogleLogin;
+    private String googleEmail;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -82,6 +84,18 @@ public class RegisterFragment extends Fragment {
         btnReg = mView.findViewById(R.id.btn_register);
         progressBar = mView.findViewById(R.id.progressBar);
         goToLoginTV = mView.findViewById(R.id.tv_login_now);
+
+        if (getArguments() != null) {
+            hasGoogleLogin = getArguments().getBoolean("is_create_with_google_email", false);
+            googleEmail = getArguments().getString("email", "");
+        }
+
+        if (hasGoogleLogin) {
+            editTextEmail.setText(googleEmail);
+            editTextEmail.setFocusable(false);
+            editTextEmail.setClickable(false);
+            editTextEmail.setLongClickable(false);
+        }
 
         String[] genders = new String[]{UserGenderEnum.MALE.name(), UserGenderEnum.FEMALE.name(), UserGenderEnum.OTHER.name()};
 
@@ -177,26 +191,34 @@ public class RegisterFragment extends Fragment {
 
         progressBar.setVisibility(View.VISIBLE);
         btnReg.setVisibility(View.GONE);
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        progressBar.setVisibility(View.GONE);
-                        btnReg.setVisibility(View.VISIBLE);
-                        if (task.isSuccessful()) {
-                            FirebaseUser authUser = mAuth.getCurrentUser();
+        if (hasGoogleLogin) {
+            FirebaseUser authUser = mAuth.getCurrentUser();
 
-                            if (authUser != null) {
-                                User user = new User(authUser.getUid(), authUser.getEmail(), phoneNo, firstName, lastName, dob, gender, -1, -1, false, "https://raw.githubusercontent.com/gotitinc/aha-assets/master/uifaces/m-10.jpg");
-                                createUserOnFirebase(user);
+            if (authUser != null) {
+                User user = new User(authUser.getUid(), authUser.getEmail(), phoneNo, firstName, lastName, dob, gender, -1, -1, false, "https://raw.githubusercontent.com/gotitinc/aha-assets/master/uifaces/m-10.jpg");
+                createUserOnFirebase(user);
+            }
+        } else {
+            mAuth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            progressBar.setVisibility(View.GONE);
+                            btnReg.setVisibility(View.VISIBLE);
+                            if (task.isSuccessful()) {
+                                FirebaseUser authUser = mAuth.getCurrentUser();
+
+                                if (authUser != null) {
+                                    User user = new User(authUser.getUid(), authUser.getEmail(), phoneNo, firstName, lastName, dob, gender, -1, -1, false, "https://raw.githubusercontent.com/gotitinc/aha-assets/master/uifaces/m-10.jpg");
+                                    createUserOnFirebase(user);
+                                }
+                            } else {
+                                Toast.makeText(getContext(), task.getException().getMessage(),
+                                        Toast.LENGTH_SHORT).show();
                             }
-                        } else {
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(getContext(), task.getException().getMessage(),
-                                    Toast.LENGTH_SHORT).show();
                         }
-                    }
-                });
+                    });
+        }
     }
 
     private void createUserOnFirebase(User user) {
@@ -205,9 +227,6 @@ public class RegisterFragment extends Fragment {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful()) {
-                    User createdUser = response.body();
-                    // Process the created user data here
-                    Log.e("User", createdUser.toString());
                     mAuthActivity.goToMainActivity();
                 } else {
                     // Handle error here

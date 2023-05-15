@@ -37,5 +37,6 @@
     <string name="tracking_enabled_notif">Tracking is currently enabled.</string>
     <string name="nav_feedback">Feedback</string>
     <string name="update_text">Cập nhật</string>
+    <string name="nav_chat">Chat</string>
 
 </resources>

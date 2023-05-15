@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mapsgt.R;
 import com.example.mapsgt.adapter.FriendAdapter;
 import com.example.mapsgt.data.entities.User;
-import com.example.mapsgt.friends.PersonProfileActivity;
+import com.example.mapsgt.ui.friends.PersonProfileActivity;
 
 import java.util.ArrayList;
 
@@ -61,7 +61,7 @@ public class FindUserFragment extends Fragment implements FriendAdapter.OnFriend
         mViewModel.findFriendByEmail(mQuery).observe(getViewLifecycleOwner(), users -> {
             users_list.clear();
             users_list.add(users);
-            FriendAdapter friendAdapter = new FriendAdapter(users_list, this);
+            FriendAdapter friendAdapter = new FriendAdapter(getContext(), users_list, this);
             rvUsers.setAdapter(friendAdapter);
             //friendAdapter.notifyDataSetChanged();
         });
@@ -69,7 +69,7 @@ public class FindUserFragment extends Fragment implements FriendAdapter.OnFriend
         mViewModel.findFriendByPhone(mQuery).observe(getViewLifecycleOwner(), users -> {
             users_list.clear();
             users_list.add(users);
-            FriendAdapter friendAdapter = new FriendAdapter(users_list, this);
+            FriendAdapter friendAdapter = new FriendAdapter(getContext(), users_list, this);
             rvUsers.setAdapter(friendAdapter);
             //friendAdapter.notifyDataSetChanged();
         });
