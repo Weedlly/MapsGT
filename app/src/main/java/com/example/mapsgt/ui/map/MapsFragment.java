@@ -40,8 +40,9 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.example.mapsgt.MainActivity;
 import com.example.mapsgt.R;
+import com.example.mapsgt.data.dao.DAOCallback;
+import com.example.mapsgt.data.dao.FavouritePlaceDAO;
 import com.example.mapsgt.data.dao.FriendRelationshipDAO;
 import com.example.mapsgt.data.dao.UserDAO;
 import com.example.mapsgt.data.dto.UserLocation;
@@ -53,7 +54,6 @@ import com.example.mapsgt.network.model.location.RoutesItem;
 import com.example.mapsgt.service.TrackingService;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -63,17 +63,10 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.FirebaseApp;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.ui.IconGenerator;
 
@@ -86,54 +79,57 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-enum FavouritePlaceEnum{
+
+enum FavouritePlaceEnum {
     Remove,
     Add
 }
+
 public class MapsFragment extends Fragment implements
         LocationListener, OnMapReadyCallback {
     private static final String TAG = "LocationFragment";
     private static final int ACCESS_FINE_LOCATION_CODE = 100;
     final RoutesItem[] routesItem = {new RoutesItem()};
-    private Switch sw_sharing;
-    private Switch sw_movementHistory;
+    private Switch sharingSw;
+    private Switch movementHistorySw;
     private boolean isTurnOnMovementHistory = false;
     private PolylineOptions movementHistoryPolylineOptions;
-    private TextView tv_distance;
-    private TextView tv_duration;
+    private TextView distanceTv;
+    private TextView durationTv;
     private TextView placeNameView;
     private TextView placeAddressView;
     private TextView placePhoneView;
     private TextView placeWebsiteView;
-    private ViewGroup bottomPanel;
     private ViewGroup placeDetailScrollView;
-    private Button btn_start_moving;
-    private Button btn_stop_moving;
-    private Button btn_add_faPlace;
-    private Button btn_show_faPlace;
+    private Button startMovingBtn;
+    private Button stopMovingBtn;
+    private Button addFaPlaceBtn;
+    private Button showFaPlaceBtn;
     private LocationManager mLocationManager;
     private GoogleMap mGoogleMap;
     private Button mSearchButton;
-    private DatabaseReference mDatabase;
-    private ValueEventListener mValueEventListener;
     private UserLocation currentUser;
     private List<Friend> friendList = new ArrayList<>();
     private List<UserLocation> friendLocations = new ArrayList<>();
     private MapManagement mapManagement;
     private UserDAO userDAO;
     private FriendRelationshipDAO friendRelationshipDAO;
+    private FavouritePlaceDAO favouritePlaceDAO;
     private String currentUserId;
+    private Marker desMarker = null;
+    private List<FavouritePlace> favouritePlaces = new ArrayList<FavouritePlace>();
+    private FavouritePlaceEnum favouritePlaceEnum = FavouritePlaceEnum.Add;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mapManagement = new MapManagement();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
         movementHistoryPolylineOptions = new PolylineOptions()
                 .color(Color.LTGRAY)
                 .width(8f);
         userDAO = new UserDAO();
         friendRelationshipDAO = new FriendRelationshipDAO();
+        favouritePlaceDAO = new FavouritePlaceDAO();
 
         currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -151,48 +147,47 @@ public class MapsFragment extends Fragment implements
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
 
-        tv_distance = view.findViewById(R.id.tv_distance);
-        tv_duration = view.findViewById(R.id.tv_duration);
-        sw_sharing = view.findViewById(R.id.sw_sharing);
-        sw_movementHistory = view.findViewById((R.id.sw_movementHistory));
-        btn_start_moving = view.findViewById(R.id.btn_start_moving);
-        btn_stop_moving = view.findViewById(R.id.btn_stop_moving);
-        btn_add_faPlace = view.findViewById(R.id.btn_add_faPlace);
-        btn_show_faPlace = view.findViewById(R.id.btn_show_faPlace);
+        distanceTv = view.findViewById(R.id.tv_distance);
+        durationTv = view.findViewById(R.id.tv_duration);
+        sharingSw = view.findViewById(R.id.sw_sharing);
+        movementHistorySw = view.findViewById((R.id.sw_movementHistory));
+        startMovingBtn = view.findViewById(R.id.btn_start_moving);
+        stopMovingBtn = view.findViewById(R.id.btn_stop_moving);
+        addFaPlaceBtn = view.findViewById(R.id.btn_add_faPlace);
+        showFaPlaceBtn = view.findViewById(R.id.btn_show_faPlace);
         placeNameView = view.findViewById(R.id.place_name);
         placeAddressView = view.findViewById(R.id.place_address);
         placePhoneView = view.findViewById(R.id.place_phone);
         placeWebsiteView = view.findViewById(R.id.place_website);
 
-        bottomPanel = view.findViewById(R.id.bottom_panel);
         placeDetailScrollView = view.findViewById(R.id.scrollView);
 
         placeDetailScrollView.setVisibility(View.GONE);
 
-        btn_start_moving.setOnClickListener(view1 -> {
+        startMovingBtn.setOnClickListener(view1 -> {
             mapManagement.setMapMode(MapMode.MOVING);
-            btn_start_moving.setVisibility(View.GONE);
-            btn_stop_moving.setVisibility(View.VISIBLE);
+            startMovingBtn.setVisibility(View.GONE);
+            stopMovingBtn.setVisibility(View.VISIBLE);
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), 25f));
         });
 
-        btn_stop_moving.setOnClickListener(view13 -> {
+        stopMovingBtn.setOnClickListener(view13 -> {
             mapManagement.setMapMode(MapMode.SHOW);
             mapManagement.setDestination(null);
-            btn_stop_moving.setVisibility(View.GONE);
-            btn_start_moving.setVisibility(View.GONE);
+            stopMovingBtn.setVisibility(View.GONE);
+            startMovingBtn.setVisibility(View.GONE);
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), 15f));
             renderAllMarker();
-            tv_duration.setVisibility(View.GONE);
-            tv_distance.setVisibility(View.GONE);
+            durationTv.setVisibility(View.GONE);
+            distanceTv.setVisibility(View.GONE);
         });
-        btn_show_faPlace.setOnClickListener(new View.OnClickListener() {
+        showFaPlaceBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 showFavouriteLocation(v);
             }
         });
-        btn_add_faPlace.setOnClickListener(viewAddFaPlace -> {
-            if(favouritePlaceEnum == FavouritePlaceEnum.Add) {
+        addFaPlaceBtn.setOnClickListener(viewAddFaPlace -> {
+            if (favouritePlaceEnum == FavouritePlaceEnum.Add) {
                 final EditText input = new EditText(getContext());
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setTitle("Favourite place");
@@ -202,18 +197,15 @@ public class MapsFragment extends Fragment implements
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String namePlace = input.getText().toString();
-                        FirebaseApp firebaseApp = FirebaseApp.getInstance();
-                        DatabaseReference databaseRef = FirebaseDatabase.getInstance(firebaseApp).getReference();
-                        DatabaseReference favoritePlacesRef = databaseRef.child("favourite_places");
                         FavouritePlace favoritePlace = new FavouritePlace(currentUserId, desMarker.getPosition().latitude, desMarker.getPosition().longitude, namePlace);
-                        favoritePlacesRef.push().setValue(favoritePlace);
+                        favouritePlaceDAO.insert(favoritePlace);
                         renderFavouriteLocation();
                         renderAllMarker();
                         LatLng latLng = desMarker.getPosition();
                         detailPlace(latLng);
                         placeDetailScrollView.setVisibility(View.VISIBLE);
                         getDirection(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), latLng);
-                        btn_add_faPlace.setText("Remove favourite place");
+                        addFaPlaceBtn.setText("Remove favourite place");
                         favouritePlaceEnum = FavouritePlaceEnum.Remove;
                     }
                 });
@@ -225,54 +217,31 @@ public class MapsFragment extends Fragment implements
                 });
                 AlertDialog dialog = builder.create();
                 dialog.show();
-            }
-            else if(favouritePlaceEnum == FavouritePlaceEnum.Remove){
-                Log.d(TAG, desMarker.getPosition().toString());
-                LatLng latLng = desMarker.getPosition();
-                Query query = FirebaseDatabase.getInstance().getReference("favourite_places")
-                        .orderByChild("userId")
-                        .equalTo(currentUserId);
-                query.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                                String favouritePlaceId = dataSnapshot.getKey();
-                                FavouritePlace place = dataSnapshot.getValue(FavouritePlace.class);
-                                if (place.getLatitude() == desMarker.getPosition().latitude && place.getLongitude() == desMarker.getPosition().longitude){
-                                    FirebaseDatabase database = FirebaseDatabase.getInstance();
-                                    DatabaseReference favouritePlaceRef = database.getReference("favourite_places").child(favouritePlaceId);
-                                    favouritePlaceRef.removeValue()
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.d(TAG, "Favourite place removed successfully");
-                                                    renderFavouriteLocation();
-                                                    renderAllMarker();
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.e(TAG, "Error removing favourite place", e);
-                                                }
-                                            });
+            } else if (favouritePlaceEnum == FavouritePlaceEnum.Remove) {
+                favouritePlaceDAO.getFavoritePlaceList(currentUserId).observe(getViewLifecycleOwner(), favoritePlaces -> {
+                    favoritePlaces.forEach(favoritePlace -> {
+                        String favouritePlaceId = favoritePlace.getId();
+                        if (favoritePlace.getLatitude() == desMarker.getPosition().latitude && favoritePlace.getLongitude() == desMarker.getPosition().longitude) {
+                            favouritePlaceDAO.delete(favouritePlaceId, new DAOCallback<FavouritePlace>() {
+                                @Override
+                                public void onSuccess(FavouritePlace object) {
+                                    renderFavouriteLocation();
+                                    renderAllMarker();
                                 }
-                            }
+
+                                @Override
+                                public void onError(String error) {
+                                    Log.e(TAG, "Error removing favourite place " + error);
+                                }
+                            });
                         }
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        Log.e(TAG, "Error removing favourite place");
-                    }
+                    });
                 });
-
-
             }
         });
 
-        sw_sharing.setOnClickListener(view12 -> {
-            if (sw_sharing.isChecked()) {
+        sharingSw.setOnClickListener(view12 -> {
+            if (sharingSw.isChecked()) {
                 startTrackerService();
                 showFriendLocation();
             } else {
@@ -281,8 +250,8 @@ public class MapsFragment extends Fragment implements
                 renderAllMarker();
             }
         });
-        sw_movementHistory.setOnClickListener(view12 -> {
-            if (sw_movementHistory.isChecked()) {
+        movementHistorySw.setOnClickListener(view12 -> {
+            if (movementHistorySw.isChecked()) {
                 isTurnOnMovementHistory = true;
                 mGoogleMap.addPolyline(movementHistoryPolylineOptions);
             } else {
@@ -336,22 +305,23 @@ public class MapsFragment extends Fragment implements
         desMarker = mGoogleMap.addMarker(options);
         // Don't remove this code
         boolean isFavouriteMarker = false;
-        for (FavouritePlace place: favouritePlaces) {
-            if(place.getLatitude() == latLng.latitude && place.getLongitude() == latLng.longitude){
-                btn_add_faPlace.setText("Remove favourite place");
+        for (FavouritePlace place : favouritePlaces) {
+            if (place.getLatitude() == latLng.latitude && place.getLongitude() == latLng.longitude) {
+                addFaPlaceBtn.setText("Remove favourite place");
                 favouritePlaceEnum = FavouritePlaceEnum.Remove;
                 isFavouriteMarker = true;
             }
         }
-        if(isFavouriteMarker == false){
-            btn_add_faPlace.setText("Add favourite place");
+        if (isFavouriteMarker == false) {
+            addFaPlaceBtn.setText("Add favourite place");
             favouritePlaceEnum = FavouritePlaceEnum.Add;
         }
         detailPlace(latLng);
         placeDetailScrollView.setVisibility(View.VISIBLE);
         getDirection(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), latLng);
     }
-    void detailPlace(LatLng latLng){
+
+    void detailPlace(LatLng latLng) {
         Geocoder geocoder = new Geocoder(getContext());
         try {
             List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
@@ -366,6 +336,7 @@ public class MapsFragment extends Fragment implements
             e.printStackTrace();
         }
     }
+
     private void drawDirectionLine(LatLng origin, LatLng dest) {
         RoutesItem route = routesItem[0];
         List<List<Double>> coordinates = route.getGeometry().getCoordinates();
@@ -377,12 +348,12 @@ public class MapsFragment extends Fragment implements
             nextStep = lng;
         }
         polylineOptions.add(nextStep, dest);
-        tv_duration.setVisibility(View.VISIBLE);
-        tv_distance.setVisibility(View.VISIBLE);
-        tv_duration.setText("Thời gian: " + formatDuration(route.getDuration()));
-        tv_distance.setText("Khoảng cách: " + formatDistance(route.getDistance()));
+        durationTv.setVisibility(View.VISIBLE);
+        distanceTv.setVisibility(View.VISIBLE);
+        durationTv.setText("Thời gian: " + formatDuration(route.getDuration()));
+        distanceTv.setText("Khoảng cách: " + formatDistance(route.getDistance()));
         if (mapManagement.getMapMode().equals(MapMode.SHOW)) {
-            btn_start_moving.setVisibility(View.VISIBLE);
+            startMovingBtn.setVisibility(View.VISIBLE);
         }
         mGoogleMap.addPolyline(polylineOptions);
     }
@@ -410,7 +381,8 @@ public class MapsFragment extends Fragment implements
             }
         });
     }
-    public void renderFavouriteLocation(){
+
+    public void renderFavouriteLocation() {
         favouritePlaces.clear();
         FirebaseDatabase.getInstance().getReference("favourite_places").orderByChild("userId")
                 .equalTo(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -429,42 +401,36 @@ public class MapsFragment extends Fragment implements
                     }
                 });
     }
-    public void showFavouriteLocation(View view){
+
+    public void showFavouriteLocation(View view) {
         favouritePlaces.clear();
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Favourite places");
         ListView listView = new ListView(getContext());
         builder.setView(listView);
 
-        FirebaseDatabase.getInstance().getReference("favourite_places").orderByChild("userId")
-                .equalTo(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+        favouritePlaceDAO.getFavoritePlaceList(currentUserId).observe(this, favoritePlacesRes -> {
+            if (favoritePlacesRes != null) {
+                favouritePlaces.addAll(favoritePlacesRes);
+                FavouritePlaceAdapter adapter = new FavouritePlaceAdapter(getContext(), favouritePlaces);
+                listView.setAdapter(adapter);
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for (DataSnapshot placeSnapshot : snapshot.getChildren()) {
-                            FavouritePlace place = placeSnapshot.getValue(FavouritePlace.class);
-                            favouritePlaces.add(place);
-                        }
-                        FavouritePlaceAdapter adapter = new FavouritePlaceAdapter(getContext(),favouritePlaces);
-                        listView.setAdapter(adapter);
-                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                FavouritePlace place = favouritePlaces.get(position);
-                                LatLng latLng = new LatLng(place.getLatitude(), place.getLongitude());
-                                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f));
-                                addDestinationPoint(latLng);
-                                builder.create().dismiss();
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        Log.e(TAG, "Failed to get favourite places", error.toException());
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        FavouritePlace place = favouritePlaces.get(position);
+                        LatLng latLng = new LatLng(place.getLatitude(), place.getLongitude());
+                        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f));
+                        addDestinationPoint(latLng);
+                        builder.create().dismiss();
                     }
                 });
+            }
+
+        });
+
         builder.create().show();
     }
+
     public void searchLocation(View view) {
         EditText locationSearch = getView().findViewById(R.id.editText);
         String location = locationSearch.getText().toString().trim();
@@ -546,6 +512,7 @@ public class MapsFragment extends Fragment implements
             getDirection(latLng, mapManagement.getDestination());
         }
 
+        Log.d(TAG, "renderAllMarker: " + currentUser.isSharing());
         // friend location
         if (currentUser.isSharing()) {
             friendLocations.forEach((friend -> {
@@ -577,16 +544,18 @@ public class MapsFragment extends Fragment implements
         Marker marker = mGoogleMap.addMarker(markerOptions);
         marker.setTag(userLocation.getId());
     }
-    private void removeFavouritePlace(LatLng latLng){
-        for (FavouritePlace place:favouritePlaces) {
-            if(place.getLongitude() == latLng.longitude &&  place.getLatitude() == latLng.latitude){
+
+    private void removeFavouritePlace(LatLng latLng) {
+        for (FavouritePlace place : favouritePlaces) {
+            if (place.getLongitude() == latLng.longitude && place.getLatitude() == latLng.latitude) {
                 favouritePlaces.remove(place);
             }
         }
     }
+
     private void renderFavouritePlaceMarker() {
-        for (FavouritePlace place: favouritePlaces) {
-            LatLng latLng = new LatLng(place.getLatitude(),place.getLongitude());
+        for (FavouritePlace place : favouritePlaces) {
+            LatLng latLng = new LatLng(place.getLatitude(), place.getLongitude());
             TextView title = new TextView(getContext());
             title.setText(place.getName());
             IconGenerator generator = new IconGenerator(getContext());
@@ -690,10 +659,6 @@ public class MapsFragment extends Fragment implements
         Intent intent = new Intent(getContext(), TrackingService.class);
         getContext().stopService(intent);
 
-        if (mValueEventListener != null) {
-            mDatabase.removeEventListener(mValueEventListener);
-        }
-
         userDAO.setIsSharing(currentUserId, false);
         Toast.makeText(getContext(), "Stop sharing", Toast.LENGTH_SHORT).show();
     }
@@ -705,20 +670,18 @@ public class MapsFragment extends Fragment implements
             friendList.addAll(friendListRes);
         });
 
-        userDAO.getByKey(currentUserId).observe(this, user -> {
-            currentUser = new UserLocation(user);
-            getBitmapDescriptorImg(user.getProfilePicture(), (BitmapDescriptor bitmapDescriptor) -> {
+        userDAO.getByKey(currentUserId).observe(this, userRes -> {
+            currentUser = new UserLocation(userRes);
+            Log.d(TAG, "getUserInfo: " + currentUser.isSharing());
+            getBitmapDescriptorImg(userRes.getProfilePicture(), (BitmapDescriptor bitmapDescriptor) -> {
                 currentUser.setProfileImg(bitmapDescriptor);
                 if (loadFirstTime.get()) {
                     moveToMyLocation();
                     loadFirstTime.set(false);
                 }
             });
+            sharingSw.setChecked(currentUser.isSharing());
         });
-    }
-
-    private interface OnBitmapDescriptorLoadedListener {
-        void onBitmapDescriptorLoaded(BitmapDescriptor bitmapDescriptor);
     }
 
     private Bitmap getCircularBitmap(Bitmap bitmap) {
@@ -793,7 +756,7 @@ public class MapsFragment extends Fragment implements
                     public boolean onMyLocationButtonClick() {
                         try {
                             moveToMyLocation();
-                        } catch (Exception e){
+                        } catch (Exception e) {
                             Log.d(TAG, "onMyLocationButtonClick: " + e);
                         }
                         return true;
@@ -830,11 +793,10 @@ public class MapsFragment extends Fragment implements
             @Override
             public boolean onMarkerClick(Marker marker) {
 
-                if (marker.getSnippet() != null){
+                if (marker.getSnippet() != null) {
                     if ("favourite-place".equals(marker.getSnippet())) {
                         addDestinationPoint(marker.getPosition());
-                    }
-                    else if (marker.getPosition().latitude != currentUser.getLatitude() || marker.getPosition().longitude != currentUser.getLongitude()) {
+                    } else if (marker.getPosition().latitude != currentUser.getLatitude() || marker.getPosition().longitude != currentUser.getLongitude()) {
                         mapManagement.setGoingToFriend(true);
                         mapManagement.setGoingFriendId((String) marker.getTag());
                         renderAllMarker();
