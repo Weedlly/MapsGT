@@ -69,6 +69,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Logger;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.ui.IconGenerator;
@@ -243,9 +244,10 @@ public class MapsFragment extends Fragment implements
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
                                                     Log.d(TAG, "Favourite place removed successfully");
-                                                    TurnOnPlaceDetailView(latLng);
                                                     renderFavouriteLocation();
                                                     renderAllMarker();
+                                                    TurnOnPlaceDetailView(latLng);
+                                                    SetStatusForFavouritePlaceButton(FavouritePlaceEnum.Add);
                                                 }
                                             })
                                             .addOnFailureListener(new OnFailureListener() {
@@ -332,7 +334,6 @@ public class MapsFragment extends Fragment implements
         FavouritePlaceEnum faPlaceEnum = GetStatusOfFavouritePlace(latLng);
         SetStatusForFavouritePlaceButton(faPlaceEnum);
         TurnOnPlaceDetailView(latLng);
-
         getDirection(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), latLng);
     }
     FavouritePlaceEnum GetStatusOfFavouritePlace(LatLng latLng){
