@@ -48,7 +48,7 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_friend);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        getSupportActionBar().setTitle("Add Friend");
         userDAO = new UserDAO();
 
         initializeFields();

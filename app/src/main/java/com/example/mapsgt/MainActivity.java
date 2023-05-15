@@ -2,6 +2,9 @@ package com.example.mapsgt;
 
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -9,6 +12,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.bumptech.glide.Glide;
+import com.example.mapsgt.data.dao.UserDAO;
 import com.example.mapsgt.ui.add_friend.AddFriendActivity;
 import com.example.mapsgt.ui.add_friend.FriendsActivity;
 import com.example.mapsgt.ui.auth.AuthActivity;
@@ -39,11 +44,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private DrawerLayout mDrawerLayout;
     private FirebaseAuth auth;
     private FirebaseUser user;
-
+    private TextView tvUserName;
+    private TextView tvUserPhone;
+    private ImageView ivUserAvatar;
+    private ImageView ivEdit;
+    private UserDAO userDAO;
     @Override
     protected void onStart() {
         super.onStart();
-        user = auth.getCurrentUser();
         if (user == null) {
             startActivity(AuthActivity.class);
         }
@@ -61,7 +69,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
 
+        userDAO = new UserDAO();
         Toolbar toolbar = findViewById(R.id.top_app_bar);
         setSupportActionBar(toolbar);
 
@@ -72,11 +82,33 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         toggle.syncState();
 
         NavigationView navigationView = findViewById(R.id.navigation_view);
+        View headerView = navigationView.getHeaderView(0);
+        tvUserName = headerView.findViewById(R.id.tv_name);
+        tvUserPhone = headerView.findViewById(R.id.tv_phone);
+        ivUserAvatar = headerView.findViewById(R.id.iv_avatar);
+
+        if (user != null) {
+            userDAO.getByKey(user.getUid()).observe(this, user -> {
+                if (user != null) {
+                    tvUserName.setText(user.getFirstName() + " " + user.getLastName());
+                    tvUserPhone.setText(user.getPhone());
+                    Glide.with(this).load(user.getProfilePicture()).into(ivUserAvatar);
+                }
+            });
+
+        }
+
+        ivEdit = headerView.findViewById(R.id.iv_edit);
+
         navigationView.setNavigationItemSelectedListener(this);
 
         replaceFragment(getLayoutResource(), new MapsFragment());
 
         navigationView.getMenu().findItem(R.id.nav_home).setChecked(true);
+
+        ivEdit.setOnClickListener(v -> {
+            startActivityNotFinish(UserProfileActivity.class);
+        });
     }
 
     @Override
