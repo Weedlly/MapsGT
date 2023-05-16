@@ -188,10 +188,10 @@ public class MapsFragment extends Fragment implements
             if (favouritePlaceEnum == FavouritePlaceEnum.Add) {
                 final EditText input = new EditText(getContext());
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle("Favourite place");
-                builder.setMessage("Naming your favourite place:");
+                builder.setTitle("Địa điểm yêu thích");
+                builder.setMessage("Đặt tên cho địa điểm của bạn:");
                 builder.setView(input);
-                builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton("Thêm", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String namePlace = input.getText().toString();
@@ -202,11 +202,11 @@ public class MapsFragment extends Fragment implements
                         LatLng latLng = desMarker.getPosition();
                         turnOnPlaceDetailView(latLng);
                         getDirection(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), latLng);
-                        addFaPlaceBtn.setText("Remove favourite place");
+                        addFaPlaceBtn.setText("Xoá địa điểm yêu ");
                         favouritePlaceEnum = FavouritePlaceEnum.Remove;
                     }
                 });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton("Huỷ", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
@@ -428,7 +428,7 @@ public class MapsFragment extends Fragment implements
     public void showFavouriteLocation(View view) {
         favouritePlaces.clear();
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Favourite places");
+        builder.setTitle("Địa điểm yêu thích");
         ListView listView = new ListView(getContext());
         builder.setView(listView);
 
