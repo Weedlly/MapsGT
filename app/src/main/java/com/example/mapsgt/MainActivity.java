@@ -13,6 +13,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.mapsgt.ui.add_friend.AddFriendActivity;
 import com.example.mapsgt.ui.add_friend.FriendsActivity;
@@ -112,6 +113,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             }
         }
     }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
