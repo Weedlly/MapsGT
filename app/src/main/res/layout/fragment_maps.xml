@@ -18,6 +18,7 @@
         android:layout_height="match_parent">
 
         <LinearLayout
+            android:id="@+id/topPanel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="50dp"
@@ -44,6 +45,24 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/middlePanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="100dp"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btn_show_faPlace"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/cardview_light_background"
+                android:onClick="showFavouriteLocation"
+                android:text="Favourite" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/bottom_panel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -52,47 +71,110 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <TextView
-                android:id="@+id/tv_duration"
+            <ScrollView
+                android:id="@+id/scrollView"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scrollbars="vertical">
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_margin="5dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_duration"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:textSize="14sp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/tv_distance"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:textSize="14sp"
+                        android:visibility="gone" />
+
+                    <Button
+                        android:id="@+id/btn_start_moving"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Bắt đầu đi"
+                        android:visibility="gone" />
+
+                    <Button
+                        android:id="@+id/btn_stop_moving"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Dừng"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/place_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="8dp"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/place_address"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="8dp" />
+
+                    <TextView
+                        android:id="@+id/place_phone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="8dp" />
+
+                    <TextView
+                        android:id="@+id/place_website"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="8dp" />
+
+                    <Button
+                        android:id="@+id/btn_add_faPlace"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"
+                        android:text="Add favourite place" />
+                </LinearLayout>
+            </ScrollView>
+
+            <LinearLayout
+                android:id="@+id/sw_panel"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:textSize="14sp"
-                android:visibility="gone" />
+                android:background="@color/cardview_light_background"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/tv_distance"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:textSize="14sp"
-                android:visibility="gone" />
+                <Switch
+                    android:id="@+id/sw_sharing"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="Chia sẻ vị trí"
+                    android:textSize="14sp" />
 
-            <Button
-                android:id="@+id/btn_start_moving"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Bắt đầu đi"
-                android:visibility="gone" />
-
-            <Button
-                android:id="@+id/btn_stop_moving"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Dừng"
-                android:visibility="gone" />
-
-            <Switch
-                android:id="@+id/sw_sharing"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginTop="16dp"
-                android:layout_weight="1"
-                android:text="Share location"
-                android:textSize="14sp" />
-
+                <Switch
+                    android:id="@+id/sw_movementHistory"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="Theo dõi"
+                    android:textSize="14sp" />
+            </LinearLayout>
         </LinearLayout>
 
     </RelativeLayout>
+
 
 </fragment>
