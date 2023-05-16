@@ -9,6 +9,10 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.mapsgt.data.dao.DAOCallback;
+import com.example.mapsgt.ui.map.FavouritePlace;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -43,6 +47,23 @@ public abstract class RealtimeDatabase<T> {
         itemRef.removeValue();
     }
 
+    public void delete(String key, DAOCallback<FavouritePlace> callback) {
+        DatabaseReference itemRef = getDBRef().child(getFirebaseNode()).child(key);
+        itemRef.removeValue()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        callback.onSuccess(null);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        callback.onError(e.getMessage());
+                    }
+                });
+    }
+
     public LiveData<List<T>> getAll() {
         MutableLiveData<List<T>> liveData = new MutableLiveData<>();
         DatabaseReference itemsRef = mDatabaseReference.child(getFirebaseNode());
@@ -69,7 +90,7 @@ public abstract class RealtimeDatabase<T> {
     public LiveData<T> getByKey(String key) {
         MutableLiveData<T> liveData = new MutableLiveData<>();
         DatabaseReference itemRef = mDatabaseReference.child(getFirebaseNode()).child(key);
-        itemRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        itemRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
