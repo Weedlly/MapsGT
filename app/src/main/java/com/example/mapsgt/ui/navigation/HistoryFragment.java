@@ -78,7 +78,19 @@ public class HistoryFragment extends Fragment {
                 MapsFragment mapFragment = new MapsFragment();
 
                 // Pass the clicked HistoryPlace object as arguments to the MapFragment
-                
+                Bundle args = new Bundle();
+                args.putParcelable("historyPlace", clickedHistoryPlace);
+                mapFragment.setArguments(args);
+
+                // Navigate to the MapFragment
+                FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+
+                transaction.replace(R.id.main_holder, mapFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+
+                NavigationView navigationView = requireActivity().findViewById(R.id.navigation_view);
+                navigationView.setCheckedItem(R.id.nav_home);
 
             }
         });
