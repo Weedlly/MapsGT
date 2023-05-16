@@ -8,14 +8,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:drawableStart="@drawable/send_24"
         android:hint="Name"
         android:textSize="20dp"
         android:textColor="@android:color/black"
-        android:id="@+id/fb_name"/>
+        android:id="@+id/fb_name"
+        android:background="@drawable/bg_white_border_gray_48dp"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+
         android:hint="This name be null"
         android:layout_below="@+id/fb_name"
         android:textSize="18dp"
@@ -29,10 +32,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:hint="Message"
+        android:drawableStart="@drawable/send_24"
         android:layout_below="@+id/bug_name"
         android:textSize="20dp"
         android:textColor="@android:color/black"
-        android:id="@+id/fb_content"/>
+        android:id="@+id/fb_content"
+        android:background="@drawable/bg_white_border_gray_48dp"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -44,12 +49,12 @@
         android:id="@+id/bug_content"/>
 
     <Button
+        android:id="@+id/btn_send_fb"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Sent Feedback"
         android:layout_centerInParent="true"
-        android:id="@+id/btn_send_fb"
-        android:textSize="20dp"/>
+        android:text="Sent Feedback"
+        android:textSize="20dp" />
 
     <Button
         android:layout_width="match_parent"

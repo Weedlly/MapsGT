@@ -4,6 +4,9 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -14,6 +17,8 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.bumptech.glide.Glide;
+import com.example.mapsgt.data.dao.UserDAO;
 import com.example.mapsgt.ui.add_friend.AddFriendActivity;
 import com.example.mapsgt.ui.add_friend.FriendsActivity;
 import com.example.mapsgt.ui.auth.AuthActivity;
@@ -45,6 +50,43 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private DrawerLayout mDrawerLayout;
     private FirebaseAuth auth;
     private FirebaseUser user;
+    private TextView tvUserName;
+    private TextView tvUserPhone;
+    private ImageView ivUserAvatar;
+    private ImageView ivEdit;
+    private UserDAO userDAO;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        auth = FirebaseAuth.getInstance();
+
+        userDAO = new UserDAO();
+        Toolbar toolbar = findViewById(R.id.top_app_bar);
+        setSupportActionBar(toolbar);
+
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+
+        mDrawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+        View headerView = navigationView.getHeaderView(0);
+        tvUserName = headerView.findViewById(R.id.tv_name);
+        tvUserPhone = headerView.findViewById(R.id.tv_phone);
+        ivUserAvatar = headerView.findViewById(R.id.iv_avatar);
+        ivEdit = headerView.findViewById(R.id.iv_edit);
+
+        navigationView.setNavigationItemSelectedListener(this);
+
+        replaceFragment(getLayoutResource(), new MapsFragment());
+
+        navigationView.getMenu().findItem(R.id.nav_home).setChecked(true);
+
+        checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, ACCESS_FINE_LOCATION_CODE);
+    }
 
     @Override
     protected void onStart() {
@@ -56,32 +98,17 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             AccountFirebaseUtil.checkEmailExists(user.getEmail(), (Boolean exists) -> {
                 if (!exists) {
                     startActivity(AuthActivity.class);
+                } else {
+                    userDAO.getByKey(user.getUid()).observe(this, userRes -> {
+                        if (userRes != null) {
+                            tvUserName.setText(userRes.getFirstName() + " " + userRes.getLastName());
+                            tvUserPhone.setText(userRes.getPhone());
+                            Glide.with(this).load(userRes.getProfilePicture()).into(ivUserAvatar);
+                        }
+                    });
                 }
             });
         }
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        auth = FirebaseAuth.getInstance();
-
-        Toolbar toolbar = findViewById(R.id.top_app_bar);
-        setSupportActionBar(toolbar);
-
-        mDrawerLayout = findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-
-        mDrawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = findViewById(R.id.navigation_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        navigationView.getMenu().findItem(R.id.nav_home).setChecked(true);
-
-        checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, ACCESS_FINE_LOCATION_CODE);
     }
 
     private void checkPermission(String permission, int requestCode) {
