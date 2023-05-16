@@ -105,7 +105,7 @@ public class MapsFragment extends Fragment implements
     private ImageButton showFaPlaceBtn;
     private LocationManager mLocationManager;
     private GoogleMap mGoogleMap;
-    private Button mSearchButton;
+    private ImageButton mSearchButton;
     private UserLocation currentUser;
     private Marker desMarker = null;
     private List<FavouritePlace> favouritePlaces = new ArrayList<FavouritePlace>();

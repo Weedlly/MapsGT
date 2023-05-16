@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -20,25 +21,26 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="65dp"
-            android:layout_marginRight="50dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="60dp"
             android:orientation="horizontal">
 
             <EditText
                 android:id="@+id/editText"
-                android:layout_width="200dp"
+                android:layout_width="190dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.5"
+                android:background="@drawable/bg_white_border_gray_48dp"
+                android:drawableLeft="@drawable/send_24"
                 android:hint="Nhập vị trí"
                 android:inputType="textPersonName" />
 
-            <Button
+            <ImageButton
                 android:id="@+id/search_bt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:onClick="searchLocation"
-                android:text="Tìm" />
+                android:background="@android:color/holo_purple"
+                android:src="@drawable/ic_search"/>
 
         </LinearLayout>
 
@@ -46,8 +48,8 @@
             android:id="@+id/middlePanel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="100dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginTop="60dp"
             android:orientation="vertical">
 
             <RelativeLayout
@@ -60,13 +62,13 @@
                     android:id="@+id/btn_show_faPlace"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
-                    android:src="@drawable/favourite_place"
-                    android:background="@null"
-                    android:padding="8dp"
-                    android:scaleType="fitCenter"
                     android:layout_centerHorizontal="true"
                     android:layout_centerVertical="true"
-                    android:onClick="showFavouriteLocation"/>
+                    android:background="@null"
+                    android:onClick="showFavouriteLocation"
+                    android:padding="8dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/favourite_place" />
 
             </RelativeLayout>
 
