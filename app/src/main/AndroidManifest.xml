@@ -2,11 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" >
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
+        android:name=".MapsGTApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -15,7 +20,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MapsGT"
         tools:targetApi="31" >
-
         <!--
              TODO: Before you run your application, you need a Google Maps API key.
 
@@ -29,12 +33,43 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/API_KEY" />
+            android:value="AIzaSyCo3yxkR1zXKi4nFel0ukpVJOiKHFx7UFw" />
+
+        <service android:name=".service.TrackingService" />
 
         <activity
-            android:name=".MapsActivity"
+            android:name=".ui.friends.PersonProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.communicate.ChatActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.friends.FindFriendsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.navigation.FeedbackActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.user_profile.UserProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.user_profile.EditProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.add_friend.AddFriendActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.add_friend.FriendsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/title_activity_maps" >
+            android:label="@string/title_activity_maps"
+            android:theme="@style/Theme.Material3.Light.NoActionBar" />
+        <activity
+            android:name=".ui.auth.AuthActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Material3.Light.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

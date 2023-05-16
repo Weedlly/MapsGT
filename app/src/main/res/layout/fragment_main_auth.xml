@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="30dp"
+    tools:context=".ui.auth.MainAuthFragment"
+    tools:ignore="RtlHardcoded, HardcodedText" >
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:src="@drawable/logo_app_name"
+        android:contentDescription="@string/app_name" />
+
+    <Button
+        android:id="@+id/btn_sign_in_google"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/white"
+        android:drawableLeft="@drawable/google"
+        android:text="Continue with Google"
+        android:textColor="@color/black"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/btn_sign_in_facebook"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/white"
+        android:drawableLeft="@drawable/facebook"
+        android:text="Continue with Facebook"
+        android:textColor="@color/black"
+        android:textSize="18sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="OR"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="bold"/>
+
+    <Button
+        android:id="@+id/btn_sign_in_email"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:backgroundTint="@color/white"
+        android:drawableLeft="@drawable/email"
+        android:text="Continue with Email"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:layout_marginBottom="70dp"/>
+
+</LinearLayout>

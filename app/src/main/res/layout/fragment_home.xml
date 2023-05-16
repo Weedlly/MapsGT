@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.navigation.HomeFragment"
+    android:background="@color/colorSecondary">
+
+    <FrameLayout
+        android:id="@+id/map_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/sv_position"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/background_icon"
+        android:textAlignment="center"
+        app:closeIcon="@drawable/ic_close"
+        app:iconifiedByDefault="true"
+        app:queryBackground="@null"
+        app:queryHint="Tìm kiếm địa điểm"
+        app:searchIcon="@drawable/ic_search"
+        app:submitBackground="@null" />
+
+    <ImageButton
+        android:id="@+id/my_location_button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="108dp"
+        android:background="@drawable/background_icon"
+        android:src="@drawable/ic_my_location"
+        android:contentDescription="@string/search_position" />
+
+    <ImageButton
+        android:id="@+id/btn_chat"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_above="@id/my_location_button"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/background_icon"
+        android:src="@drawable/ic_chat"
+        android:contentDescription="@string/chat"/>
+</RelativeLayout>
