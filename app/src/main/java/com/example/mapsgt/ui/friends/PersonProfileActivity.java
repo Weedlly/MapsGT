@@ -156,7 +156,7 @@ public class PersonProfileActivity extends AppCompatActivity {
                                             declineFriendRequestBtn.setEnabled(false);
 
                                             blockFriendBtn.setEnabled(true);
-                                            blockFriendBtn.setText("UnBlocked");
+                                            blockFriendBtn.setText("Gỡ chặn");
                                         }
                                     }
                                 });
