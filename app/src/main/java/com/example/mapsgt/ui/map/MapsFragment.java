@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -96,17 +97,15 @@ public class MapsFragment extends Fragment implements
     private TextView durationTv;
     private TextView placeNameView;
     private TextView placeAddressView;
-    private TextView placePhoneView;
-    private TextView placeWebsiteView;
     private ViewGroup bottomPanel;
     private ViewGroup placeDetailScrollView;
     private Button startMovingBtn;
     private Button stopMovingBtn;
     private Button addFaPlaceBtn;
-    private Button showFaPlaceBtn;
+    private ImageButton showFaPlaceBtn;
     private LocationManager mLocationManager;
     private GoogleMap mGoogleMap;
-    private Button mSearchButton;
+    private ImageButton mSearchButton;
     private UserLocation currentUser;
     private Marker desMarker = null;
     private List<FavouritePlace> favouritePlaces = new ArrayList<FavouritePlace>();
@@ -158,8 +157,6 @@ public class MapsFragment extends Fragment implements
         showFaPlaceBtn = view.findViewById(R.id.btn_show_faPlace);
         placeNameView = view.findViewById(R.id.place_name);
         placeAddressView = view.findViewById(R.id.place_address);
-        placePhoneView = view.findViewById(R.id.place_phone);
-        placeWebsiteView = view.findViewById(R.id.place_website);
 
         bottomPanel = view.findViewById(R.id.bottom_panel);
         placeDetailScrollView = view.findViewById(R.id.scrollView);
@@ -191,10 +188,10 @@ public class MapsFragment extends Fragment implements
             if (favouritePlaceEnum == FavouritePlaceEnum.Add) {
                 final EditText input = new EditText(getContext());
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle("Favourite place");
-                builder.setMessage("Naming your favourite place:");
+                builder.setTitle("Địa điểm yêu thích");
+                builder.setMessage("Đặt tên cho địa điểm của bạn:");
                 builder.setView(input);
-                builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton("Thêm", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String namePlace = input.getText().toString();
@@ -205,11 +202,11 @@ public class MapsFragment extends Fragment implements
                         LatLng latLng = desMarker.getPosition();
                         turnOnPlaceDetailView(latLng);
                         getDirection(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), latLng);
-                        addFaPlaceBtn.setText("Remove favourite place");
+                        addFaPlaceBtn.setText("Xoá địa điểm yêu ");
                         favouritePlaceEnum = FavouritePlaceEnum.Remove;
                     }
                 });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton("Huỷ", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
@@ -292,6 +289,13 @@ public class MapsFragment extends Fragment implements
         mapFragment.getMapAsync(this);
 
         checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, ACCESS_FINE_LOCATION_CODE);
+        mapFragment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                // Tắt la bàn (compass)
+                googleMap.getUiSettings().setCompassEnabled(false);
+            }
+        });
     }
 
 
@@ -360,8 +364,6 @@ public class MapsFragment extends Fragment implements
                 Address address = addresses.get(0);
                 placeNameView.setText(address.getFeatureName());
                 placeAddressView.setText(address.getAddressLine(0));
-                placePhoneView.setText(address.getPhone());
-                placeWebsiteView.setText(address.getUrl());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -426,7 +428,7 @@ public class MapsFragment extends Fragment implements
     public void showFavouriteLocation(View view) {
         favouritePlaces.clear();
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Favourite places");
+        builder.setTitle("Địa điểm yêu thích");
         ListView listView = new ListView(getContext());
         builder.setView(listView);
 
