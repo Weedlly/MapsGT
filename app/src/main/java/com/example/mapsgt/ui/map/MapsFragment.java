@@ -63,12 +63,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.maps.android.ui.IconGenerator;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.FirebaseApp;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -100,6 +99,7 @@ public class MapsFragment extends Fragment implements
     private TextView placeAddressView;
     private TextView placePhoneView;
     private TextView placeWebsiteView;
+    private ViewGroup bottomPanel;
     private ViewGroup placeDetailScrollView;
     private Button startMovingBtn;
     private Button stopMovingBtn;
@@ -109,27 +109,26 @@ public class MapsFragment extends Fragment implements
     private GoogleMap mGoogleMap;
     private Button mSearchButton;
     private UserLocation currentUser;
+    private Marker desMarker = null;
+    private List<FavouritePlace> favouritePlaces = new ArrayList<FavouritePlace>();
+    private FavouritePlaceEnum favouritePlaceEnum = FavouritePlaceEnum.Add;
     private List<Friend> friendList = new ArrayList<>();
     private List<UserLocation> friendLocations = new ArrayList<>();
     private MapManagement mapManagement;
     private UserDAO userDAO;
     private FriendRelationshipDAO friendRelationshipDAO;
-    private FavouritePlaceDAO favouritePlaceDAO;
     private String currentUserId;
-    private Marker desMarker = null;
-    private List<FavouritePlace> favouritePlaces = new ArrayList<FavouritePlace>();
-    private FavouritePlaceEnum favouritePlaceEnum = FavouritePlaceEnum.Add;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mapManagement = new MapManagement();
+//        mDatabase = FirebaseDatabase.getInstance().getReference();
         movementHistoryPolylineOptions = new PolylineOptions()
                 .color(Color.LTGRAY)
                 .width(8f);
         userDAO = new UserDAO();
         friendRelationshipDAO = new FriendRelationshipDAO();
-        favouritePlaceDAO = new FavouritePlaceDAO();
 
         currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -160,9 +159,9 @@ public class MapsFragment extends Fragment implements
         placePhoneView = view.findViewById(R.id.place_phone);
         placeWebsiteView = view.findViewById(R.id.place_website);
 
+        bottomPanel = view.findViewById(R.id.bottom_panel);
         placeDetailScrollView = view.findViewById(R.id.scrollView);
-
-        placeDetailScrollView.setVisibility(View.GONE);
+        TurnOffPlaceDetailView();
 
         startMovingBtn.setOnClickListener(view1 -> {
             mapManagement.setMapMode(MapMode.MOVING);
@@ -202,8 +201,7 @@ public class MapsFragment extends Fragment implements
                         renderFavouriteLocation();
                         renderAllMarker();
                         LatLng latLng = desMarker.getPosition();
-                        detailPlace(latLng);
-                        placeDetailScrollView.setVisibility(View.VISIBLE);
+                        TurnOnPlaceDetailView(latLng);
                         getDirection(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), latLng);
                         addFaPlaceBtn.setText("Remove favourite place");
                         favouritePlaceEnum = FavouritePlaceEnum.Remove;
@@ -303,25 +301,43 @@ public class MapsFragment extends Fragment implements
 
         renderAllMarker();
         desMarker = mGoogleMap.addMarker(options);
-        // Don't remove this code
-        boolean isFavouriteMarker = false;
-        for (FavouritePlace place : favouritePlaces) {
-            if (place.getLatitude() == latLng.latitude && place.getLongitude() == latLng.longitude) {
-                addFaPlaceBtn.setText("Remove favourite place");
-                favouritePlaceEnum = FavouritePlaceEnum.Remove;
-                isFavouriteMarker = true;
-            }
-        }
-        if (isFavouriteMarker == false) {
-            addFaPlaceBtn.setText("Add favourite place");
-            favouritePlaceEnum = FavouritePlaceEnum.Add;
-        }
-        detailPlace(latLng);
-        placeDetailScrollView.setVisibility(View.VISIBLE);
+
+        FavouritePlaceEnum faPlaceEnum = GetStatusOfFavouritePlace(latLng);
+        SetStatusForFavouritePlaceButton(faPlaceEnum);
+        TurnOnPlaceDetailView(latLng);
         getDirection(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), latLng);
     }
 
-    void detailPlace(LatLng latLng) {
+    private FavouritePlaceEnum GetStatusOfFavouritePlace(LatLng latLng) {
+        for (FavouritePlace place : favouritePlaces) {
+            if (place.getLatitude() == latLng.latitude && place.getLongitude() == latLng.longitude) {
+                return FavouritePlaceEnum.Remove;
+            }
+        }
+        return FavouritePlaceEnum.Add;
+    }
+
+    private void SetStatusForFavouritePlaceButton(FavouritePlaceEnum faPlaceEnum){
+        if (faPlaceEnum == FavouritePlaceEnum.Remove){
+            favouritePlaceEnum = FavouritePlaceEnum.Remove;
+            addFaPlaceBtn.setText("Remove favourite place");
+        }
+        else{
+            favouritePlaceEnum = FavouritePlaceEnum.Add;
+            addFaPlaceBtn.setText("Add favourite place");
+        }
+    }
+
+    private void TurnOnPlaceDetailView(LatLng latLng) {
+        detailPlace(latLng);
+        placeDetailScrollView.setVisibility(View.VISIBLE);
+    }
+
+    private void TurnOffPlaceDetailView() {
+        placeDetailScrollView.setVisibility(View.GONE);
+    }
+
+    private void detailPlace(LatLng latLng) {
         Geocoder geocoder = new Geocoder(getContext());
         try {
             List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
@@ -431,6 +447,7 @@ public class MapsFragment extends Fragment implements
         builder.create().show();
     }
 
+
     public void searchLocation(View view) {
         EditText locationSearch = getView().findViewById(R.id.editText);
         String location = locationSearch.getText().toString().trim();
@@ -492,7 +509,7 @@ public class MapsFragment extends Fragment implements
     private void renderAllMarker() {
         // clear marker
         mGoogleMap.clear();
-        placeDetailScrollView.setVisibility(View.GONE);
+        TurnOffPlaceDetailView();
         // user location
         renderUserMarker(currentUser);
         // favourite place
@@ -512,7 +529,6 @@ public class MapsFragment extends Fragment implements
             getDirection(latLng, mapManagement.getDestination());
         }
 
-        Log.d(TAG, "renderAllMarker: " + currentUser.isSharing());
         // friend location
         if (currentUser.isSharing()) {
             friendLocations.forEach((friend -> {
@@ -652,7 +668,6 @@ public class MapsFragment extends Fragment implements
         userDAO.setIsSharing(currentUserId, true);
         Toast.makeText(getContext(), "Start sharing", Toast.LENGTH_SHORT).show();
 
-        // Todo: Schedule a task to stop the service after 15 minutes
     }
 
     private void stopTrackerService() {
@@ -722,7 +737,8 @@ public class MapsFragment extends Fragment implements
         return output;
     }
 
-    private void getBitmapDescriptorImg(String imgUrl, OnBitmapDescriptorLoadedListener listener) {
+    private void getBitmapDescriptorImg(String imgUrl, OnBitmapDescriptorLoadedListener
+            listener) {
         if (isAdded()) {
             Glide.with(this)
                     .asBitmap()
