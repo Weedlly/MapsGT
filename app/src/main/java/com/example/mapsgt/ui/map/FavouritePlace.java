@@ -1,6 +1,7 @@
 package com.example.mapsgt.ui.map;
 
 public class FavouritePlace {
+    private String id;
     private String userId;
     private double latitude;
     private double longitude;
@@ -45,5 +46,12 @@ public class FavouritePlace {
         return name;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 }
 

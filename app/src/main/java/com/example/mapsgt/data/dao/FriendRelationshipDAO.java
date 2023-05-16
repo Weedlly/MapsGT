@@ -45,6 +45,6 @@ public class FriendRelationshipDAO extends RealtimeDatabase<Friend> {
 
     @Override
     protected Class<Friend> getGenericType() {
-        return null;
+        return Friend.class;
     }
 }
