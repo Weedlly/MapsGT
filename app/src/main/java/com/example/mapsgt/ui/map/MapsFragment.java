@@ -44,9 +44,11 @@ import com.example.mapsgt.R;
 import com.example.mapsgt.data.dao.DAOCallback;
 import com.example.mapsgt.data.dao.FavouritePlaceDAO;
 import com.example.mapsgt.data.dao.FriendRelationshipDAO;
+import com.example.mapsgt.data.dao.HistoryPlaceDAO;
 import com.example.mapsgt.data.dao.UserDAO;
 import com.example.mapsgt.data.dto.UserLocation;
 import com.example.mapsgt.data.entities.Friend;
+import com.example.mapsgt.data.entities.HistoryPlace;
 import com.example.mapsgt.enumeration.MovingStyleEnum;
 import com.example.mapsgt.network.RetrofitClient;
 import com.example.mapsgt.network.model.location.LocationResponse;
@@ -115,6 +117,7 @@ public class MapsFragment extends Fragment implements
     private UserDAO userDAO;
     private FriendRelationshipDAO friendRelationshipDAO;
     private FavouritePlaceDAO favouritePlaceDAO;
+    private HistoryPlaceDAO historyPlaceDAO;
     private String currentUserId;
 
     @Override
@@ -127,6 +130,7 @@ public class MapsFragment extends Fragment implements
         userDAO = new UserDAO();
         friendRelationshipDAO = new FriendRelationshipDAO();
         favouritePlaceDAO = new FavouritePlaceDAO();
+        historyPlaceDAO = new HistoryPlaceDAO();
 
         currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -264,6 +268,20 @@ public class MapsFragment extends Fragment implements
         return view;
     }
 
+    private void addNewHistoryPlaceToFirebase(Address placeAddress) {
+        HistoryPlace historyPlace = new HistoryPlace(currentUserId, placeAddress.getLatitude(), placeAddress.getLongitude(), placeAddress.getFeatureName(), placeAddress.getAddressLine(0));
+        historyPlaceDAO.insert(historyPlace);
+        checkingReplaceNewHistoryPlace();
+    }
+
+    private void checkingReplaceNewHistoryPlace() {
+        historyPlaceDAO.getHistoryPlaceList(currentUserId).observe(this, historyPlaceListRes -> {
+            if (historyPlaceListRes.size() > 10) {
+                historyPlaceDAO.delete(historyPlaceListRes.get(0).getId());
+            }
+        });
+    }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -318,10 +336,10 @@ public class MapsFragment extends Fragment implements
     private void setStatusForFavouritePlaceButton(FavouritePlaceEnum faPlaceEnum) {
         if (faPlaceEnum == FavouritePlaceEnum.Remove) {
             favouritePlaceEnum = FavouritePlaceEnum.Remove;
-            addFaPlaceBtn.setText("Remove favourite place");
+            addFaPlaceBtn.setText("Xóa địa điểm yêu thích");
         } else {
             favouritePlaceEnum = FavouritePlaceEnum.Add;
-            addFaPlaceBtn.setText("Add favourite place");
+            addFaPlaceBtn.setText("Thêm địa điểm yêu thích");
         }
     }
 
@@ -449,9 +467,11 @@ public class MapsFragment extends Fragment implements
             }
             if (addressList != null && !addressList.isEmpty()) {
                 Address address = addressList.get(0);
+                addNewHistoryPlaceToFirebase(address);
                 LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                 addDestinationPoint(latLng);
                 mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                turnOnPlaceDetailView(latLng);
             }
             Toast.makeText(this.getContext(), "Try another name please", Toast.LENGTH_LONG).show();
         }
@@ -637,7 +657,7 @@ public class MapsFragment extends Fragment implements
         if (requestCode == ACCESS_FINE_LOCATION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this.getContext(), "Activity Permission Granted", Toast.LENGTH_SHORT).show();
-
+                moveToMyLocation();
             } else {
                 Toast.makeText(this.getContext(), "Activity Permission Denied", Toast.LENGTH_SHORT).show();
             }
@@ -678,6 +698,7 @@ public class MapsFragment extends Fragment implements
                 currentUser.setProfileImg(bitmapDescriptor);
                 if (loadFirstTime.get()) {
                     moveToMyLocation();
+                    goToHistoryPlace();
                     loadFirstTime.set(false);
                 }
             });
@@ -723,8 +744,7 @@ public class MapsFragment extends Fragment implements
         return output;
     }
 
-    private void getBitmapDescriptorImg(String imgUrl, OnBitmapDescriptorLoadedListener
-            listener) {
+    private void getBitmapDescriptorImg(String imgUrl, OnBitmapDescriptorLoadedListener listener) {
         if (isAdded()) {
             Glide.with(this)
                     .asBitmap()
@@ -743,6 +763,7 @@ public class MapsFragment extends Fragment implements
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mGoogleMap = googleMap;
+        checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, ACCESS_FINE_LOCATION_CODE);
 
         // check permission
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -804,10 +825,22 @@ public class MapsFragment extends Fragment implements
                         renderAllMarker();
                     }
                 }
-
                 return true;
             }
         });
+    }
+
+    private void goToHistoryPlace() {
+        if (getArguments() != null) {
+            Bundle args = getArguments();
+            if (args != null && args.containsKey("historyPlace")) {
+                HistoryPlace historyPlace = args.getParcelable("historyPlace");
+                LatLng latLng = new LatLng(historyPlace.getLatitude(), historyPlace.getLongitude());
+                addDestinationPoint(latLng);
+                mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                turnOnPlaceDetailView(latLng);
+            }
+        }
     }
 
     private String formatDistance(double distanceInMeters) {
@@ -845,4 +878,3 @@ public class MapsFragment extends Fragment implements
         void onBitmapDescriptorLoaded(BitmapDescriptor bitmapDescriptor);
     }
 }
-
