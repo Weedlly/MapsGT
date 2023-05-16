@@ -6,11 +6,9 @@
     android:name="com.google.android.gms.maps.SupportMapFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="50dp"
     map:cameraTilt="30"
     map:mapId="@string/map_id"
     map:uiRotateGestures="true"
-    map:uiZoomControls="true"
     tools:context="ui.map.MapsFragment">
 
     <RelativeLayout
@@ -21,9 +19,9 @@
             android:id="@+id/topPanel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="50dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginLeft="65dp"
             android:layout_marginRight="50dp"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
             <EditText
@@ -52,13 +50,25 @@
             android:layout_marginTop="100dp"
             android:orientation="vertical">
 
-            <Button
-                android:id="@+id/btn_show_faPlace"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@color/cardview_light_background"
-                android:onClick="showFavouriteLocation"
-                android:text="Favourite" />
+            <RelativeLayout
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="8dp"
+                android:background="@drawable/background_icon">
+
+                <ImageButton
+                    android:id="@+id/btn_show_faPlace"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:src="@drawable/favourite_place"
+                    android:background="@null"
+                    android:padding="8dp"
+                    android:scaleType="fitCenter"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:onClick="showFavouriteLocation"/>
+
+            </RelativeLayout>
 
         </LinearLayout>
 
@@ -127,24 +137,13 @@
                         android:layout_height="wrap_content"
                         android:padding="8dp" />
 
-                    <TextView
-                        android:id="@+id/place_phone"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="8dp" />
-
-                    <TextView
-                        android:id="@+id/place_website"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="8dp" />
-
                     <Button
                         android:id="@+id/btn_add_faPlace"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="20dp"
-                        android:text="Add favourite place" />
+                        android:text="Add favourite place"
+                        />
                 </LinearLayout>
             </ScrollView>
 

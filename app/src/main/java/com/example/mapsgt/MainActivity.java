@@ -148,11 +148,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 replaceFragment(getLayoutResource(), new MapsFragment());
                 mCurrentFragment = FRAGMENT_HOME;
             }
-        } else if (id == R.id.nav_favorite) {
-            if (mCurrentFragment != FRAGMENT_FAVORITE) {
-                replaceFragment(getLayoutResource(), new FavoriteFragment());
-                mCurrentFragment = FRAGMENT_FAVORITE;
-            }
         } else if (id == R.id.nav_history) {
             if (mCurrentFragment != FRAGMENT_HISTORY) {
                 replaceFragment(getLayoutResource(), new HistoryFragment());

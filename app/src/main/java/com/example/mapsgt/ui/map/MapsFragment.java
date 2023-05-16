@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -96,14 +97,12 @@ public class MapsFragment extends Fragment implements
     private TextView durationTv;
     private TextView placeNameView;
     private TextView placeAddressView;
-    private TextView placePhoneView;
-    private TextView placeWebsiteView;
     private ViewGroup bottomPanel;
     private ViewGroup placeDetailScrollView;
     private Button startMovingBtn;
     private Button stopMovingBtn;
     private Button addFaPlaceBtn;
-    private Button showFaPlaceBtn;
+    private ImageButton showFaPlaceBtn;
     private LocationManager mLocationManager;
     private GoogleMap mGoogleMap;
     private Button mSearchButton;
@@ -158,8 +157,6 @@ public class MapsFragment extends Fragment implements
         showFaPlaceBtn = view.findViewById(R.id.btn_show_faPlace);
         placeNameView = view.findViewById(R.id.place_name);
         placeAddressView = view.findViewById(R.id.place_address);
-        placePhoneView = view.findViewById(R.id.place_phone);
-        placeWebsiteView = view.findViewById(R.id.place_website);
 
         bottomPanel = view.findViewById(R.id.bottom_panel);
         placeDetailScrollView = view.findViewById(R.id.scrollView);
@@ -292,6 +289,13 @@ public class MapsFragment extends Fragment implements
         mapFragment.getMapAsync(this);
 
         checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, ACCESS_FINE_LOCATION_CODE);
+        mapFragment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                // Tắt la bàn (compass)
+                googleMap.getUiSettings().setCompassEnabled(false);
+            }
+        });
     }
 
 
@@ -360,8 +364,6 @@ public class MapsFragment extends Fragment implements
                 Address address = addresses.get(0);
                 placeNameView.setText(address.getFeatureName());
                 placeAddressView.setText(address.getAddressLine(0));
-                placePhoneView.setText(address.getPhone());
-                placeWebsiteView.setText(address.getUrl());
             }
         } catch (IOException e) {
             e.printStackTrace();

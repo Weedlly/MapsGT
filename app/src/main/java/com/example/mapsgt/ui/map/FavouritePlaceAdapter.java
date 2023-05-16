@@ -42,7 +42,7 @@ public class FavouritePlaceAdapter extends BaseAdapter {
         if (convertView == null) {
             convertView = mInflater.inflate(R.layout.favourite_place_item, parent, false);
             holder = new ViewHolder();
-            holder.nameTextView = convertView.findViewById(R.id.place_name_tv);
+            holder.nameTextView = convertView.findViewById(R.id.place_lat_lng_tv);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
