@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mapsgt.R;
 import com.example.mapsgt.adapter.FriendAdapter;
+import com.example.mapsgt.data.dao.UserDAO;
 import com.example.mapsgt.data.entities.User;
 import com.example.mapsgt.ui.friends.PersonProfileActivity;
 
@@ -19,23 +20,24 @@ import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link FindUserFragment#newInstance} factory method to
+ * Use the {@link FoundUserFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FindUserFragment extends Fragment implements FriendAdapter.OnFriendsDetailListener {
+public class FoundUserFragment extends Fragment implements FriendAdapter.OnFriendsDetailListener {
     private static final String ARG_PARAM = "query";
-    public static String visit_user_id;
+    private static final String TAG = "FindUserFragment";
+    public static String visitUserId;
     private String mQuery;
     private RecyclerView rvUsers;
-    private FindUserViewModel mViewModel;
-    private ArrayList<User> users_list = new ArrayList<>();
+    private ArrayList<User> usersList = new ArrayList<>();
+    private UserDAO userDAO;
 
-    public FindUserFragment() {
+    public FoundUserFragment() {
         // Required empty public constructor
     }
 
-    public static FindUserFragment newInstance(String query) {
-        FindUserFragment fragment = new FindUserFragment();
+    public static FoundUserFragment newInstance(String query) {
+        FoundUserFragment fragment = new FoundUserFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM, query);
         fragment.setArguments(args);
@@ -48,43 +50,42 @@ public class FindUserFragment extends Fragment implements FriendAdapter.OnFriend
         if (getArguments() != null) {
             mQuery = getArguments().getString(ARG_PARAM);
         }
+        userDAO = new UserDAO();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_find_user, container, false);
+        View view = inflater.inflate(R.layout.fragment_found_user_list, container, false);
         rvUsers = view.findViewById(R.id.rcv_find_user);
         rvUsers.setLayoutManager(new LinearLayoutManager(getContext()));
-        mViewModel = new FindUserViewModel();
 
-        mViewModel.findFriendByEmail(mQuery).observe(getViewLifecycleOwner(), users -> {
-            users_list.clear();
-            users_list.add(users);
-            FriendAdapter friendAdapter = new FriendAdapter(getContext(), users_list, this);
-            rvUsers.setAdapter(friendAdapter);
-            //friendAdapter.notifyDataSetChanged();
+        userDAO.getByEmail(mQuery).observe(getViewLifecycleOwner(), userRes -> {
+            if (userRes != null) {
+                usersList.clear();
+                usersList.add(userRes);
+                FriendAdapter friendAdapter = new FriendAdapter(getContext(), usersList, this);
+                rvUsers.setAdapter(friendAdapter);
+            }
         });
 
-        mViewModel.findFriendByPhone(mQuery).observe(getViewLifecycleOwner(), users -> {
-            users_list.clear();
-            users_list.add(users);
-            FriendAdapter friendAdapter = new FriendAdapter(getContext(), users_list, this);
-            rvUsers.setAdapter(friendAdapter);
-            //friendAdapter.notifyDataSetChanged();
+        userDAO.getByPhone(mQuery).observe(getViewLifecycleOwner(), userRes -> {
+            if (userRes != null) {
+                usersList.clear();
+                usersList.add(userRes);
+                FriendAdapter friendAdapter = new FriendAdapter(getContext(), usersList, this);
+                rvUsers.setAdapter(friendAdapter);
+            }
         });
-        // Inflate the layout for this fragment
         return view;
     }
 
     @Override
     public void onFriendsDetailClick(int position) {
-        visit_user_id = users_list.get(position).getId();
+        visitUserId = usersList.get(position).getId();
 
         Intent intent = new Intent(getContext(), PersonProfileActivity.class);
-        intent.putExtra("visit_user_id", visit_user_id);
+        intent.putExtra("visit_user_id", visitUserId);
         startActivity(intent);
     }
-
-
 }

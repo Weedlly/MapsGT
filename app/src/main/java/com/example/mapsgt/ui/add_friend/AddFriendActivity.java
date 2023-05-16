@@ -18,7 +18,7 @@ import com.example.mapsgt.data.dao.UserDAO;
 import com.example.mapsgt.data.entities.User;
 import com.example.mapsgt.enumeration.UserGenderEnum;
 import com.example.mapsgt.ui.friends.PersonProfileActivity;
-import com.example.mapsgt.ui.add_friend.find_friend.FindUserFragment;
+import com.example.mapsgt.ui.add_friend.find_friend.FoundUserFragment;
 import com.example.mapsgt.ui.base.BaseActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -48,7 +48,7 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_friend);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Add Friend");
+        getSupportActionBar().setTitle("Thêm bạn bè");
         userDAO = new UserDAO();
 
         initializeFields();
@@ -59,7 +59,7 @@ public class AddFriendActivity extends BaseActivity implements FriendAdapter.OnF
         svUserSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String newText) {
-                replaceFragment(getLayoutResource(), FindUserFragment.newInstance(newText));
+                replaceFragment(getLayoutResource(), FoundUserFragment.newInstance(newText));
                 return false;
             }
 

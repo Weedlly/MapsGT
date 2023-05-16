@@ -1,9 +1,6 @@
 package com.example.mapsgt.adapter;
 
-import static android.content.ContentValues.TAG;
-
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -127,7 +124,6 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
                     mListUser = list;
 
                 }
-                Log.d(TAG, "List Filter: " + mListUser);
                 FilterResults filterResults = new FilterResults();
                 filterResults.values = mListUser;
 

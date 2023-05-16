@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -20,13 +19,12 @@
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/person_profile_pic"
-                android:layout_width="300dp"
-                android:layout_height="300dp"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="15dp"
                 android:src="@drawable/ic_profile" />
-
 
             <LinearLayout
                 android:id="@+id/linear_layout"
@@ -34,15 +32,15 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/person_profile_pic"
                 android:background="@drawable/background_icon"
-                android:orientation="vertical"
-                android:gravity="center">
+                android:gravity="center"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/person_profile_full_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:text="Profile Name"
+                    android:text="Huy Nguyen"
                     android:textAllCaps="false"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -57,29 +55,27 @@
                     android:textAllCaps="false"
                     android:textSize="18sp" />
 
-                <TextView
-                    android:id="@+id/person_profile_status"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/person_username"
-                    android:layout_marginTop="10dp"
-                    android:text="Status"
-                    android:textAlignment="center"
-                    android:textAllCaps="false"
+                <!--                <TextView-->
+                <!--                    android:id="@+id/person_profile_status"-->
+                <!--                    android:layout_width="wrap_content"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:layout_below="@+id/person_username"-->
+                <!--                    android:layout_marginTop="10dp"-->
+                <!--                    android:text="Status"-->
+                <!--                    android:textAlignment="center"-->
+                <!--                    android:textAllCaps="false"-->
+                <!--                    android:textSize="22sp" />-->
 
-                    android:textSize="22sp" />
-
-                <TextView
-                    android:id="@+id/person_country"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/person_profile_status"
-                    android:layout_marginTop="10dp"
-                    android:text="Country"
-                    android:textAlignment="center"
-                    android:textAllCaps="false"
-
-                    android:textSize="18sp" />
+                <!--                <TextView-->
+                <!--                    android:id="@+id/person_country"-->
+                <!--                    android:layout_width="wrap_content"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:layout_below="@+id/person_profile_status"-->
+                <!--                    android:layout_marginTop="10dp"-->
+                <!--                    android:text="Country"-->
+                <!--                    android:textAlignment="center"-->
+                <!--                    android:textAllCaps="false"-->
+                <!--                    android:textSize="18sp" />-->
 
                 <TextView
                     android:id="@+id/person_dob"
@@ -90,7 +86,6 @@
                     android:text="Date of Birth"
                     android:textAlignment="center"
                     android:textAllCaps="false"
-
                     android:textSize="18sp" />
 
                 <TextView
@@ -103,10 +98,8 @@
                     android:text="Gender"
                     android:textAlignment="center"
                     android:textAllCaps="false"
-
                     android:textSize="18sp" />
             </LinearLayout>
-
 
             <Button
                 android:id="@+id/person_send_friend_request_btn"
@@ -116,8 +109,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="20dp"
                 android:background="@color/design_default_color_primary_dark"
-                android:text="Send Friend Request"
-
+                android:text="Kết bạn"
                 android:textSize="16sp" />
 
             <Button
@@ -128,8 +120,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="8dp"
                 android:background="@color/design_default_color_primary"
-                android:text="Decline Friend Request"
-
+                android:text="Hủy yêu cầu kết bạn"
                 android:textSize="16sp" />
 
             <Button
@@ -140,8 +131,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="8dp"
                 android:background="@color/colorError"
-                android:text="Blocked"
-
+                android:text="Chặn"
                 android:textSize="16sp" />
         </RelativeLayout>
     </ScrollView>
