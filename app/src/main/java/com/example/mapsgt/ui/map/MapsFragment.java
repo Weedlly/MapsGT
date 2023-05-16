@@ -63,7 +63,14 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.ui.IconGenerator;
 
 import java.io.IOException;
@@ -194,11 +201,8 @@ public class MapsFragment extends Fragment implements
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String namePlace = input.getText().toString();
-                        FirebaseApp firebaseApp = FirebaseApp.getInstance();
-                        DatabaseReference databaseRef = FirebaseDatabase.getInstance(firebaseApp).getReference();
-                        DatabaseReference favoritePlacesRef = databaseRef.child("favourite_places");
                         FavouritePlace favoritePlace = new FavouritePlace(currentUserId, desMarker.getPosition().latitude, desMarker.getPosition().longitude, namePlace);
-                        favoritePlacesRef.push().setValue(favoritePlace);
+                        favouritePlaceDAO.insert(favoritePlace);
                         renderFavouriteLocation();
                         renderAllMarker();
                         LatLng latLng = desMarker.getPosition();
@@ -267,24 +271,16 @@ public class MapsFragment extends Fragment implements
         return view;
     }
 
-    void AddNewFavouritePlaceToFirebase(String namePlace) {
-        FirebaseApp firebaseApp = FirebaseApp.getInstance();
-        DatabaseReference databaseRef = FirebaseDatabase.getInstance(firebaseApp).getReference();
-        DatabaseReference favoritePlacesRef = databaseRef.child("favourite_places");
-        FavouritePlace favoritePlace = new FavouritePlace(currentUserId, desMarker.getPosition().latitude, desMarker.getPosition().longitude, namePlace);
-        favoritePlacesRef.push().setValue(favoritePlace);
-    }
-
-    void AddNewHistoryPlaceToFirebase(Address placeAddress) {
+    private void addNewHistoryPlaceToFirebase(Address placeAddress) {
         FirebaseApp firebaseApp = FirebaseApp.getInstance();
         DatabaseReference databaseRef = FirebaseDatabase.getInstance(firebaseApp).getReference();
         DatabaseReference favoritePlacesRef = databaseRef.child("history_places");
         HistoryPlace historyPlace = new HistoryPlace(currentUserId, placeAddress.getLatitude(), placeAddress.getLongitude(), placeAddress.getFeatureName(), placeAddress.getAddressLine(0));
         favoritePlacesRef.push().setValue(historyPlace);
-        CheckingReplaceNewHistoryPlace();
+        checkingReplaceNewHistoryPlace();
     }
 
-    void CheckingReplaceNewHistoryPlace() {
+    private void checkingReplaceNewHistoryPlace() {
         DatabaseReference historyPlacesRef = FirebaseDatabase.getInstance().getReference("history_places");
         Query query = historyPlacesRef.orderByChild("userId").equalTo(currentUserId);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -295,7 +291,6 @@ public class MapsFragment extends Fragment implements
                     HistoryPlace historyPlace = snapshot.getValue(HistoryPlace.class);
                     tmpHistoryPlaces.add(historyPlace);
                 }
-                Log.d(TAG, "onDataChange: " + tmpHistoryPlaces.size());
                 while (tmpHistoryPlaces.size() > 10) {
                     Log.d(TAG, "Replace: " + tmpHistoryPlaces.get(tmpHistoryPlaces.size() - 1).getName());
                     tmpHistoryPlaces.remove(0);
@@ -365,10 +360,10 @@ public class MapsFragment extends Fragment implements
     private void setStatusForFavouritePlaceButton(FavouritePlaceEnum faPlaceEnum) {
         if (faPlaceEnum == FavouritePlaceEnum.Remove) {
             favouritePlaceEnum = FavouritePlaceEnum.Remove;
-            addFaPlaceBtn.setText("Remove favourite place");
+            addFaPlaceBtn.setText("Xóa địa điểm yêu thích");
         } else {
             favouritePlaceEnum = FavouritePlaceEnum.Add;
-            addFaPlaceBtn.setText("Add favourite place");
+            addFaPlaceBtn.setText("Thêm địa điểm yêu thích");
         }
     }
 
@@ -496,7 +491,7 @@ public class MapsFragment extends Fragment implements
             }
             if (addressList != null && !addressList.isEmpty()) {
                 Address address = addressList.get(0);
-                AddNewHistoryPlaceToFirebase(address);
+                addNewHistoryPlaceToFirebase(address);
                 LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                 addDestinationPoint(latLng);
                 mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -726,12 +721,6 @@ public class MapsFragment extends Fragment implements
             getBitmapDescriptorImg(userRes.getProfilePicture(), (BitmapDescriptor bitmapDescriptor) -> {
                 currentUser.setProfileImg(bitmapDescriptor);
                 if (loadFirstTime.get()) {
-//                    checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, ACCESS_FINE_LOCATION_CODE);
-//                    Location locationGPS = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//                    if (currentUser != null && locationGPS != null) {
-//                        currentUser.setLatitude(locationGPS.getLatitude());
-//                        currentUser.setLongitude(locationGPS.getLongitude());
-//                    }
                     moveToMyLocation();
                     goToHistoryPlace();
                     loadFirstTime.set(false);
@@ -865,7 +854,7 @@ public class MapsFragment extends Fragment implements
         });
     }
 
-    void goToHistoryPlace() {
+    private void goToHistoryPlace() {
         if (getArguments() != null) {
             Bundle args = getArguments();
             if (args != null && args.containsKey("historyPlace")) {
