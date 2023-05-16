@@ -18,7 +18,8 @@ public class UserLocation {
         this.latitude = user.getLatitude();
         this.longitude = user.getLongitude();
     }
-    public UserLocation(String id, String displayName, boolean isSharing,double latitude, double longitude) {
+
+    public UserLocation(String id, String displayName, boolean isSharing, double latitude, double longitude) {
         this.id = id;
         this.displayName = displayName;
         this.isSharing = isSharing;

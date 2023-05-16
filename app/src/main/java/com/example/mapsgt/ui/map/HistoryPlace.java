@@ -13,6 +13,7 @@ public class HistoryPlace implements Parcelable {
     public HistoryPlace() {
         // Default constructor required for calls to DataSnapshot.getValue(FavoritePlace.class)
     }
+
     protected HistoryPlace(Parcel in) {
         userId = in.readString();
         latitude = in.readDouble();
@@ -46,6 +47,7 @@ public class HistoryPlace implements Parcelable {
         dest.writeString(name);
         dest.writeString(address);
     }
+
     public HistoryPlace(String userId, double latitude, double longitude, String name, String address) {
         this.userId = userId;
         this.latitude = latitude;
@@ -81,12 +83,15 @@ public class HistoryPlace implements Parcelable {
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
+
     public String getAddress() {
         return address;
     }
+
     public void setAddress(String address) {
         this.address = address;
     }

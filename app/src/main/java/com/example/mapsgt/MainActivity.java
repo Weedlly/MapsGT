@@ -13,7 +13,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.example.mapsgt.ui.add_friend.AddFriendActivity;
 import com.example.mapsgt.ui.add_friend.FriendsActivity;
@@ -53,8 +52,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         user = auth.getCurrentUser();
         if (user == null) {
             startActivity(AuthActivity.class);
-        }
-        else {
+        } else {
             AccountFirebaseUtil.checkEmailExists(user.getEmail(), (Boolean exists) -> {
                 if (!exists) {
                     startActivity(AuthActivity.class);
@@ -85,6 +83,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, ACCESS_FINE_LOCATION_CODE);
     }
+
     private void checkPermission(String permission, int requestCode) {
         // Checking if permission is not granted
         if (ContextCompat.checkSelfPermission(this.getBaseContext(), permission) == PackageManager.PERMISSION_DENIED) {

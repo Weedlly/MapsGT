@@ -45,7 +45,6 @@ import com.example.mapsgt.data.dao.FriendRelationshipDAO;
 import com.example.mapsgt.data.dao.UserDAO;
 import com.example.mapsgt.data.dto.UserLocation;
 import com.example.mapsgt.data.entities.Friend;
-import com.example.mapsgt.data.entities.User;
 import com.example.mapsgt.enumeration.MovingStyleEnum;
 import com.example.mapsgt.network.RetrofitClient;
 import com.example.mapsgt.network.model.location.LocationResponse;
@@ -84,10 +83,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-enum FavouritePlaceEnum{
+enum FavouritePlaceEnum {
     Remove,
     Add
 }
+
 public class MapsFragment extends Fragment implements
         LocationListener, OnMapReadyCallback {
     private static final String TAG = "LocationFragment";
@@ -192,7 +192,7 @@ public class MapsFragment extends Fragment implements
             }
         });
         btn_add_faPlace.setOnClickListener(viewAddFaPlace -> {
-            if(favouritePlaceEnum == FavouritePlaceEnum.Add) {
+            if (favouritePlaceEnum == FavouritePlaceEnum.Add) {
                 final EditText input = new EditText(getContext());
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setTitle("Favourite place");
@@ -220,8 +220,7 @@ public class MapsFragment extends Fragment implements
                 });
                 AlertDialog dialog = builder.create();
                 dialog.show();
-            }
-            else if(favouritePlaceEnum == FavouritePlaceEnum.Remove){
+            } else if (favouritePlaceEnum == FavouritePlaceEnum.Remove) {
                 Query query = FirebaseDatabase.getInstance().getReference("favourite_places")
                         .orderByChild("userId")
                         .equalTo(currentUserId);
@@ -233,7 +232,7 @@ public class MapsFragment extends Fragment implements
                                 LatLng latLng = desMarker.getPosition();
                                 String favouritePlaceId = dataSnapshot.getKey();
                                 FavouritePlace place = dataSnapshot.getValue(FavouritePlace.class);
-                                if (place.getLatitude() == latLng.latitude && place.getLongitude() == latLng.longitude){
+                                if (place.getLatitude() == latLng.latitude && place.getLongitude() == latLng.longitude) {
                                     FirebaseDatabase database = FirebaseDatabase.getInstance();
                                     DatabaseReference favouritePlaceRef = database.getReference("favourite_places").child(favouritePlaceId);
                                     favouritePlaceRef.removeValue()
@@ -257,6 +256,7 @@ public class MapsFragment extends Fragment implements
                             }
                         }
                     }
+
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
                         Log.e(TAG, "Error removing favourite place");
@@ -291,22 +291,25 @@ public class MapsFragment extends Fragment implements
         });
         return view;
     }
-    void AddNewFavouritePlaceToFirebase(String namePlace){
+
+    void AddNewFavouritePlaceToFirebase(String namePlace) {
         FirebaseApp firebaseApp = FirebaseApp.getInstance();
         DatabaseReference databaseRef = FirebaseDatabase.getInstance(firebaseApp).getReference();
         DatabaseReference favoritePlacesRef = databaseRef.child("favourite_places");
         FavouritePlace favoritePlace = new FavouritePlace(currentUserId, desMarker.getPosition().latitude, desMarker.getPosition().longitude, namePlace);
         favoritePlacesRef.push().setValue(favoritePlace);
     }
-    void AddNewHistoryPlaceToFirebase(Address placeAddress){
+
+    void AddNewHistoryPlaceToFirebase(Address placeAddress) {
         FirebaseApp firebaseApp = FirebaseApp.getInstance();
         DatabaseReference databaseRef = FirebaseDatabase.getInstance(firebaseApp).getReference();
         DatabaseReference favoritePlacesRef = databaseRef.child("history_places");
-        HistoryPlace historyPlace = new HistoryPlace(currentUserId, placeAddress.getLatitude(), placeAddress.getLongitude(), placeAddress.getFeatureName(),placeAddress.getAddressLine(0));
+        HistoryPlace historyPlace = new HistoryPlace(currentUserId, placeAddress.getLatitude(), placeAddress.getLongitude(), placeAddress.getFeatureName(), placeAddress.getAddressLine(0));
         favoritePlacesRef.push().setValue(historyPlace);
         CheckingReplaceNewHistoryPlace();
     }
-    void CheckingReplaceNewHistoryPlace(){
+
+    void CheckingReplaceNewHistoryPlace() {
         DatabaseReference historyPlacesRef = FirebaseDatabase.getInstance().getReference("history_places");
         Query query = historyPlacesRef.orderByChild("userId").equalTo(currentUserId);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -319,11 +322,12 @@ public class MapsFragment extends Fragment implements
                 }
                 Log.d(TAG, "onDataChange: " + tmpHistoryPlaces.size());
                 while (tmpHistoryPlaces.size() > 10) {
-                    Log.d(TAG, "Replace: " + tmpHistoryPlaces.get(tmpHistoryPlaces.size() -1 ).getName());
+                    Log.d(TAG, "Replace: " + tmpHistoryPlaces.get(tmpHistoryPlaces.size() - 1).getName());
                     tmpHistoryPlaces.remove(0);
                     historyPlacesRef.setValue(tmpHistoryPlaces);
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 // Handle the error case if the query is canceled or fails
@@ -331,6 +335,7 @@ public class MapsFragment extends Fragment implements
             }
         });
     }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -368,37 +373,41 @@ public class MapsFragment extends Fragment implements
         FavouritePlaceEnum faPlaceEnum = GetStatusOfFavouritePlace(latLng);
         SetStatusForFavouritePlaceButton(faPlaceEnum);
         TurnOnPlaceDetailView(latLng);
-        Log.d(TAG, "origin: " + currentUser.getLatitude() +"," +currentUser.getLongitude());
-        Log.d(TAG, "des: "+ latLng);
+        Log.d(TAG, "origin: " + currentUser.getLatitude() + "," + currentUser.getLongitude());
+        Log.d(TAG, "des: " + latLng);
         getDirection(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), latLng);
 
     }
-    FavouritePlaceEnum GetStatusOfFavouritePlace(LatLng latLng){
-        for (FavouritePlace place: favouritePlaces) {
-            if(place.getLatitude() == latLng.latitude && place.getLongitude() == latLng.longitude){
+
+    FavouritePlaceEnum GetStatusOfFavouritePlace(LatLng latLng) {
+        for (FavouritePlace place : favouritePlaces) {
+            if (place.getLatitude() == latLng.latitude && place.getLongitude() == latLng.longitude) {
                 return FavouritePlaceEnum.Remove;
             }
         }
         return FavouritePlaceEnum.Add;
     }
-    void SetStatusForFavouritePlaceButton(FavouritePlaceEnum faPlaceEnum){
-        if (faPlaceEnum == FavouritePlaceEnum.Remove){
+
+    void SetStatusForFavouritePlaceButton(FavouritePlaceEnum faPlaceEnum) {
+        if (faPlaceEnum == FavouritePlaceEnum.Remove) {
             favouritePlaceEnum = FavouritePlaceEnum.Remove;
             btn_add_faPlace.setText("Remove favourite place");
-        }
-        else{
+        } else {
             favouritePlaceEnum = FavouritePlaceEnum.Add;
             btn_add_faPlace.setText("Add favourite place");
         }
     }
-    void TurnOnPlaceDetailView(LatLng latLng){
+
+    void TurnOnPlaceDetailView(LatLng latLng) {
         detailPlace(latLng);
         placeDetailScrollView.setVisibility(View.VISIBLE);
     }
-    void TurnOffPlaceDetailView(){
+
+    void TurnOffPlaceDetailView() {
         placeDetailScrollView.setVisibility(View.GONE);
     }
-    void detailPlace(LatLng latLng){
+
+    void detailPlace(LatLng latLng) {
         Geocoder geocoder = new Geocoder(getContext());
         try {
             List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
@@ -458,7 +467,8 @@ public class MapsFragment extends Fragment implements
             }
         });
     }
-    public void renderFavouriteLocation(){
+
+    public void renderFavouriteLocation() {
         favouritePlaces.clear();
         FirebaseDatabase.getInstance().getReference("favourite_places").orderByChild("userId")
                 .equalTo(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -477,7 +487,8 @@ public class MapsFragment extends Fragment implements
                     }
                 });
     }
-    public void showFavouriteLocation(View view){
+
+    public void showFavouriteLocation(View view) {
         favouritePlaces.clear();
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Favourite places");
@@ -492,7 +503,7 @@ public class MapsFragment extends Fragment implements
                             FavouritePlace place = placeSnapshot.getValue(FavouritePlace.class);
                             favouritePlaces.add(place);
                         }
-                        FavouritePlaceAdapter adapter = new FavouritePlaceAdapter(getContext(),favouritePlaces);
+                        FavouritePlaceAdapter adapter = new FavouritePlaceAdapter(getContext(), favouritePlaces);
                         listView.setAdapter(adapter);
                         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                             @Override
@@ -513,6 +524,7 @@ public class MapsFragment extends Fragment implements
                 });
         builder.create().show();
     }
+
     public void searchLocation(View view) {
         EditText locationSearch = getView().findViewById(R.id.editText);
         String location = locationSearch.getText().toString().trim();
@@ -629,16 +641,18 @@ public class MapsFragment extends Fragment implements
         Marker marker = mGoogleMap.addMarker(markerOptions);
         marker.setTag(userLocation.getId());
     }
-    private void removeFavouritePlace(LatLng latLng){
-        for (FavouritePlace place:favouritePlaces) {
-            if(place.getLongitude() == latLng.longitude &&  place.getLatitude() == latLng.latitude){
+
+    private void removeFavouritePlace(LatLng latLng) {
+        for (FavouritePlace place : favouritePlaces) {
+            if (place.getLongitude() == latLng.longitude && place.getLatitude() == latLng.latitude) {
                 favouritePlaces.remove(place);
             }
         }
     }
+
     private void renderFavouritePlaceMarker() {
-        for (FavouritePlace place: favouritePlaces) {
-            LatLng latLng = new LatLng(place.getLatitude(),place.getLongitude());
+        for (FavouritePlace place : favouritePlaces) {
+            LatLng latLng = new LatLng(place.getLatitude(), place.getLongitude());
             TextView title = new TextView(getContext());
             title.setText(place.getName());
             IconGenerator generator = new IconGenerator(getContext());
@@ -844,7 +858,7 @@ public class MapsFragment extends Fragment implements
                     public boolean onMyLocationButtonClick() {
                         try {
                             moveToMyLocation();
-                        } catch (Exception e){
+                        } catch (Exception e) {
                             Log.d(TAG, "onMyLocationButtonClick: " + e);
                         }
                         return true;
@@ -878,11 +892,10 @@ public class MapsFragment extends Fragment implements
             @Override
             public boolean onMarkerClick(Marker marker) {
 
-                if (marker.getSnippet() != null){
+                if (marker.getSnippet() != null) {
                     if ("favourite-place".equals(marker.getSnippet())) {
                         addDestinationPoint(marker.getPosition());
-                    }
-                    else if (marker.getPosition().latitude != currentUser.getLatitude() || marker.getPosition().longitude != currentUser.getLongitude()) {
+                    } else if (marker.getPosition().latitude != currentUser.getLatitude() || marker.getPosition().longitude != currentUser.getLongitude()) {
                         mapManagement.setGoingToFriend(true);
                         mapManagement.setGoingFriendId((String) marker.getTag());
                         renderAllMarker();
@@ -892,7 +905,8 @@ public class MapsFragment extends Fragment implements
             }
         });
     }
-    void goToHistoryPlace(){
+
+    void goToHistoryPlace() {
         if (getArguments() != null) {
             Bundle args = getArguments();
             if (args != null && args.containsKey("historyPlace")) {
@@ -904,6 +918,7 @@ public class MapsFragment extends Fragment implements
             }
         }
     }
+
     private String formatDistance(double distanceInMeters) {
         if (distanceInMeters < 1000) {
             // Round the distance to the nearest 10 meters.

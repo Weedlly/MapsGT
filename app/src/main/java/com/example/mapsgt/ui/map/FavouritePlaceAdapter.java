@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.example.mapsgt.R;
 
 import java.util.List;
+
 public class FavouritePlaceAdapter extends BaseAdapter {
     private List<FavouritePlace> mFavouritePlaces;
     private LayoutInflater mInflater;
