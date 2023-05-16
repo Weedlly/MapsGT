@@ -1,30 +1,23 @@
 package com.example.mapsgt.ui.navigation;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.mapsgt.MainActivity;
 import com.example.mapsgt.R;
-import com.example.mapsgt.ui.map.HistoryPlace;
+import com.example.mapsgt.data.entities.HistoryPlace;
 import com.example.mapsgt.ui.map.HistoryPlaceAdapter;
 import com.example.mapsgt.ui.map.MapsFragment;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;

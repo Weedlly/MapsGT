@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mapsgt.R;
+import com.example.mapsgt.data.entities.HistoryPlace;
 
 import java.util.List;
 

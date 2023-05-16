@@ -1,9 +1,10 @@
-package com.example.mapsgt.ui.map;
+package com.example.mapsgt.data.entities;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 public class HistoryPlace implements Parcelable {
+    private String id;
     private String userId;
     private double latitude;
     private double longitude;
@@ -96,5 +97,12 @@ public class HistoryPlace implements Parcelable {
         this.address = address;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 }
 

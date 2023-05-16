@@ -44,9 +44,11 @@ import com.example.mapsgt.R;
 import com.example.mapsgt.data.dao.DAOCallback;
 import com.example.mapsgt.data.dao.FavouritePlaceDAO;
 import com.example.mapsgt.data.dao.FriendRelationshipDAO;
+import com.example.mapsgt.data.dao.HistoryPlaceDAO;
 import com.example.mapsgt.data.dao.UserDAO;
 import com.example.mapsgt.data.dto.UserLocation;
 import com.example.mapsgt.data.entities.Friend;
+import com.example.mapsgt.data.entities.HistoryPlace;
 import com.example.mapsgt.enumeration.MovingStyleEnum;
 import com.example.mapsgt.network.RetrofitClient;
 import com.example.mapsgt.network.model.location.LocationResponse;
@@ -63,14 +65,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.ui.IconGenerator;
 
 import java.io.IOException;
@@ -122,6 +117,7 @@ public class MapsFragment extends Fragment implements
     private UserDAO userDAO;
     private FriendRelationshipDAO friendRelationshipDAO;
     private FavouritePlaceDAO favouritePlaceDAO;
+    private HistoryPlaceDAO historyPlaceDAO;
     private String currentUserId;
 
     @Override
@@ -134,6 +130,7 @@ public class MapsFragment extends Fragment implements
         userDAO = new UserDAO();
         friendRelationshipDAO = new FriendRelationshipDAO();
         favouritePlaceDAO = new FavouritePlaceDAO();
+        historyPlaceDAO = new HistoryPlaceDAO();
 
         currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -272,36 +269,15 @@ public class MapsFragment extends Fragment implements
     }
 
     private void addNewHistoryPlaceToFirebase(Address placeAddress) {
-        FirebaseApp firebaseApp = FirebaseApp.getInstance();
-        DatabaseReference databaseRef = FirebaseDatabase.getInstance(firebaseApp).getReference();
-        DatabaseReference favoritePlacesRef = databaseRef.child("history_places");
         HistoryPlace historyPlace = new HistoryPlace(currentUserId, placeAddress.getLatitude(), placeAddress.getLongitude(), placeAddress.getFeatureName(), placeAddress.getAddressLine(0));
-        favoritePlacesRef.push().setValue(historyPlace);
+        historyPlaceDAO.insert(historyPlace);
         checkingReplaceNewHistoryPlace();
     }
 
     private void checkingReplaceNewHistoryPlace() {
-        DatabaseReference historyPlacesRef = FirebaseDatabase.getInstance().getReference("history_places");
-        Query query = historyPlacesRef.orderByChild("userId").equalTo(currentUserId);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                List<HistoryPlace> tmpHistoryPlaces = new ArrayList<>();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    HistoryPlace historyPlace = snapshot.getValue(HistoryPlace.class);
-                    tmpHistoryPlaces.add(historyPlace);
-                }
-                while (tmpHistoryPlaces.size() > 10) {
-                    Log.d(TAG, "Replace: " + tmpHistoryPlaces.get(tmpHistoryPlaces.size() - 1).getName());
-                    tmpHistoryPlaces.remove(0);
-                    historyPlacesRef.setValue(tmpHistoryPlaces);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle the error case if the query is canceled or fails
-                Log.d(TAG, databaseError.toString());
+        historyPlaceDAO.getHistoryPlaceList(currentUserId).observe(this, historyPlaceListRes -> {
+            if (historyPlaceListRes.size() > 10) {
+                historyPlaceDAO.delete(historyPlaceListRes.get(0).getId());
             }
         });
     }
