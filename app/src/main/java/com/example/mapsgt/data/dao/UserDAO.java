@@ -33,9 +33,11 @@ public class UserDAO extends RealtimeDatabase<User> {
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    User user = snapshot.getValue(User.class);
-                    liveData.setValue(user);
+                if (snapshot.hasChildren()) {
+                    for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                        User user = userSnapshot.getValue(User.class);
+                        liveData.setValue(user);
+                    }
                 } else {
                     liveData.setValue(null);
                 }
@@ -56,9 +58,11 @@ public class UserDAO extends RealtimeDatabase<User> {
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    User user = snapshot.getValue(User.class);
-                    liveData.setValue(user);
+                if (snapshot.hasChildren()) {
+                    for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                        User user = userSnapshot.getValue(User.class);
+                        liveData.setValue(user);
+                    }
                 } else {
                     liveData.setValue(null);
                 }

@@ -3,13 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/white"
-    tools:context=".ui.add_friend.find_friend.FindUserFragment">
+    android:orientation="vertical"
+    tools:context=".ui.add_friend.find_friend.FoundUserFragment"
+    tools:ignore="MissingDefaultResource">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcv_find_user"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/background_icon_gray"/>
+        android:background="@drawable/background_icon_gray" />
 </LinearLayout>
