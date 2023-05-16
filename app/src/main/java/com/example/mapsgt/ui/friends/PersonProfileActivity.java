@@ -338,7 +338,7 @@ public class PersonProfileActivity extends AppCompatActivity {
 
                         blockFriendBtn.setVisibility(View.VISIBLE);
                         blockFriendBtn.setEnabled(true);
-                        blockFriendBtn.setText("Chặn");
+                        blockFriendBtn.setText("Gỡ chặn");
                         isBlocked = true;
 
                         blockFriendBtn.setOnClickListener(new View.OnClickListener() {
