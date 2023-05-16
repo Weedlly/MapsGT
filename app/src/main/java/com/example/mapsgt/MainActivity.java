@@ -7,6 +7,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -54,20 +55,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private ImageView ivUserAvatar;
     private ImageView ivEdit;
     private UserDAO userDAO;
-    @Override
-    protected void onStart() {
-        super.onStart();
-        user = auth.getCurrentUser();
-        if (user == null) {
-            startActivity(AuthActivity.class);
-        } else {
-            AccountFirebaseUtil.checkEmailExists(user.getEmail(), (Boolean exists) -> {
-                if (!exists) {
-                    startActivity(AuthActivity.class);
-                }
-            });
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,18 +77,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         tvUserName = headerView.findViewById(R.id.tv_name);
         tvUserPhone = headerView.findViewById(R.id.tv_phone);
         ivUserAvatar = headerView.findViewById(R.id.iv_avatar);
-
-        if (user != null) {
-            userDAO.getByKey(user.getUid()).observe(this, user -> {
-                if (user != null) {
-                    tvUserName.setText(user.getFirstName() + " " + user.getLastName());
-                    tvUserPhone.setText(user.getPhone());
-                    Glide.with(this).load(user.getProfilePicture()).into(ivUserAvatar);
-                }
-            });
-
-        }
-
         ivEdit = headerView.findViewById(R.id.iv_edit);
 
         navigationView.setNavigationItemSelectedListener(this);
@@ -111,6 +86,29 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         navigationView.getMenu().findItem(R.id.nav_home).setChecked(true);
 
         checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, ACCESS_FINE_LOCATION_CODE);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        user = auth.getCurrentUser();
+        if (user == null) {
+            startActivity(AuthActivity.class);
+        } else {
+            AccountFirebaseUtil.checkEmailExists(user.getEmail(), (Boolean exists) -> {
+                if (!exists) {
+                    startActivity(AuthActivity.class);
+                } else {
+                    userDAO.getByKey(user.getUid()).observe(this, userRes -> {
+                        if (userRes != null) {
+                            tvUserName.setText(userRes.getFirstName() + " " + userRes.getLastName());
+                            tvUserPhone.setText(userRes.getPhone());
+                            Glide.with(this).load(userRes.getProfilePicture()).into(ivUserAvatar);
+                        }
+                    });
+                }
+            });
+        }
     }
 
     private void checkPermission(String permission, int requestCode) {
