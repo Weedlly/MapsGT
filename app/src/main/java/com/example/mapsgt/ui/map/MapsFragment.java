@@ -63,11 +63,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.FirebaseApp;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.maps.android.ui.IconGenerator;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -117,18 +114,19 @@ public class MapsFragment extends Fragment implements
     private MapManagement mapManagement;
     private UserDAO userDAO;
     private FriendRelationshipDAO friendRelationshipDAO;
+    private FavouritePlaceDAO favouritePlaceDAO;
     private String currentUserId;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mapManagement = new MapManagement();
-//        mDatabase = FirebaseDatabase.getInstance().getReference();
         movementHistoryPolylineOptions = new PolylineOptions()
                 .color(Color.LTGRAY)
                 .width(8f);
         userDAO = new UserDAO();
         friendRelationshipDAO = new FriendRelationshipDAO();
+        favouritePlaceDAO = new FavouritePlaceDAO();
 
         currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -161,7 +159,7 @@ public class MapsFragment extends Fragment implements
 
         bottomPanel = view.findViewById(R.id.bottom_panel);
         placeDetailScrollView = view.findViewById(R.id.scrollView);
-        TurnOffPlaceDetailView();
+        turnOffPlaceDetailView();
 
         startMovingBtn.setOnClickListener(view1 -> {
             mapManagement.setMapMode(MapMode.MOVING);
@@ -201,7 +199,7 @@ public class MapsFragment extends Fragment implements
                         renderFavouriteLocation();
                         renderAllMarker();
                         LatLng latLng = desMarker.getPosition();
-                        TurnOnPlaceDetailView(latLng);
+                        turnOnPlaceDetailView(latLng);
                         getDirection(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), latLng);
                         addFaPlaceBtn.setText("Remove favourite place");
                         favouritePlaceEnum = FavouritePlaceEnum.Remove;
@@ -302,13 +300,13 @@ public class MapsFragment extends Fragment implements
         renderAllMarker();
         desMarker = mGoogleMap.addMarker(options);
 
-        FavouritePlaceEnum faPlaceEnum = GetStatusOfFavouritePlace(latLng);
-        SetStatusForFavouritePlaceButton(faPlaceEnum);
-        TurnOnPlaceDetailView(latLng);
+        FavouritePlaceEnum faPlaceEnum = getStatusOfFavouritePlace(latLng);
+        setStatusForFavouritePlaceButton(faPlaceEnum);
+        turnOnPlaceDetailView(latLng);
         getDirection(new LatLng(currentUser.getLatitude(), currentUser.getLongitude()), latLng);
     }
 
-    private FavouritePlaceEnum GetStatusOfFavouritePlace(LatLng latLng) {
+    private FavouritePlaceEnum getStatusOfFavouritePlace(LatLng latLng) {
         for (FavouritePlace place : favouritePlaces) {
             if (place.getLatitude() == latLng.latitude && place.getLongitude() == latLng.longitude) {
                 return FavouritePlaceEnum.Remove;
@@ -317,23 +315,22 @@ public class MapsFragment extends Fragment implements
         return FavouritePlaceEnum.Add;
     }
 
-    private void SetStatusForFavouritePlaceButton(FavouritePlaceEnum faPlaceEnum){
-        if (faPlaceEnum == FavouritePlaceEnum.Remove){
+    private void setStatusForFavouritePlaceButton(FavouritePlaceEnum faPlaceEnum) {
+        if (faPlaceEnum == FavouritePlaceEnum.Remove) {
             favouritePlaceEnum = FavouritePlaceEnum.Remove;
             addFaPlaceBtn.setText("Remove favourite place");
-        }
-        else{
+        } else {
             favouritePlaceEnum = FavouritePlaceEnum.Add;
             addFaPlaceBtn.setText("Add favourite place");
         }
     }
 
-    private void TurnOnPlaceDetailView(LatLng latLng) {
+    private void turnOnPlaceDetailView(LatLng latLng) {
         detailPlace(latLng);
         placeDetailScrollView.setVisibility(View.VISIBLE);
     }
 
-    private void TurnOffPlaceDetailView() {
+    private void turnOffPlaceDetailView() {
         placeDetailScrollView.setVisibility(View.GONE);
     }
 
@@ -400,22 +397,12 @@ public class MapsFragment extends Fragment implements
 
     public void renderFavouriteLocation() {
         favouritePlaces.clear();
-        FirebaseDatabase.getInstance().getReference("favourite_places").orderByChild("userId")
-                .equalTo(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for (DataSnapshot placeSnapshot : snapshot.getChildren()) {
-                            FavouritePlace place = placeSnapshot.getValue(FavouritePlace.class);
-                            favouritePlaces.add(place);
-                        }
-                        renderFavouritePlaceMarker();
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        Log.e(TAG, "Failed to get favourite places", error.toException());
-                    }
-                });
+        favouritePlaceDAO.getFavoritePlaceList(currentUserId).observe(this, favouritePlacesRes -> {
+            if (favouritePlacesRes != null) {
+                favouritePlaces.addAll(favouritePlacesRes);
+                renderFavouritePlaceMarker();
+            }
+        });
     }
 
     public void showFavouriteLocation(View view) {
@@ -509,7 +496,7 @@ public class MapsFragment extends Fragment implements
     private void renderAllMarker() {
         // clear marker
         mGoogleMap.clear();
-        TurnOffPlaceDetailView();
+        turnOffPlaceDetailView();
         // user location
         renderUserMarker(currentUser);
         // favourite place
@@ -687,7 +674,6 @@ public class MapsFragment extends Fragment implements
 
         userDAO.getByKey(currentUserId).observe(this, userRes -> {
             currentUser = new UserLocation(userRes);
-            Log.d(TAG, "getUserInfo: " + currentUser.isSharing());
             getBitmapDescriptorImg(userRes.getProfilePicture(), (BitmapDescriptor bitmapDescriptor) -> {
                 currentUser.setProfileImg(bitmapDescriptor);
                 if (loadFirstTime.get()) {
