@@ -37,7 +37,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     private static final int ACCESS_FINE_LOCATION_CODE = 100;
     private static final int FRAGMENT_HOME = 0;
-    private static final int FRAGMENT_FAVORITE = 1;
     private static final int FRAGMENT_HISTORY = 2;
     private static final int ACTIVITY_ADD_FRIEND = 3;
     private static final int ACTIVITY_FEEDBACK = 4;

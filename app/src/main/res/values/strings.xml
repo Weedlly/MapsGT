@@ -21,22 +21,22 @@
     <string name="forgot_password">Forgot password?</string>
     <string name="search_hint" />
     <string name="action_search">Search friends</string>
-    <string name="nav_home">Home</string>
+    <string name="nav_home">Trang chủ</string>
     <string name="nav_favorite">Favorite</string>
-    <string name="nav_history">History</string>
+    <string name="nav_history">Lịch sử tìm kiếm</string>
     <string name="nav_account">Account</string>
-    <string name="nav_my_profile">My Profile</string>
-    <string name="nav_add_friend">Add Friend</string>
+    <string name="nav_my_profile">Hồ sơ</string>
+    <string name="nav_add_friend">Kết bạn</string>
     <string name="nav_security">Security</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_log_out">Log out</string>
+    <string name="nav_log_out">Đăng xuất</string>
     <string name="search_position">Nhập địa điểm muốn đến</string>
     <string name="chat">chat</string>
     <string name="tracking_enabled_notif">Tracking is currently enabled.</string>
-    <string name="nav_feedback">Feedback</string>
+    <string name="nav_feedback">Đánh giá</string>
     <string name="update_text">Cập nhật</string>
-    <string name="nav_chat">Chat</string>
+    <string name="nav_chat">Tin nhắn</string>
 
 </resources>
