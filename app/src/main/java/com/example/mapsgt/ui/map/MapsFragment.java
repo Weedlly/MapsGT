@@ -488,31 +488,29 @@ public class MapsFragment extends Fragment implements
     }
 
     private void showFriendLocation() {
-        Boolean isTracking = currentUser.isSharing();
-        if (isTracking) {
-            friendList.forEach((friendItem) -> {
-                userDAO.getByKey(friendItem.getId()).observe(getViewLifecycleOwner(), friend -> {
-                    Optional<UserLocation> friendOptional = friendLocations.stream().filter(item -> item.getId().equals(friend.getId())).findFirst();
-                    if (friendOptional.isPresent()) {
-                        UserLocation foundFriend = friendOptional.get();
+        friendList.forEach((friendItem) -> {
+            userDAO.getByKey(friendItem.getId()).observe(getViewLifecycleOwner(), friend -> {
+                Optional<UserLocation> friendOptional = friendLocations.stream().filter(item -> item.getId().equals(friend.getId())).findFirst();
+                if (friendOptional.isPresent()) {
+                    UserLocation foundFriend = friendOptional.get();
 
-                        foundFriend.setIsSharing(friend.getIsSharing());
-                        foundFriend.setLatitude(friend.getLatitude());
-                        foundFriend.setLongitude(friend.getLongitude());
+                    foundFriend.setIsSharing(friend.getIsSharing());
+                    foundFriend.setLatitude(friend.getLatitude());
+                    foundFriend.setLongitude(friend.getLongitude());
 
+                    renderAllMarker();
+                } else {
+                    UserLocation friendLocation = new UserLocation(friend);
+
+                    getBitmapDescriptorImg(friend.getProfilePicture(), (BitmapDescriptor bitmapDescriptor) -> {
+                        friendLocation.setProfileImg(bitmapDescriptor);
+                        friendLocations.add(friendLocation);
                         renderAllMarker();
-                    } else {
-                        UserLocation friendLocation = new UserLocation(friend);
-
-                        getBitmapDescriptorImg(friend.getProfilePicture(), (BitmapDescriptor bitmapDescriptor) -> {
-                            friendLocation.setProfileImg(bitmapDescriptor);
-                            friendLocations.add(friendLocation);
-                            renderAllMarker();
-                        });
-                    }
-                });
+                    });
+                }
             });
-        }
+        });
+
     }
 
     private void renderAllMarker() {
@@ -817,7 +815,6 @@ public class MapsFragment extends Fragment implements
         mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-
                 if (marker.getSnippet() != null) {
                     if ("favourite-place".equals(marker.getSnippet())) {
                         addDestinationPoint(marker.getPosition());
@@ -825,6 +822,7 @@ public class MapsFragment extends Fragment implements
                         mapManagement.setGoingToFriend(true);
                         mapManagement.setGoingFriendId((String) marker.getTag());
                         renderAllMarker();
+                        turnOnPlaceDetailView(marker.getPosition());
                     }
                 }
                 return true;
